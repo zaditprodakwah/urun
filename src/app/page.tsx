@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+
 
 // Simulated bot responses based on real database seeds and webhook implementation
 interface Message {
@@ -205,6 +207,9 @@ export default function Home() {
             <a href="#about" className="text-sm text-zinc-400 hover:text-white transition-colors">Visi & Pilar</a>
             <a href="#compliance" className="text-sm text-zinc-400 hover:text-white transition-colors">7 Aturan Sakral</a>
             <a href="#simulator" className="text-sm text-zinc-400 hover:text-white transition-colors">Simulator WhatsApp</a>
+            <Link href="/catalog" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors border-l border-zinc-800 pl-6">Katalog Publik</Link>
+            <Link href="/leaderboard" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">Papan Peringkat</Link>
+            <Link href="/multisig" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">Dashboard Multi-Sig</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -229,6 +234,30 @@ export default function Home() {
           <p className="text-lg text-zinc-400 max-w-2xl leading-relaxed">
             URUN adalah platform operasi komunitas mikro yang dirancang untuk merobohkan monopoli ekonomi ekstraktif. Melalui integrasi WhatsApp Webhook yang mulus dan arsitektur database yang kebal, URUN mempertemukan kebersamaan warga secara nyata dan terdesentralisasi.
           </p>
+
+          <div className="flex flex-wrap gap-4 pt-3 pb-2">
+            <Link 
+              href="/catalog" 
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-bold hover:from-emerald-400 hover:to-emerald-300 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-emerald-500/20 text-sm active:scale-95"
+            >
+              <span>Etalase Katalog Publik</span>
+              <span className="text-base font-bold">➔</span>
+            </Link>
+            <Link 
+              href="/leaderboard" 
+              className="px-6 py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/30 text-white font-bold hover:bg-zinc-850 transition-all duration-300 flex items-center gap-2 text-sm active:scale-95"
+            >
+              <span>Papan Peringkat Warga</span>
+              <span className="text-emerald-400 font-bold">★</span>
+            </Link>
+            <Link 
+              href="/multisig" 
+              className="px-6 py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/30 text-white font-bold hover:bg-zinc-850 transition-all duration-300 flex items-center gap-2 text-sm active:scale-95"
+            >
+              <span>Dashboard Multi-Sig</span>
+              <span className="text-emerald-400 font-bold">🛡️</span>
+            </Link>
+          </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
             <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-emerald-500/20 transition-all duration-300">

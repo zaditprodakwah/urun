@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
       const idempotencyKey = crypto.randomUUID();
 
       // Write transaction using our secure RPC gateway
-      const { data: ledgerId, error: rpcErr } = await supabaseAdmin.rpc('process_ledger_entry', {
+      const { data: rpcResult, error: rpcErr } = await supabaseAdmin.rpc('process_ledger_entry', {
         p_community_id: communityId,
         p_actor_id: memberId,
         p_tender_id: tender.id,
@@ -251,18 +251,25 @@ export async function POST(req: NextRequest) {
       });
 
       if (rpcErr) {
-        if (rpcErr.message.includes('MULTISIG_REQUIRED')) {
-          await sendWhatsappMessage(
-            sender,
-            `⚠️ *PERSETUJUAN MULTI-SIG DIBUTUHKAN*\n\n` +
-            `Partisipasi Anda dalam *${tender.title}* sebanyak ${qty} unit dengan total *${formatIDR(totalAmount)}* telah dicatat.\n\n` +
-            `Karena nilai transaksi melebihi ambang batas Multi-Sig komunitas, transaksi dikunci dalam status *PENDING* hingga disetujui oleh minimal 2 Pengurus.`
-          );
-          return NextResponse.json({ status: true });
-        }
-
         console.error('❌ RPC Error:', rpcErr);
         await sendWhatsappMessage(sender, `❌ Terjadi kesalahan sistem saat mencatat transaksi Anda.`);
+        return NextResponse.json({ status: true });
+      }
+
+      const result = rpcResult as any;
+
+      if (result && result.status === 'multisig_required') {
+        await sendWhatsappMessage(
+          sender,
+          `⚠️ *PERSETUJUAN MULTI-SIG DIBUTUHKAN*\n\n` +
+          `Partisipasi Anda dalam *${tender.title}* sebanyak ${qty} unit dengan total *${formatIDR(totalAmount)}* telah dicatat.\n\n` +
+          `Karena nilai transaksi melebihi ambang batas Multi-Sig komunitas, transaksi dikunci dalam status *PENDING* (Req ID: ${result.multisig_id}) hingga disetujui oleh minimal 2 Pengurus.`
+        );
+        return NextResponse.json({ status: true });
+      }
+
+      if (result && result.status === 'error') {
+        await sendWhatsappMessage(sender, `❌ Gagal mencatat transaksi: ${result.message}`);
         return NextResponse.json({ status: true });
       }
 
@@ -434,31 +441,35 @@ export async function POST(req: NextRequest) {
       
       if (newSigsCount >= msig.required_sigs) {
         // Complete the multisig transaction!
-        // 1. Update status in multisig_requests
-        await supabaseAdmin
-          .from('multisig_requests')
-          .update({
-            current_sigs: newSigsCount,
-            approvals: updatedApprovals,
-            status: 'approved'
-          })
-          .eq('id', msig.id);
+        // Fetch requested_by member to determine dynamic entry type and direction
+        const { data: reqMember } = await supabaseAdmin
+          .from('community_members')
+          .select('role, permissions')
+          .eq('id', msig.requested_by)
+          .single();
 
-        // 2. Insert transaction to immutable ledger using admin client (bypassing multisig block)
+        const isOutflow = reqMember?.role === 'pengurus' || (reqMember?.permissions as any)?.is_treasurer;
+        const direction = isOutflow ? 'out' : 'in';
+        const entryType = isOutflow ? 'tender_settlement' : 'tender_contribution';
+        const typeLabel = isOutflow ? 'Tender Settlement (Outflow)' : 'Tender Contribution (Inflow)';
+
+        // 1. Insert transaction to immutable ledger using admin client (bypassing multisig block)
         const idempotencyKey = crypto.randomUUID();
-        const { error: ledgerErr } = await supabaseAdmin
+        const { data: ledgerEntry, error: ledgerErr } = await supabaseAdmin
           .from('ledger')
           .insert({
             community_id: communityId,
             actor_id: msig.requested_by,
             tender_id: msig.tender_id,
             amount: msig.amount,
-            direction: 'in',
-            entry_type: 'tender_contribution',
-            description: `MULTISIG APPROVED: URUN Dana Kontribusi (Req ID: ${msig.id})`,
+            direction: direction,
+            entry_type: entryType,
+            description: `MULTISIG APPROVED: ${typeLabel} (Req ID: ${msig.id})`,
             idempotency_key: idempotencyKey,
             multisig_status: 'approved'
-          });
+          })
+          .select()
+          .single();
 
         if (ledgerErr) {
           console.error('❌ Failed to write ledger on multisig success:', ledgerErr);
@@ -466,11 +477,35 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ status: true });
         }
 
+        // 2. Update status and save ledger reference in multisig_requests
+        await supabaseAdmin
+          .from('multisig_requests')
+          .update({
+            current_sigs: newSigsCount,
+            approvals: updatedApprovals,
+            status: 'approved',
+            ledger_ref_id: ledgerEntry.id
+          })
+          .eq('id', msig.id);
+
+        // 3. Log to audit_log
+        await supabaseAdmin
+          .from('audit_log')
+          .insert({
+            community_id: communityId,
+            actor_id: memberId,
+            action: 'multisig_approved',
+            table_affected: 'ledger',
+            new_value: { ledger_id: ledgerEntry.id, request_id: msig.id, direction, entryType },
+            reason: `Multi-sig quorum met (${newSigsCount}/${msig.required_sigs}) via WhatsApp Bot. Atomic ledger insertion completed.`
+          });
+
         await sendWhatsappMessage(
           sender,
           `✅ *TRANSAKSI MULTI-SIG DISETUJUI PERMANEN*\n\n` +
           `Tandatangan Anda telah divalidasi. Kuorum tercapai (*${newSigsCount}/${msig.required_sigs}*).\n\n` +
-          `Dana sebesar *${formatIDR(msig.amount)}* resmi dicairkan dan dicatat ke *Buku Kas Kolektif* Simpul Komunitas.`
+          `Dana sebesar *${formatIDR(msig.amount)}* resmi ${isOutflow ? 'dicairkan ke supplier' : 'disetorkan ke kas'} Buku Kas Kolektif (Ledger Immutable).\n` +
+          `Sistem otomatis memproses pembagian 70/30 secara transparan.`
         );
       } else {
         // Update approval count, still pending
