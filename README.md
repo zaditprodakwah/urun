@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# URUN — Micro-Community Operating System
 
-## Getting Started
+> **Berdaulat. Transparan. Gotong Royong Digital.**
 
-First, run the development server:
+Platform keuangan dan logistik komunitas berbasis Next.js + Supabase, dibangun untuk RT/RW/Komunitas Lokal Indonesia.
+
+**Production URL:** [urunwarga.vercel.app](https://urunwarga.vercel.app)  
+**Repository:** [github.com/zaditprodakwah/urun](https://github.com/zaditprodakwah/urun)
+
+---
+
+## 🚀 Quick Start (Development)
 
 ```bash
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.local.example .env.local
+# Isi nilai SUPABASE dan FONNTE di .env.local
+
+# Jalankan dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🏗️ Build & Deploy
 
-## Learn More
+### Production Build (Local Check)
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pastikan output **tidak ada error TypeScript** sebelum push ke GitHub.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Deploy ke Vercel
 
-## Deploy on Vercel
+Deployment berjalan **otomatis** via GitHub Actions setiap kali ada push ke branch `main`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> ⚠️ **PENTING — Aturan Git Author**
+>
+> Vercel Project `inframeet-s-projects/urunwarga` hanya menerima commit dari author yang **terdaftar sebagai member tim**.
+>
+> **Selalu gunakan konfigurasi git berikut sebelum commit:**
+> ```bash
+> git config user.email "dakuprodakwah@gmail.com"
+> git config user.name "zaditprodakwah"
+> ```
+>
+> Commit dengan author lain (misalnya `muhzadnet@gmail.com` / `bitmuh`) akan **otomatis diblokir (Blocked)** oleh Vercel dan tidak akan pernah live.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Vercel Project Info
+
+| Item | Detail |
+|------|--------|
+| Project | `inframeet-s-projects/urunwarga` |
+| Project ID | `prj_9VvhG7y8cGPBSW9pL9vGyn0lEq4w` |
+| Production Domain | `urunwarga.vercel.app` |
+| GitHub Repo | `zaditprodakwah/urun` |
+| Authorized Author Email | `dakuprodakwah@gmail.com` |
+| Authorized GitHub User | `zaditprodakwah` |
+| Vercel Account | `dakuprodakwah-4228` |
+
+---
+
+## 📦 Environment Variables
+
+Variabel berikut **wajib** tersedia di Vercel Environment Variables dan `.env.local`:
+
+| Variable | Keterangan |
+|----------|-----------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL Supabase project |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only) |
+| `FONNTE_TOKEN` | Token WhatsApp gateway Fonnte |
+| `FONNTE_WEBHOOK_SECRET` | Secret validasi webhook Fonnte |
+
+---
+
+## 🗺️ Routes Aplikasi
+
+| Route | Tipe | Keterangan |
+|-------|------|-----------|
+| `/` | Static | Homepage & navigasi utama |
+| `/catalog` | ISR (60s) | Katalog produk publik (SEO/AEO ready) |
+| `/catalog/[slug]` | SSR | Detail produk dengan JSON-LD schema |
+| `/leaderboard` | SSR | Papan keaktifan warga |
+| `/multisig` | Client | Multi-Sig Command Center pengurus |
+| `/api/webhook/whatsapp` | Dynamic | Webhook penerima pesan WhatsApp |
+| `/api/multisig/requests` | Dynamic | Daftar permintaan Multi-Sig |
+| `/api/multisig/approve` | Dynamic | Prosesor persetujuan Multi-Sig |
+| `/api/multisig/simulate` | Dynamic | Simulator transaksi besar |
+| `/api/parser` | Dynamic | Ethical marketplace parser |
+| `/api/reconcile` | Dynamic | Engine rekonsiliasi kas harian |
+
+---
+
+## 📚 Dokumentasi Lengkap
+
+Lihat folder [`docs/`](docs/README.md) untuk dokumentasi teknis, arsitektur, dan spesifikasi lengkap.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 16 (App Router, Turbopack)
+- **Database:** Supabase (PostgreSQL + RLS)
+- **Hosting:** Vercel (Edge Network)
+- **WhatsApp Gateway:** Fonnte
+- **Language:** TypeScript
+
+Lihat [`docs/SPECIFICATIONS/14_approved_open_source_stack.md`](docs/SPECIFICATIONS/14_approved_open_source_stack.md) untuk daftar lengkap.

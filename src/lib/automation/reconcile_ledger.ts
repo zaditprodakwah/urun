@@ -12,13 +12,14 @@ export interface AuditAnomaly {
   details: string;
 }
 
-export async function runLedgerReconciliation(): Promise<{
+export async function runLedgerReconciliation(targetCommunityId?: string): Promise<{
   success: boolean;
   totalSettlementsChecked: number;
   anomaliesFound: number;
   anomalies: AuditAnomaly[];
 }> {
-  console.log(`⏰ [${new Date().toISOString()}] Initiating automated ledger reconciliation audit...`);
+  const commId = targetCommunityId || COMMUNITY_ID;
+  console.log(`⏰ [${new Date().toISOString()}] Initiating automated ledger reconciliation audit for community: ${commId}...`);
 
   try {
     const anomalies: AuditAnomaly[] = [];
@@ -27,7 +28,7 @@ export async function runLedgerReconciliation(): Promise<{
     const { data: settlements, error: setErr } = await supabaseAdmin
       .from('ledger')
       .select('*')
-      .eq('community_id', COMMUNITY_ID)
+      .eq('community_id', commId)
       .eq('entry_type', 'tender_settlement');
 
     if (setErr) {
@@ -39,7 +40,7 @@ export async function runLedgerReconciliation(): Promise<{
     const { data: splits, error: splitErr } = await supabaseAdmin
       .from('ledger')
       .select('*')
-      .eq('community_id', COMMUNITY_ID)
+      .eq('community_id', commId)
       .in('entry_type', ['platform_revenue', 'community_share'])
       .not('ref_id', 'is', null);
 
@@ -118,7 +119,7 @@ export async function runLedgerReconciliation(): Promise<{
       const { error: logErr } = await supabaseAdmin
         .from('audit_log')
         .insert({
-          community_id: COMMUNITY_ID,
+          community_id: commId,
           actor_id: null, // SYSTEM Action
           action: 'imbalance_alert',
           table_affected: 'ledger',
@@ -140,7 +141,7 @@ export async function runLedgerReconciliation(): Promise<{
             full_name
           )
         `)
-        .eq('community_id', COMMUNITY_ID)
+        .eq('community_id', commId)
         .eq('role', 'pengurus');
 
       if (signers && signers.length > 0) {
@@ -172,7 +173,7 @@ export async function runLedgerReconciliation(): Promise<{
     await supabaseAdmin
       .from('audit_log')
       .insert({
-        community_id: COMMUNITY_ID,
+        community_id: commId,
         actor_id: null,
         action: 'ledger_audit_success',
         table_affected: 'ledger',

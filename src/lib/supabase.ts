@@ -1,18 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://awkwtxtgxjojavwmasfh.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-// During Next.js build/compile time, environment variables might be absent.
-// We use placeholder values to prevent the build from crashing at module evaluation time.
-const activeUrl = supabaseUrl || 'https://awkwtxtgxjojavwmasfh.supabase.co'; // Fallback to project domain
-const activeKey = supabaseServiceKey || 'build-placeholder-key';
+// Browser Client (uses Anon key, supports session persistence in client)
+export const supabaseBrowser = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 
-// Service role client bypasses RLS for admin operations,
-// but we MUST strictly enforce community_id isolation in all queries manually.
-export const supabaseAdmin = createClient(activeUrl, activeKey, {
+// Admin Client (uses Service Role key, bypasses RLS, server-only)
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || 'build-placeholder-key', {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
   },
 });
+

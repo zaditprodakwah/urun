@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/multisig/reconcile",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/sitemap",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/digest",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/tender-remind",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}

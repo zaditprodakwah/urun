@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { sendWhatsappMessage, formatIDR } from '@/lib/whatsapp';
+import { sendReputationNotif } from '@/lib/notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -167,6 +168,42 @@ export async function POST(req: NextRequest) {
           new_value: { ledger_id: ledgerEntry.id, request_id: msig.id, direction, entryType },
           reason: `Multi-sig quorum met (${newSigsCount}/${msig.required_sigs}). Atomic ledger insertion completed.`
         });
+
+      // Calculate reputation score delta & trigger WA notification for requester
+      try {
+        const { data: updatedMember } = await supabaseAdmin
+          .from('community_members')
+          .select(`
+            reputation_score,
+            profiles (
+              full_name,
+              phone
+            )
+          `)
+          .eq('profile_id', msig.requested_by)
+          .eq('community_id', msig.community_id)
+          .single();
+
+        if (updatedMember && updatedMember.profiles) {
+          const profile = updatedMember.profiles as any;
+          if (profile.phone) {
+            const delta = entryType === 'tender_settlement' ? 3 : 5;
+            const reason = entryType === 'tender_settlement'
+              ? 'Penyelesaian tender (outflow) disetujui kuorum'
+              : 'Penyetoran kontribusi tender (inflow) disetujui kuorum';
+
+            await sendReputationNotif(
+              profile.phone,
+              profile.full_name,
+              delta,
+              reason,
+              updatedMember.reputation_score
+            );
+          }
+        }
+      } catch (repErr) {
+        console.error('❌ Failed to process reputation WA notification:', repErr);
+      }
 
       // d. Notify all signers/pengurus via WhatsApp
       const { data: signers } = await supabaseAdmin
