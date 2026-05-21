@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
-
-const COMMUNITY_ID = 'b4db4d82-bfe0-4640-8d06-e4724038d1c7';
 
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const communityId = url.searchParams.get('community_id') || COMMUNITY_ID;
+    let communityId = url.searchParams.get('community_id');
+
+    if (!communityId) {
+      const session = await getSession();
+      if (session) {
+        communityId = session.communityId;
+      }
+    }
+
+    if (!communityId) {
+      return NextResponse.json({ error: 'Missing community_id parameter or active session.' }, { status: 400 });
+    }
 
     // Fetch multisig requests joined with tender info and requester profile info
     const { data: requests, error } = await supabaseAdmin

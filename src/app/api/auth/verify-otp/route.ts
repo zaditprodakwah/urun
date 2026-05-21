@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import crypto from 'crypto';
+import { encryptSession } from '@/lib/auth';
+import { formatPhoneNumber } from '@/lib/whatsapp';
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,12 +12,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: false, error: 'Nomor WhatsApp dan OTP wajib diisi' }, { status: 400 });
     }
 
-    // Format phone
-    let formattedPhone = phone.trim();
-    if (formattedPhone.startsWith('08')) {
-      formattedPhone = '628' + formattedPhone.slice(2);
-    } else if (formattedPhone.startsWith('+628')) {
-      formattedPhone = '628' + formattedPhone.slice(4);
+    const formattedPhone = formatPhoneNumber(phone);
+
+    // 1. Brute-Force Protection (Max 5 failed attempts in the last 5 minutes)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { count: failedCount, error: countErr } = await supabaseAdmin
+      .from('audit_log')
+      .select('*', { count: 'exact', head: true })
+      .eq('action', 'otp_verify_failed')
+      .eq('reason', `otp_verify_failed:${formattedPhone}`)
+      .gt('created_at', fiveMinutesAgo);
+
+    if (!countErr && failedCount !== null && failedCount >= 5) {
+      return NextResponse.json({
+        status: false,
+        error: 'Nomor Anda diblokir sementara karena terlalu banyak memasukkan OTP salah. Silakan coba lagi dalam 5 menit.'
+      }, { status: 429 });
     }
 
     const hashedOtp = crypto.createHash('sha256').update(otp.trim()).digest('hex');
@@ -32,6 +44,16 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     if (otpErr || !otpData || otpData.length === 0) {
+      // Record failed attempt in audit_log
+      await supabaseAdmin
+        .from('audit_log')
+        .insert({
+          action: 'otp_verify_failed',
+          table_affected: 'otp_sessions',
+          reason: `otp_verify_failed:${formattedPhone}`,
+          new_value: { phone: formattedPhone, attemptedAt: new Date().toISOString() }
+        });
+
       return NextResponse.json({ status: false, error: 'Kode OTP tidak valid atau telah kedaluwarsa' }, { status: 400 });
     }
 
@@ -94,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     // Create session payload
     const sessionPayload = {
-      userId: citizen.id, // citizen.id is the auth.users.id
+      userId: citizen.id,
       profileId: citizen.id,
       phone: formattedPhone,
       role: citizen.role,
@@ -102,14 +124,17 @@ export async function POST(req: NextRequest) {
       name: citizen.name
     };
 
+    // Encrypt the session payload to a secure JWT using jose
+    const encryptedToken = await encryptSession(sessionPayload);
+
     const response = NextResponse.json({
       status: true,
       message: 'Login berhasil',
       session: sessionPayload
     });
 
-    // Save session payload in encrypted cookie for middleware and server components
-    response.cookies.set('urun_session', JSON.stringify(sessionPayload), {
+    // Save signed JWT in HTTP-only cookie
+    response.cookies.set('urun_session', encryptedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

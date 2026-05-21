@@ -1,49 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-
-// Helper function to send replies back using Fonnte API
-async function sendWhatsappMessage(target: string, text: string) {
-  const token = process.env.FONNTE_TOKEN;
-  if (!token) {
-    console.error('❌ FONNTE_TOKEN is missing in environment!');
-    return false;
-  }
-
-  try {
-    const res = await fetch('https://api.fonnte.com/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': token,
-      },
-      body: new URLSearchParams({
-        target: target,
-        message: text,
-      }),
-    });
-
-    const data = await res.json();
-    if (data.status) {
-      console.log(`✅ Message successfully sent to ${target}`);
-      return true;
-    } else {
-      console.error(`❌ Fonnte error: ${JSON.stringify(data)}`);
-      return false;
-    }
-  } catch (err) {
-    console.error(`❌ Failed to call Fonnte API:`, err);
-    return false;
-  }
-}
-
-// Function to format currency into IDR
-function formatIDR(amount: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-}
+import { sendWhatsappMessage, formatIDR, formatPhoneNumber } from '@/lib/whatsapp';
 
 export async function POST(req: NextRequest) {
   console.log('📬 Received incoming WhatsApp Webhook request');

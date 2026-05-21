@@ -8,7 +8,11 @@ export async function GET(req: NextRequest) {
   try {
     // Validate CRON_SECRET
     const authHeader = req.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET || 'RahasiaUrunWarga2026!';
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret) {
+      console.error('❌ CRON_SECRET environment variable is missing!');
+      return NextResponse.json({ error: 'CRON_SECRET is not configured' }, { status: 500 });
+    }
     if (authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

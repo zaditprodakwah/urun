@@ -1,12 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic'; // Prevent Next.js from caching this API statically
 
-const COMMUNITY_ID = 'b4db4d82-bfe0-4640-8d06-e4724038d1c7';
-
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const url = new URL(req.url);
+    let communityId = url.searchParams.get('community_id');
+
+    if (!communityId) {
+      const session = await getSession();
+      if (session) {
+        communityId = session.communityId;
+      }
+    }
+
+    if (!communityId) {
+      return NextResponse.json({ error: 'Missing community_id parameter or active session.' }, { status: 400 });
+    }
+
     // 1. Fetch Top 5 members based on deterministic reputation score
     const { data: topContributors, error: topErr } = await supabaseAdmin
       .from('community_members')
@@ -20,7 +33,7 @@ export async function GET() {
           phone
         )
       `)
-      .eq('community_id', COMMUNITY_ID)
+      .eq('community_id', communityId)
       .order('reputation_score', { ascending: false })
       .limit(5);
 
@@ -44,7 +57,7 @@ export async function GET() {
           )
         )
       `)
-      .eq('community_id', COMMUNITY_ID)
+      .eq('community_id', communityId)
       .order('created_at', { ascending: false })
       .limit(6);
 

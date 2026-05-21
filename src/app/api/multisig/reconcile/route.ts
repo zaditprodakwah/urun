@@ -5,11 +5,16 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest) {
+async function handleReconcile(req: NextRequest) {
   try {
-    // 1. Check CRON token authentication
     const authHeader = req.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET || 'RahasiaUrunWarga2026!';
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret) {
+      console.error('❌ CRON_SECRET is missing in environment!');
+      return NextResponse.json({ error: 'CRON_SECRET is not configured' }, { status: 500 });
+    }
+
     const isCronTrigger = authHeader === `Bearer ${cronSecret}`;
 
     if (isCronTrigger) {
@@ -56,4 +61,12 @@ export async function POST(req: NextRequest) {
     console.error('[Reconcile API Route Error]:', err);
     return NextResponse.json({ error: err.message || 'Server error' }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest) {
+  return handleReconcile(req);
+}
+
+export async function POST(req: NextRequest) {
+  return handleReconcile(req);
 }

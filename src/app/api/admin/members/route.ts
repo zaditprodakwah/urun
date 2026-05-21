@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         reputation_score,
         permissions,
         joined_at,
-        profiles (
+        profiles!community_members_profile_id_fkey (
           id,
           full_name,
           phone,

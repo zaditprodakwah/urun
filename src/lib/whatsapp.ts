@@ -39,3 +39,18 @@ export function formatIDR(amount: number): string {
     maximumFractionDigits: 0
   }).format(amount);
 }
+
+/**
+ * Formats a phone number to standard Indonensian international format (starts with 628)
+ */
+export function formatPhoneNumber(phone: string): string {
+  let formatted = phone.trim();
+  if (formatted.startsWith('08')) {
+    formatted = '628' + formatted.slice(2);
+  } else if (formatted.startsWith('+628')) {
+    formatted = '628' + formatted.slice(4);
+  } else if (formatted.startsWith('+')) {
+    formatted = formatted.slice(1);
+  }
+  return formatted;
+}

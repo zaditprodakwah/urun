@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { supabaseAdmin } from './supabase';
+import { SignJWT, jwtVerify } from 'jose';
 
 export interface UserSession {
   userId: string;
@@ -10,6 +11,40 @@ export interface UserSession {
   name: string;
 }
 
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
+function getSecretKey(): Uint8Array {
+  if (!SESSION_SECRET) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('❌ Missing SESSION_SECRET environment variable!');
+    }
+    return new TextEncoder().encode('RahasiaUrunWargaSessionSecretFallback2026!');
+  }
+  return new TextEncoder().encode(SESSION_SECRET);
+}
+
+export async function encryptSession(payload: UserSession): Promise<string> {
+  const secretKey = getSecretKey();
+  return await new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(secretKey);
+}
+
+export async function decryptSession(jwt: string): Promise<UserSession | null> {
+  try {
+    const secretKey = getSecretKey();
+    const { payload } = await jwtVerify(jwt, secretKey, {
+      algorithms: ['HS256'],
+    });
+    return payload as unknown as UserSession;
+  } catch (err) {
+    console.error('Error verifying JWT signature:', err);
+    return null;
+  }
+}
+
 // Read and decode the session from Next.js cookies
 export async function getSession(): Promise<UserSession | null> {
   try {
@@ -17,12 +52,7 @@ export async function getSession(): Promise<UserSession | null> {
     const sessionCookie = cookieStore.get('urun_session')?.value;
     if (!sessionCookie) return null;
 
-    // The session cookie stores a JSON string
-    const sessionData = JSON.parse(sessionCookie) as UserSession;
-    if (!sessionData || !sessionData.userId || !sessionData.communityId) {
-      return null;
-    }
-    return sessionData;
+    return await decryptSession(sessionCookie);
   } catch (err) {
     console.error('Error parsing session cookie:', err);
     return null;

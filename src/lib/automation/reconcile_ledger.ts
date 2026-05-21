@@ -1,8 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import { sendWhatsappMessage, formatIDR } from '@/lib/whatsapp';
 
-const COMMUNITY_ID = 'b4db4d82-bfe0-4640-8d06-e4724038d1c7';
-
 export interface AuditAnomaly {
   type: 'missing_splits' | 'split_sum_mismatch' | 'negative_amount' | 'percentage_mismatch';
   ledgerId: string;
@@ -12,13 +10,13 @@ export interface AuditAnomaly {
   details: string;
 }
 
-export async function runLedgerReconciliation(targetCommunityId?: string): Promise<{
+export async function runLedgerReconciliation(targetCommunityId: string): Promise<{
   success: boolean;
   totalSettlementsChecked: number;
   anomaliesFound: number;
   anomalies: AuditAnomaly[];
 }> {
-  const commId = targetCommunityId || COMMUNITY_ID;
+  const commId = targetCommunityId;
   console.log(`⏰ [${new Date().toISOString()}] Initiating automated ledger reconciliation audit for community: ${commId}...`);
 
   try {

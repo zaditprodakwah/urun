@@ -1,38 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import crypto from 'crypto';
-
-// Fonnte messenger helper
-async function sendWhatsappOTP(phone: string, otp: string) {
-  const token = process.env.FONNTE_TOKEN;
-  if (!token) {
-    console.error('❌ FONNTE_TOKEN is missing in environment!');
-    return false;
-  }
-
-  const message = `🔐 *KODE OTP URUN*\n\n` +
-    `Kode verifikasi Anda adalah: *${otp}*\n\n` +
-    `Berlaku selama 5 menit. Jangan bagikan kode ini kepada siapapun demi keamanan akun warga Anda.`;
-
-  try {
-    const res = await fetch('https://api.fonnte.com/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': token,
-      },
-      body: new URLSearchParams({
-        target: phone,
-        message: message,
-      }),
-    });
-
-    const data = await res.json();
-    return !!data.status;
-  } catch (err) {
-    console.error('❌ Failed to send WhatsApp OTP:', err);
-    return false;
-  }
-}
+import { formatPhoneNumber, sendWhatsappMessage } from '@/lib/whatsapp';
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,17 +10,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: false, error: 'Nomor WhatsApp wajib diisi' }, { status: 400 });
     }
 
-    // Format phone to standard starting with 62 or 08
-    let formattedPhone = phone.trim();
-    if (formattedPhone.startsWith('08')) {
-      formattedPhone = '628' + formattedPhone.slice(2);
-    } else if (formattedPhone.startsWith('+628')) {
-      formattedPhone = '628' + formattedPhone.slice(4);
+    const formattedPhone = formatPhoneNumber(phone);
+
+    // 1. Cooldown rate limit check (60 seconds)
+    const { data: recentSessions, error: cooldownErr } = await supabaseAdmin
+      .from('otp_sessions')
+      .select('created_at')
+      .eq('phone', formattedPhone)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (!cooldownErr && recentSessions && recentSessions.length > 0) {
+      const lastCreatedAt = new Date(recentSessions[0].created_at).getTime();
+      const diffSeconds = (Date.now() - lastCreatedAt) / 1000;
+      if (diffSeconds < 60) {
+        return NextResponse.json({
+          status: false,
+          error: `Mohon tunggu ${Math.ceil(60 - diffSeconds)} detik sebelum meminta kode OTP kembali.`
+        }, { status: 429 });
+      }
     }
 
-    // Find profile in profiles table by phone or contact_info
-    // Sesuai rules: member harus terdaftar di profiles terlebih dahulu
-    // Profiles table has a 'phone' column (added in 003 migration) or contact_info
+    // Find profile in profiles table by phone
     const { data: profiles, error: profErr } = await supabaseAdmin
       .from('profiles')
       .select(`
@@ -117,7 +97,11 @@ export async function POST(req: NextRequest) {
 
     // Send OTP via WhatsApp
     console.log(`📤 Sending OTP to ${formattedPhone} (Citizen: ${citizen.name})...`);
-    const sent = await sendWhatsappOTP(formattedPhone, otp);
+    const message = `🔐 *KODE OTP URUN*\n\n` +
+      `Kode verifikasi Anda adalah: *${otp}*\n\n` +
+      `Berlaku selama 5 menit. Jangan bagikan kode ini kepada siapapun demi keamanan akun warga Anda.`;
+
+    const sent = await sendWhatsappMessage(formattedPhone, message);
 
     // For local development and fallback/testing, print to terminal
     console.log(`🔑 [OTP DEV BYPASS] Phone: ${formattedPhone} | Code: ${otp}`);
@@ -125,7 +109,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ 
       status: true, 
       message: 'Kode OTP telah dikirim melalui WhatsApp',
-      // Return OTP only in dev mode bypass for debugging if needed, but not returned for prod
       devBypass: process.env.NODE_ENV === 'development' ? otp : undefined
     });
   } catch (err: any) {

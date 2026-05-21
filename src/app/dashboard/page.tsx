@@ -18,8 +18,7 @@ export default async function DashboardPage() {
       id,
       role,
       reputation_score,
-      status,
-      profiles (
+      profiles!community_members_profile_id_fkey (
         id,
         full_name,
         phone
@@ -95,7 +94,7 @@ export default async function DashboardPage() {
               <h2 className="text-lg font-bold text-white mb-6">Hak Kedaulatan Data (PDP)</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <a 
-                  href={`/api/profile/export?member_id=${member.id}`} 
+                  href="/api/profile/export" 
                   target="_blank" 
                   rel="noreferrer"
                   className="p-5 rounded-xl border border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800 transition-colors group"
@@ -169,7 +168,7 @@ export default async function DashboardPage() {
                 <div>
                   <div className="text-zinc-500 mb-1">Status Verifikasi</div>
                   <div className="inline-flex px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 capitalize">
-                    {member.status}
+                    Aktif
                   </div>
                 </div>
               </div>

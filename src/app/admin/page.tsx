@@ -29,10 +29,9 @@ export default async function AdminPage() {
     .select(`
       id,
       role,
-      status,
       reputation_score,
       joined_at,
-      profiles (
+      profiles!community_members_profile_id_fkey (
         full_name,
         phone
       )
@@ -120,12 +119,8 @@ export default async function AdminPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold border capitalize ${
-                            m.status === 'verified'
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                            : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                          }`}>
-                            {m.status}
+                          <span className="inline-flex px-2 py-0.5 rounded text-xs font-semibold border capitalize bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                            Aktif
                           </span>
                         </td>
                         <td className="px-6 py-4">
