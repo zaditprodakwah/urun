@@ -56,6 +56,12 @@ export default function MultisigDashboard() {
   const [simulating, setSimulating] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   
+  interface Anomaly {
+    type: string;
+    ledgerId: string;
+    details: string;
+  }
+
   // Alert/Notification State
   const [alert, setAlert] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
@@ -65,8 +71,13 @@ export default function MultisigDashboard() {
     success: boolean;
     totalSettlements: number;
     anomaliesFound: number;
-    anomalies: any[];
+    anomalies: Anomaly[];
   } | null>(null);
+
+  const showGlobalAlert = (type: 'success' | 'error' | 'info', message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 6000);
+  };
 
   const fetchRequests = async () => {
     try {
@@ -87,13 +98,19 @@ export default function MultisigDashboard() {
   };
 
   useEffect(() => {
-    fetchRequests();
+    let mounted = true;
+    const load = async () => {
+      await Promise.resolve();
+      if (mounted) {
+        await fetchRequests();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const showGlobalAlert = (type: 'success' | 'error' | 'info', message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 6000);
-  };
 
   const handleSimulateOutflow = async () => {
     try {

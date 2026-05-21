@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, User, LayoutDashboard, Shield, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, LayoutDashboard, Shield, LogOut } from "lucide-react";
 import type { UserSession } from "@/lib/auth";
+import SyncStatusIndicator from "@/components/SyncStatusIndicator";
 
 interface NavbarProps {
   session: UserSession | null;
@@ -66,7 +67,8 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
         </div>
 
         {/* Auth Section (Desktop) */}
-        <div className="hidden md:flex items-center justify-end min-w-[200px]">
+        <div className="hidden md:flex items-center justify-end gap-4 min-w-[200px]">
+          <SyncStatusIndicator />
           {!session ? (
             <Link
               href="/login"
@@ -128,7 +130,8 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
         </div>
 
         {/* Mobile Hamburger */}
-        <div className="md:hidden flex items-center">
+        <div className="md:hidden flex items-center gap-3">
+          <SyncStatusIndicator />
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"

@@ -150,7 +150,7 @@ export async function runLedgerReconciliation(targetCommunityId: string): Promis
         const alertMessage = `🚨 *P1 SYSTEM ALERT: LEDGER DISCREPANCY DETECTED* 🚨\n\nSistem audit mandiri URUN mendeteksi kejanggalan integritas Buku Kas Kolektif:\n\n• *Jumlah Masalah*: ${anomalies.length} anomali keuangan\n\n*Rincian Anomali*:\n${anomalySummary}\n\n⚠️ *PANDUAN INTEGRITAS KEAMANAN*:\n• *JANGAN* melakukan UPDATE/DELETE langsung pada tabel ledger (Immutability Rule #2).\n• Periksa entri dan lakukan perbaikan menggunakan metode *correction_entry* (reversal) jika terdapat kesalahan input manual.\n• Hubungi developer sistem jika trigger auto-split mengalami gangguan.`;
 
         for (const signer of signers) {
-          const profile = signer.profiles as any;
+          const profile = signer.profiles as { phone?: string } | null | undefined;
           if (profile && profile.phone) {
             await sendWhatsappMessage(profile.phone, alertMessage);
           }
@@ -186,7 +186,7 @@ export async function runLedgerReconciliation(targetCommunityId: string): Promis
       anomalies: []
     };
 
-  } catch (err: any) {
+  } catch (err) {
     console.error('💥 Critical error during automated ledger reconciliation:', err);
     return {
       success: false,

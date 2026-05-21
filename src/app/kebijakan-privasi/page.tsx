@@ -28,7 +28,7 @@ export default function KebijakanPrivasiPage() {
             Kebijakan Privasi & Perlindungan Data Pribadi
           </h1>
           <p className="text-lg text-emerald-400 font-medium max-w-2xl mx-auto italic">
-            "Data Anda adalah Milik Komunitas Anda, Bukan Komoditas Komersial."
+            &quot;Data Anda adalah Milik Komunitas Anda, Bukan Komoditas Komersial.&quot;
           </p>
           <p className="text-zinc-400 max-w-3xl mx-auto leading-relaxed text-sm">
             Selamat datang di URUN. Kami membangun sistem ini sebagai infrastruktur sosial digital yang bertujuan untuk mempererat kegotongroyongan warga. Kami menjamin privasi dan kedaulatan data Anda dikelola dengan transparansi penuh serta terbebas dari pemanfaatan komersial pihak ketiga.
@@ -114,7 +114,7 @@ export default function KebijakanPrivasiPage() {
             <div className="px-6 pb-6 pt-2 border-t border-zinc-800/50 text-zinc-400 text-sm leading-relaxed space-y-3">
               <p>Setiap warga berhak mengunduh seluruh data aktivitas pribadinya di dalam sistem untuk dipindahkan ke platform lain jika diinginkan:</p>
               <ul className="list-disc pl-5 space-y-2">
-                <li><strong className="text-white">Cara Melakukan:</strong> Buka halaman profil Anda, pilih menu "Hak Data Saya" &gt; "Ekspor Riwayat Data".</li>
+                <li><strong className="text-white">Cara Melakukan:</strong> Buka halaman profil Anda, pilih menu &quot;Hak Data Saya&quot; &gt; &quot;Ekspor Riwayat Data&quot;.</li>
                 <li><strong className="text-white">Format File:</strong> Sistem akan membuat file data terstandar yang aman dan rapi, berisi data profil Anda, riwayat iuran, kontribusi proyek, serta riwayat perubahan poin dedikasi sosial Anda.</li>
               </ul>
             </div>
@@ -129,7 +129,7 @@ export default function KebijakanPrivasiPage() {
             <div className="px-6 pb-6 pt-2 border-t border-zinc-800/50 text-zinc-400 text-sm leading-relaxed space-y-3">
               <p>Jika Anda pindah domisili atau tidak ingin lagi menggunakan sistem URUN, Anda berhak meminta penghapusan seluruh data identitas pribadi Anda:</p>
               <ul className="list-disc pl-5 space-y-2">
-                <li><strong className="text-white">Cara Mengajukan:</strong> Masuk ke profil Anda, pilih menu "Hapus Identitas Saya" dan konfirmasikan permintaan Anda melalui kode keamanan otomatis yang dikirim ke nomor WhatsApp Anda.</li>
+                <li><strong className="text-white">Cara Mengajukan:</strong> Masuk ke profil Anda, pilih menu &quot;Hapus Identitas Saya&quot; dan konfirmasikan permintaan Anda melalui kode keamanan otomatis yang dikirim ke nomor WhatsApp Anda.</li>
                 <li><strong className="text-white">Masa Tenggang 7 Hari:</strong> Untuk menghindari ketidaksengajaan, sistem akan menunda eksekusi permanen selama 7 hari. Anda dapat membatalkan permintaan ini kapan saja dalam kurun waktu tersebut.</li>
                 <li><strong className="text-white">Penghapusan & Anonimisasi Permanen:</strong> Setelah masa tenggang selesai, seluruh data identitas sensitif (Nama lengkap, nomor WhatsApp, email, dan alamat rumah) akan dihapus secara total dari database utama.</li>
                 <li><strong className="text-white">Integritas Transparansi Keuangan:</strong> Demi menjaga keaslian laporan kas warga lainnya, catatan nominal transaksi keuangan historis yang pernah Anda lakukan akan tetap dipertahankan, namun identitas nama Anda di dalam transaksi tersebut akan disamarkan secara permanen oleh sistem menjadi <strong className="text-emerald-400">Warga_Anonim</strong> sehingga tidak dapat dilacak kembali kepada Anda.</li>

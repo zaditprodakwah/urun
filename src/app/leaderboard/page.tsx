@@ -54,7 +54,17 @@ export default function LeaderboardPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    let mounted = true;
+    const load = async () => {
+      await Promise.resolve();
+      if (mounted) {
+        await fetchData();
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

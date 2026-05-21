@@ -27,7 +27,7 @@ export default function SyaratKetentuanPage() {
             Syarat & Ketentuan Layanan Komunitas
           </h1>
           <p className="text-lg text-emerald-400 font-medium max-w-2xl mx-auto italic">
-            "Saling Percaya, Transparan, dan Bertanggung Jawab."
+            &quot;Saling Percaya, Transparan, dan Bertanggung Jawab.&quot;
           </p>
           <p className="text-zinc-400 max-w-3xl mx-auto leading-relaxed text-sm">
             Syarat dan ketentuan ini mengatur hak, kewajiban, dan tata laksana interaksi sosial warga di dalam ekosistem digital URUN. Dengan mendaftarkan diri, Anda setuju untuk menjaga kerukunan dan integritas lingkungan bertetangga.
@@ -119,7 +119,7 @@ export default function SyaratKetentuanPage() {
               </ul>
 
               <h4 className="font-bold text-white mt-4">Prosedur Pelaporan & Penurunan Konten Cepat</h4>
-              <p>Jika Anda menemukan konten yang melanggar, gunakan tombol "Laporkan Konten" yang tersedia. Sistem akan langsung meneruskan laporan tersebut ke antrean peninjauan prioritas.</p>
+              <p>Jika Anda menemukan konten yang melanggar, gunakan tombol &quot;Laporkan Konten&quot; yang tersedia. Sistem akan langsung meneruskan laporan tersebut ke antrean peninjauan prioritas.</p>
               <p>Jika terbukti melanggar aturan, konten tersebut akan diturunkan secara permanen dalam waktu <strong className="text-emerald-400">maksimal 1x24 jam</strong> sejak laporan divalidasi. Warga atau mitra yang melanggar akan menerima pemberitahuan otomatis.</p>
             </div>
           </details>
@@ -156,7 +156,7 @@ export default function SyaratKetentuanPage() {
         <div className="mt-16 p-8 border border-zinc-800 bg-zinc-950 rounded-2xl text-center space-y-4">
           <h3 className="font-bold text-white text-lg">Pernyataan Bersama Warga URUN</h3>
           <p className="text-emerald-400 font-medium italic text-sm max-w-2xl mx-auto leading-relaxed">
-            "Dengan menyetujui dokumen ini saat pertama kali menggunakan sistem, kami menyatakan sepakat untuk bertransaksi secara jujur, menjaga transparansi kas lingkungan, menghormati hak data tetangga, dan bergotong royong secara merdeka demi kemandirian ekonomi komunitas kami."
+            &quot;Dengan menyetujui dokumen ini saat pertama kali menggunakan sistem, kami menyatakan sepakat untuk bertransaksi secara jujur, menjaga transparansi kas lingkungan, menghormati hak data tetangga, dan bergotong royong secara merdeka demi kemandirian ekonomi komunitas kami.&quot;
           </p>
         </div>
 

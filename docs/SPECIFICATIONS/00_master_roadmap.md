@@ -65,3 +65,5 @@ Sebelum AI Coder memulai fitur baru, fitur tersebut harus melalui matriks ini:
 
 **Roadmap ini adalah kompas Anda.** Kita tidak membangun sistem yang "besar" di awal, kita membangun sistem yang "benar" di awal, lalu membiarkannya tumbuh secara otonom melalui automasi.
 
+> [!NOTE]
+> Rencana detail implementasi teknis untuk penyelesaian sisa Peta Jalan (Fase 4: Sovereign Autonomy) dapat diakses secara langsung pada [Master Implementation Plan](file:///Users/mac/Downloads/URUN/docs/master_implementation_plan.md).

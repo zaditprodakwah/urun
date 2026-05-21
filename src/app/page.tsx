@@ -32,10 +32,19 @@ export default function Home() {
   const [showPrivacyBanner, setShowPrivacyBanner] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem("urun_pdp_consent");
-    if (!consent) {
-      setShowPrivacyBanner(true);
-    }
+    let mounted = true;
+    const checkConsent = async () => {
+      await Promise.resolve();
+      if (!mounted) return;
+      const consent = localStorage.getItem("urun_pdp_consent");
+      if (!consent) {
+        setShowPrivacyBanner(true);
+      }
+    };
+    checkConsent();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handlePrivacyConsent = () => {
@@ -135,7 +144,7 @@ export default function Home() {
           title: "Multi-Sig Consensus Resolution",
           description: "Menambahkan tanda tangan digital pengurus. Saat kuorum tercapai (2 dari 3 tanda tangan), status berubah menjadi approved dan sistem secara otomatis memicu transfer ledger kas secara aman.",
           rules: ["RULE 5: Multi-Sig Threshold Verification", "RULE 2: Immutable Ledger Entry Generation"],
-          technical: "UPDATE multisig_requests SET status = 'approved' WHERE id = $1 AND current_sigs >= required_sigs;",
+          technical: `UPDATE multisig_requests SET status = 'approved' WHERE id = '${reqId}' AND current_sigs >= required_sigs;`,
         };
       } else {
         replyText = "🤖 *ASISTEN BOT URUN*\n\nFormat perintah tidak dikenal. Gunakan perintah resmi berikut:\n\n• *#urun* : Lihat daftar program URUN Dana aktif\n• *#urun join [nama-slug] [qty]* : Ikut serta tender kolektif\n• *#kas* : Transparansi mutasi Buku Kas Kolektif secara real-time\n• *#reputasi* : Cek Skor Reputasi & portofolio warga\n• *#approve [request_id]* : Tandatangan Multi-Sig (Khusus Pengurus)";

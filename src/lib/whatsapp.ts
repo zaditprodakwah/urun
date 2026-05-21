@@ -22,12 +22,38 @@ export async function sendWhatsappMessage(target: string, text: string): Promise
       console.log(`✅ Message successfully sent to ${target}`);
       return true;
     } else {
-      console.error(`❌ Fonnte error: ${JSON.stringify(data)}`);
+      console.log(`❌ Fonnte error: ${JSON.stringify(data)}`);
       return false;
     }
   } catch (err) {
     console.error(`❌ Failed to call Fonnte API:`, err);
     return false;
+  }
+}
+
+/**
+ * Sends a WhatsApp message in a non-blocking background task using Next.js waitUntil if available,
+ * or standard background Promise execution, preventing serverless function termination issues.
+ */
+export function sendWhatsappMessageAsync(target: string, text: string): void {
+  const p = sendWhatsappMessage(target, text)
+    .then(success => {
+      if (success) console.log(`📡 [Async WA] Sent successfully to ${target}`);
+      else console.error(`📡 [Async WA] Failed to send to ${target}`);
+    })
+    .catch(err => {
+      console.error(`📡 [Async WA] Error sending to ${target}:`, err);
+    });
+
+  // Check if Vercel / Next.js waitUntil is globally available in the current context
+  try {
+    import('next/server').then(({ waitUntil }) => {
+      if (typeof waitUntil === 'function') {
+        waitUntil(p);
+      }
+    }).catch(() => {});
+  } catch {
+    // Normal environment, promise runs in background
   }
 }
 
