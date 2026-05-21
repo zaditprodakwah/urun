@@ -47,7 +47,8 @@ export function sendWhatsappMessageAsync(target: string, text: string): void {
 
   // Check if Vercel / Next.js waitUntil is globally available in the current context
   try {
-    import('next/server').then(({ waitUntil }) => {
+    import('next/server').then((mod: any) => {
+      const { waitUntil } = mod;
       if (typeof waitUntil === 'function') {
         waitUntil(p);
       }
