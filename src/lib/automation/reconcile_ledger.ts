@@ -186,7 +186,7 @@ export async function runLedgerReconciliation(targetCommunityId: string): Promis
       anomalies: []
     };
 
-  } catch (err) {
+  } catch (err: any) {
     console.error('💥 Critical error during automated ledger reconciliation:', err);
     return {
       success: false,
