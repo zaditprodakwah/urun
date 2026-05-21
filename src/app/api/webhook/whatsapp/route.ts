@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
     let sender = '';
     let message = '';
     let name = '';
+    let token = '';
 
     const contentType = req.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -60,16 +61,31 @@ export async function POST(req: NextRequest) {
       sender = body.sender || '';
       message = body.message || '';
       name = body.name || '';
+      token = body.token || '';
     } else {
       const formData = await req.formData();
       sender = (formData.get('sender') as string) || '';
       message = (formData.get('message') as string) || '';
       name = (formData.get('name') as string) || '';
+      token = (formData.get('token') as string) || '';
     }
 
     sender = sender.trim();
     message = message.trim();
     name = name.trim();
+    token = token.trim();
+
+    // Security: Optional Webhook Secret Verification
+    const webhookSecret = process.env.FONNTE_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const isHeaderMatch = req.headers.get('Authorization') === webhookSecret || req.headers.get('x-fonnte-token') === webhookSecret;
+      const isBodyMatch = token === webhookSecret;
+      if (!isHeaderMatch && !isBodyMatch) {
+        console.warn('❌ Unauthorized webhook request: Fonnte Webhook Secret mismatch.');
+        return NextResponse.json({ status: false, error: 'Unauthorized: Webhook Secret mismatch' }, { status: 401 });
+      }
+      console.log('🔒 Webhook request authenticated successfully via Fonnte Webhook Secret.');
+    }
 
     if (!sender || !message) {
       return NextResponse.json({ status: false, error: 'Sender or message missing' }, { status: 400 });
