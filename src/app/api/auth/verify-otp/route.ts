@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import crypto from 'crypto';
 import { encryptSession } from '@/lib/auth';
 import { formatPhoneNumber } from '@/lib/whatsapp';

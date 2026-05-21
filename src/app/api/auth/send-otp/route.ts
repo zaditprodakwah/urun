@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import crypto from 'crypto';
 import { formatPhoneNumber, sendWhatsappMessage } from '@/lib/whatsapp';
 
@@ -12,22 +12,32 @@ export async function POST(req: NextRequest) {
 
     const formattedPhone = formatPhoneNumber(phone);
 
-    // 1. Cooldown rate limit check (60 seconds)
+    // 1. Rate limit checks (Cooldown & Daily Limit)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: recentSessions, error: cooldownErr } = await supabaseAdmin
       .from('otp_sessions')
       .select('created_at')
       .eq('phone', formattedPhone)
-      .order('created_at', { ascending: false })
-      .limit(1);
+      .gte('created_at', oneDayAgo)
+      .order('created_at', { ascending: false });
 
-    if (!cooldownErr && recentSessions && recentSessions.length > 0) {
-      const lastCreatedAt = new Date(recentSessions[0].created_at).getTime();
-      const diffSeconds = (Date.now() - lastCreatedAt) / 1000;
-      if (diffSeconds < 60) {
-        return NextResponse.json({
-          status: false,
-          error: `Mohon tunggu ${Math.ceil(60 - diffSeconds)} detik sebelum meminta kode OTP kembali.`
-        }, { status: 429 });
+    if (!cooldownErr && recentSessions) {
+      if (recentSessions.length >= 5) {
+         return NextResponse.json({
+           status: false,
+           error: 'Batas permintaan OTP harian tercapai. Silakan coba lagi besok (Maks 5x/hari).'
+         }, { status: 429 });
+      }
+
+      if (recentSessions.length > 0) {
+        const lastCreatedAt = new Date(recentSessions[0].created_at).getTime();
+        const diffSeconds = (Date.now() - lastCreatedAt) / 1000;
+        if (diffSeconds < 60) {
+          return NextResponse.json({
+            status: false,
+            error: `Mohon tunggu ${Math.ceil(60 - diffSeconds)} detik sebelum meminta kode OTP kembali.`
+          }, { status: 429 });
+        }
       }
     }
 
@@ -101,7 +111,7 @@ export async function POST(req: NextRequest) {
       `Kode verifikasi Anda adalah: *${otp}*\n\n` +
       `Berlaku selama 5 menit. Jangan bagikan kode ini kepada siapapun demi keamanan akun warga Anda.`;
 
-    const sent = await sendWhatsappMessage(formattedPhone, message);
+    await sendWhatsappMessage(formattedPhone, message);
 
     // For local development and fallback/testing, print to terminal
     console.log(`🔑 [OTP DEV BYPASS] Phone: ${formattedPhone} | Code: ${otp}`);

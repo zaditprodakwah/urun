@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
 
 // Guard: verify that the requester is indeed an admin or pengurus
-async function verifyAdminAccess(req: NextRequest) {
+async function verifyAdminAccess(_req: NextRequest) {
   const session = await getSession();
   if (!session) {
     return { error: 'UNAUTHORIZED: Silakan login terlebih dahulu.', status: 401 };
@@ -17,9 +17,9 @@ async function verifyAdminAccess(req: NextRequest) {
 }
 
 // GET: List all members in the community
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
-    const authCheck = await verifyAdminAccess(req);
+    const authCheck = await verifyAdminAccess(_req);
     if (authCheck.error) {
       return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
     }

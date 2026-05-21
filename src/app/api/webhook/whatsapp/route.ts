@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
-import { sendWhatsappMessage, formatIDR, formatPhoneNumber } from '@/lib/whatsapp';
+import { supabaseAdmin } from '@/lib/supabase-server';
+import { sendWhatsappMessage, formatIDR } from '@/lib/whatsapp';
 
 export async function POST(req: NextRequest) {
   console.log('📬 Received incoming WhatsApp Webhook request');

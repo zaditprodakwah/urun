@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { supabaseAdmin } from './supabase';
+import { supabaseAdmin } from './supabase-server';
 import { SignJWT, jwtVerify } from 'jose';
 
 export interface UserSession {

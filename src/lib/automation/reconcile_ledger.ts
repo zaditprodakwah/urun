@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import { sendWhatsappMessage, formatIDR } from '@/lib/whatsapp';
 
 export interface AuditAnomaly {

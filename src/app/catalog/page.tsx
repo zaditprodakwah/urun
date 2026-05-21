@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 export const revalidate = 60; // Incremental Static Regeneration every 60 seconds
 

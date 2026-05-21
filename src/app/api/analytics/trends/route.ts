@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +22,7 @@ function applyDifferentialPrivacy(value: number, sensitivity: number = 100000): 
   return Math.max(0, Math.round(value + noise));
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await getSession();
     if (!session) {

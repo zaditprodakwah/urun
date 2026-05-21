@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runLedgerReconciliation } from '@/lib/automation/reconcile_ledger';
 import { getSession } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
 

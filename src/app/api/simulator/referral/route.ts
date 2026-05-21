@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Insert successful referral into interaction_log
     // This will trigger update_reputation_deterministic trigger in DB (+2 reputation)
-    const { data: logEntry, error: logErr } = await supabaseAdmin
+    const { error: logErr } = await supabaseAdmin
       .from('interaction_log')
       .insert({
         community_id: member.community_id,
@@ -59,6 +59,10 @@ export async function POST(req: NextRequest) {
       .select('reputation_score')
       .eq('id', referrerId)
       .single();
+
+    if (fetchErr) {
+      console.warn('⚠️ Could not fetch updated reputation score:', fetchErr);
+    }
 
     return NextResponse.json({
       success: true,

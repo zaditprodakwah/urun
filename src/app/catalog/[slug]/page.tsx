@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import { applyJitAffiliateLink } from '@/lib/parser';
 import { Product, WithContext } from 'schema-dts';
 
