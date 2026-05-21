@@ -53,7 +53,10 @@ export async function getSession(): Promise<UserSession | null> {
     if (!sessionCookie) return null;
 
     return await decryptSession(sessionCookie);
-  } catch (err) {
+  } catch (err: any) {
+    if (err && (err.message?.includes('Dynamic server usage') || err.digest === 'DYNAMIC_SERVER_USAGE')) {
+      throw err;
+    }
     console.error('Error parsing session cookie:', err);
     return null;
   }
