@@ -4,8 +4,8 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://awkwtxtgxjo
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseServiceKey) {
-  throw new Error('❌ Missing SUPABASE_SERVICE_ROLE_KEY environment variable. Crucial security enforcement.');
+if (typeof window === 'undefined' && !supabaseServiceKey) {
+  console.warn('⚠️ Missing SUPABASE_SERVICE_ROLE_KEY environment variable. Please configure it in Vercel.');
 }
 
 // Browser Client (uses Anon key, supports session persistence in client)
