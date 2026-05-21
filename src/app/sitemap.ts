@@ -1,56 +1,39 @@
 import { MetadataRoute } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 
-export const revalidate = 3600; // Cache sitemap for 1 hour
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.VERCEL_PROJECT_URL 
-    ? `https://${process.env.VERCEL_DOMAIN || 'urunwarga.vercel.app'}`
-    : 'https://urunwarga.vercel.app';
-
-  // Base routes
-  const routes: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/catalog`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/leaderboard`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.5,
-    },
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://urunwarga.vercel.app';
+  
+  const staticRoutes = [
+    { url: `${baseUrl}/`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 1.0 },
+    { url: `${baseUrl}/tentang`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${baseUrl}/kebijakan-privasi`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${baseUrl}/syarat-ketentuan`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${baseUrl}/kontak`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${baseUrl}/catalog`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.9 },
+    { url: `${baseUrl}/leaderboard`, lastModified: new Date(), changeFrequency: 'hourly' as const, priority: 0.9 },
   ];
 
   try {
-    // Fetch all public catalog items
-    const { data: items } = await supabaseAdmin
-      .from('catalog_items')
-      .select('slug, updated_at')
-      .eq('status', 'public')
-      .order('updated_at', { ascending: false });
-
-    if (items && items.length > 0) {
-      items.forEach((item) => {
-        routes.push({
-          url: `${baseUrl}/catalog/${item.slug}`,
-          lastModified: item.updated_at ? new Date(item.updated_at) : new Date(),
-          changeFrequency: 'weekly' as const,
-          priority: 0.8,
-        });
-      });
+    // Attempt to fetch public communities or items if we have dynamic pages for them
+    // Assuming we might have community profiles in the future, e.g. /community/[slug]
+    const { data: communities } = await supabaseAdmin
+      .from('communities')
+      .select('id, updated_at')
+      .limit(100);
+      
+    if (communities) {
+      const dynamicRoutes = communities.map((comm) => ({
+        url: `${baseUrl}/community/${comm.id}`,
+        lastModified: new Date(comm.updated_at || new Date()),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      }));
+      return [...staticRoutes, ...dynamicRoutes];
     }
-  } catch (err) {
-    console.error('❌ Error generating dynamic sitemap:', err);
+  } catch (error) {
+    console.error("Error generating sitemap dynamic routes:", error);
   }
 
-  return routes;
+  return staticRoutes;
 }
