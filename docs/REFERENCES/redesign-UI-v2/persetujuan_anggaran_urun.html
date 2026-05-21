@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>URUN - Halaman Konsensus &amp; Persetujuan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#faf8ff",
+                        "surface-container-high": "#e2e7ff",
+                        "surface": "#faf8ff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#5a2e00",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#002113",
+                        "on-surface-variant": "#3c4a42",
+                        "on-primary-container": "#00422b",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed-variant": "#004395",
+                        "tertiary": "#904d00",
+                        "primary-fixed": "#6ffbbe",
+                        "surface-container-highest": "#dae2fd",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "outline": "#6c7a71",
+                        "tertiary-fixed": "#ffdcc3",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#dae2fd",
+                        "inverse-surface": "#283044",
+                        "surface-container": "#eaedff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#006c49",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#006c49",
+                        "inverse-primary": "#4edea3",
+                        "surface-dim": "#d2d9f4",
+                        "secondary-container": "#2170e4",
+                        "secondary": "#0058be",
+                        "on-secondary-fixed": "#001a42",
+                        "on-surface": "#131b2e",
+                        "primary-fixed-dim": "#4edea3",
+                        "primary-container": "#10b981",
+                        "tertiary-container": "#f08921",
+                        "surface-bright": "#faf8ff",
+                        "on-primary-fixed-variant": "#005236",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#131b2e",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bbcabf"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "40px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-base": ["Geist Sans"],
+                        "label-caps": ["Geist Sans"],
+                        "display-lg": ["Geist Sans"],
+                        "body-bold": ["Geist Sans"],
+                        "display-lg-mobile": ["Geist Sans"],
+                        "headline-md": ["Geist Sans"]
+                    },
+                    "fontSize": {
+                        "body-base": ["16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-bold": ["16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "700" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex bg-surface-container-low border-r border-outline-variant w-64 h-screen fixed left-0 top-0 flex-col p-md z-40">
+<div class="mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">URUN</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Kedaulatan Warga</p>
+</div>
+<button class="w-full bg-primary text-on-primary font-body-bold text-body-bold rounded-xl py-3 px-4 mb-xl min-h-[48px] flex items-center justify-center hover:bg-surface-tint transition-colors duration-200">
+<span class="material-symbols-outlined mr-2">add</span>
+            Buat Usulan
+        </button>
+<ul class="flex-1 space-y-2">
+<li><a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span><span class="font-body-bold text-body-bold">Ringkasan</span></a></li>
+<li><a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="gavel">gavel</span><span class="font-body-bold text-body-bold">Tender Publik</span></a></li>
+<li><a class="flex items-center px-4 py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold translate-x-1 transition-transform duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="account_balance_wallet">account_balance_wallet</span><span class="font-body-bold text-body-bold">Buku Kas</span></a></li>
+<li><a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="campaign">campaign</span><span class="font-body-bold text-body-bold">Usulan Warga</span></a></li>
+<li><a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="settings">settings</span><span class="font-body-bold text-body-bold">Pengaturan</span></a></li>
+</ul>
+<ul class="mt-auto space-y-2 border-t border-outline-variant pt-4">
+<li><a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="help">help</span><span class="font-body-bold text-body-bold">Bantuan</span></a></li>
+<li><a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#"><span class="material-symbols-outlined mr-3" data-icon="logout">logout</span><span class="font-body-bold text-body-bold">Keluar</span></a></li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden bg-surface border-b border-outline-variant w-full flex justify-between items-center px-margin-mobile py-md sticky top-0 z-30">
+<div class="flex items-center">
+<span class="font-display-lg-mobile text-display-lg-mobile font-black tracking-tighter text-primary">URUN</span>
+</div>
+<div class="flex items-center space-x-4 text-primary">
+<button class="material-symbols-outlined" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined" data-icon="account_circle">account_circle</button>
+</div>
+</header>
+<div class="p-margin-mobile md:p-margin-desktop max-w-[1280px] mx-auto w-full flex-1">
+<div class="mb-xl">
+<h2 class="font-display-lg text-display-lg md:font-display-lg md:text-display-lg text-on-background mb-2">Konsensus &amp; Persetujuan</h2>
+<p class="font-body-base text-body-base text-on-surface-variant">Tinjau dan setujui anggaran secara kolektif untuk memastikan transparansi.</p>
+</div>
+<!-- Dashboard Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<div class="bg-surface rounded-xl p-lg border border-outline-variant">
+<div class="flex justify-between items-start mb-4">
+<span class="font-body-bold text-body-bold text-on-surface-variant">Menunggu Tanda Tangan</span>
+<span class="material-symbols-outlined text-tertiary-container">pending_actions</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-background">4</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-2">PROPOSAL AKTIF</p>
+</div>
+<div class="bg-surface rounded-xl p-lg border border-outline-variant">
+<div class="flex justify-between items-start mb-4">
+<span class="font-body-bold text-body-bold text-on-surface-variant">Total Dana Disetujui</span>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-background">Rp 145M</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-2">BULAN INI</p>
+</div>
+<div class="bg-surface rounded-xl p-lg border border-outline-variant">
+<div class="flex justify-between items-start mb-4">
+<span class="font-body-bold text-body-bold text-on-surface-variant">Tingkat Partisipasi</span>
+<span class="material-symbols-outlined text-secondary">group</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-background">88%</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-2">PENGURUS AKTIF</p>
+</div>
+</div>
+<!-- Pending Approvals Bento Grid -->
+<h3 class="font-headline-md text-headline-md font-bold text-on-background mb-lg">Antrean Proposal</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+<!-- Card 1 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col hover:border-outline transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block bg-tertiary-container/20 text-tertiary-container font-label-caps text-label-caps px-2 py-1 rounded mb-2">MENUNGGU ANDA</span>
+<h4 class="font-body-bold text-body-bold text-on-background">Perbaikan Drainase Sektor 4</h4>
+</div>
+<span class="font-body-bold text-body-bold text-on-background">Rp 25.500.000</span>
+</div>
+<p class="font-body-base text-body-base text-on-surface-variant mb-4 flex-1">Anggaran untuk material dan upah kerja perbaikan gorong-gorong utama di jalan merdeka.</p>
+<div class="mb-6">
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-2">
+<span>Status Konsensus: 2/5</span>
+<span>40%</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 40%"></div>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 bg-primary text-on-primary font-body-bold text-body-bold h-[48px] rounded-xl flex items-center justify-center hover:bg-surface-tint transition-colors">
+<span class="material-symbols-outlined mr-2">edit_document</span> Tandatangani
+                        </button>
+<button class="flex-1 bg-surface-container-high text-on-background font-body-bold text-body-bold h-[48px] rounded-xl flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+                            Lihat Detail
+                        </button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col hover:border-outline transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block bg-secondary-container/20 text-secondary font-label-caps text-label-caps px-2 py-1 rounded mb-2">PROSES VOTING</span>
+<h4 class="font-body-bold text-body-bold text-on-background">Pengadaan Tong Sampah Terpilah</h4>
+</div>
+<span class="font-body-bold text-body-bold text-on-background">Rp 12.000.000</span>
+</div>
+<p class="font-body-base text-body-base text-on-surface-variant mb-4 flex-1">Pembelian 50 set tong sampah 3 warna untuk seluruh area perumahan.</p>
+<div class="mb-6">
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-2">
+<span>Status Konsensus: 4/5</span>
+<span>80%</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-2">
+<div class="bg-secondary h-2 rounded-full" style="width: 80%"></div>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="w-full bg-surface-container-high text-on-background font-body-bold text-body-bold h-[48px] rounded-xl flex items-center justify-center hover:bg-surface-container-highest transition-colors" disabled="">
+<span class="material-symbols-outlined mr-2">check_circle</span> Anda Sudah Setuju
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-highest w-full py-xl px-margin-desktop mt-auto border-t border-outline-variant">
+<div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="font-body-base text-body-base text-on-surface-variant text-center md:text-left">
+                    © 2024 URUN - Ekosistem Digital Kedaulatan Warga. Inklusif &amp; Transparan.
+                </p>
+<div class="flex gap-4 font-label-caps text-label-caps">
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Panduan Komunitas</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Kebijakan Privasi</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Kontak</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant flex justify-around items-center h-16 z-40 px-2 pb-safe">
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-medium">Ringkasan</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="gavel">gavel</span>
+<span class="text-[10px] font-medium">Tender</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="text-[10px] font-bold">Buku Kas</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="campaign">campaign</span>
+<span class="text-[10px] font-medium">Usulan</span>
+</a>
+</nav>
+</body></html>

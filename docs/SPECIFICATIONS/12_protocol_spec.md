@@ -41,6 +41,46 @@ Untuk sinkronisasi *real-time* dengan ekosistem (misal: Notifikasi ke Bot WhatsA
 * POST /v1/webhook/events  
   * Event Type: transaction.created, workflow.updated, catalog.added.
 
+### **D. Callback Kemitraan Afiliasi Eksternal (Inbound Revenue - Epic 4)**
+
+Menerima callback/webhook komisi dari marketplace atau platform afiliasi pihak ketiga eksternal untuk diproses bagi hasil secara instan ke kas warga (70%) dan platform fee (30%).
+
+* **Rute:** `POST /api/v1/affiliate/callback`
+* **Keamanan Headers:**
+  * `X-Urun-Signature`: String hex tanda tangan HMAC-SHA256 dari *raw request body* menggunakan `SESSION_SECRET`.
+  * `X-Urun-Timestamp`: Integer unix epoch timestamp (detik). Ditolak jika selisih dengan waktu server $> 300$ detik (anti replay-attack).
+* **Payload Request Body (JSON):**
+  ```json
+  {
+    "product_id": "uuid-v4 (opsional jika ada product_slug)",
+    "product_slug": "string (opsional jika ada product_id)",
+    "commission_amount": 100000.00,
+    "source_tx_id": "string (ID transaksi unik platform asal)",
+    "platform": "string (contoh: 'tokopedia', 'shopee')",
+    "idempotency_key": "uuid-v4 (kunci idempotensi unik wajib)"
+  }
+  ```
+* **Status Tanggapan (Responses):**
+  * **201 Created**: Pencatatan ledger ganda (`community_share` & `platform_revenue`) berhasil diproses pertama kali.
+    ```json
+    {
+      "status": "success",
+      "message": "Komisi kemitraan berhasil diproses secara otomatis.",
+      "community_ledger_id": "uuid-v4",
+      "platform_ledger_id": "uuid-v4",
+      "calculations": {
+        "total_commission": 100000,
+        "platform_fee_30pct": 30000,
+        "community_share_70pct": 70000
+      }
+    }
+    ```
+  * **200 OK**: Hit idempotensi berulang (kunci idempotensi terdeteksi sudah pernah diproses). Mengembalikan data respons yang sama persis tanpa menulis ulang ledger.
+  * **401 Unauthorized**: Header signature hilang, timestamp kedaluwarsa ($> 300$ detik), atau tanda tangan HMAC tidak cocok.
+  * **400 Bad Request**: Payload JSON cacat, parameter wajib kosong (`commission_amount <= 0`, `source_tx_id`, `platform`, `idempotency_key`), atau format `idempotency_key` bukan UUID v4.
+  * **404 Not Found**: Barang katalog (`product_id` dan `product_slug`) tidak ditemukan di database.
+  * **500 Internal Server Error**: Kesalahan server internal atau kegagalan transaksi database.
+
 ## **IV. Spesifikasi Webhook (Event Payload)**
 
 Setiap peristiwa di sistem wajib mengirimkan notifikasi ke *webhook* yang terdaftar untuk menjaga sinkronisasi ekosistem.

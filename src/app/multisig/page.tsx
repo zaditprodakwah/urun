@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import { 
+  ShieldCheck, 
+  Wrench, 
+  RotateCw, 
+  Inbox, 
+  CheckCircle2, 
+  XCircle, 
+  Info, 
+  Search,
+  ChevronRight
+} from 'lucide-react';
 
 interface Tender {
   id: string;
@@ -209,80 +219,60 @@ export default function MultisigDashboard() {
   const activeSigner = SIGNERS.find(s => s.id === activeSignerId);
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-300">
+    <div className="min-h-screen bg-[#FCFBF9] text-zinc-900 font-sans selection:bg-emerald-500/20 selection:text-emerald-800 relative overflow-hidden pb-20">
+      {/* Background elegant architectural line details */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e2db_1px,transparent_1px),linear-gradient(to_bottom,#e5e2db_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none -z-10"></div>
       
-      {/* Glow Ambient */}
-      <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[128px] pointer-events-none -z-10 animate-pulse duration-[8000ms]"></div>
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-emerald-600/5 rounded-full blur-[128px] pointer-events-none -z-10"></div>
+      {/* Soft bright warm ambient glows */}
+      <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none -z-10 animate-pulse duration-[10000ms]"></div>
+      <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform">
-              <span className="text-xl font-bold text-zinc-950">U</span>
-            </Link>
-            <div>
-              <div className="flex items-center gap-2">
-                <Link href="/" className="text-xl font-bold tracking-tight text-white hover:text-emerald-400 transition-colors">URUN</Link>
-                <span className="text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                  FINANCIAL GUARDRAILS
-                </span>
-              </div>
-              <p className="text-xs text-zinc-400">Sovereign Financial Autonomy & Multi-Sig Panel</p>
-            </div>
-          </div>
-          
-          <nav className="flex items-center gap-4">
-            <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors">← Simulator WA</Link>
-            <Link href="/catalog" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">Etalase Publik</Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
         
         {/* Global Notifications Alert Banner */}
         {alert && (
-          <div className={`p-4 rounded-xl border animate-fade-in flex items-start gap-3 shadow-xl ${
+          <div className={`p-4.5 rounded-2xl border animate-fade-in flex items-start gap-3.5 shadow-md ${
             alert.type === 'success' 
-              ? 'bg-emerald-950/40 border-emerald-500/20 text-emerald-300' 
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
               : alert.type === 'error'
-              ? 'bg-red-950/40 border-red-500/20 text-red-300'
-              : 'bg-zinc-900 border-zinc-800 text-zinc-300'
+              ? 'bg-red-50 border-red-200 text-red-800'
+              : 'bg-surface border-outline-variant text-on-surface'
           }`}>
-            <span className="text-lg">{alert.type === 'success' ? '✅' : alert.type === 'error' ? '❌' : 'ℹ️'}</span>
-            <div className="text-sm font-medium">{alert.message}</div>
+            <span className="text-lg leading-none shrink-0 mt-0.5">
+              {alert.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : alert.type === 'error' ? <XCircle className="w-5 h-5 text-red-600" /> : <Info className="w-5 h-5 text-zinc-600" />}
+            </span>
+            <div className="text-xs font-bold leading-normal">{alert.message}</div>
           </div>
         )}
 
         {/* Dashboard Introduction Section */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-8 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 
-              Sovereign Autonomy Enforced
+          <div className="lg:col-span-8 space-y-5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-[11px] font-bold text-emerald-800">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Sovereign Autonomy Enforced</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-zinc-900 leading-tight">
               Multi-Sig Command Center
             </h2>
-            <p className="text-zinc-400 leading-relaxed text-sm max-w-3xl">
-              Untuk melindungi kas komunitas dari risiko kecurangan keuangan, pengeluaran pengadaan barang bernilai besar (nominal <span className="text-emerald-400 font-semibold">&gt;= Rp 5.000.000</span>) dialihkan secara paksa dari pengisian kas langsung menuju antrean konsensus digital. Buku Kas Kolektif (Ledger) hanya dapat mencatatkan mutasi final secara otomatis begitu kuorum pengurus terpenuhi secara berdaulat.
+            <p className="text-zinc-600 leading-relaxed text-sm max-w-3xl font-medium">
+              Untuk melindungi kas komunitas dari risiko kecurangan keuangan, pengeluaran pengadaan barang bernilai besar (nominal <span className="text-emerald-700 font-bold">&gt;= Rp 5.000.000</span>) dialihkan secara paksa dari pengisian kas langsung menuju antrean konsensus digital. Buku Kas Kolektif (Ledger) hanya dapat mencatatkan mutasi final secara otomatis begitu kuorum pengurus terpenuhi secara berdaulat.
             </p>
           </div>
 
-          <div className="lg:col-span-4 bg-zinc-900/40 border border-zinc-850 p-6 rounded-2xl space-y-4 shadow-xl backdrop-blur-sm">
-            <h3 className="font-bold text-white text-sm flex items-center gap-2">
-              <span>🔧</span> CONTROL PANEL & SIMULATION
+          <div className="lg:col-span-4 bg-white border border-outline-variant p-6 rounded-3xl shadow-sm space-y-4">
+            <h3 className="font-black text-zinc-900 text-xs tracking-wider uppercase flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-emerald-600" />
+              <span>Control Panel & Simulation</span>
             </h3>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-500 mb-1.5">SIMULATE ACTIVE SIGNER AS:</label>
+                <label className="block text-[10px] font-bold tracking-wider text-zinc-400 uppercase mb-1.5">SIMULATE ACTIVE SIGNER AS:</label>
                 <select 
                   value={activeSignerId}
                   onChange={(e) => setActiveSignerId(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+                  className="w-full bg-surface border border-outline-variant rounded-xl px-3.5 py-3 text-xs text-zinc-900 font-bold focus:outline-none focus:border-primary transition-colors cursor-pointer"
                 >
                   {SIGNERS.map(s => (
                     <option key={s.id} value={s.id}>{s.name} ({s.role})</option>
@@ -290,21 +280,22 @@ export default function MultisigDashboard() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handleSimulateOutflow}
                   disabled={simulating}
-                  className="px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-400 text-zinc-950 text-xs font-extrabold hover:from-emerald-500 hover:to-emerald-300 transition-all shadow-lg shadow-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-center"
+                  className="px-4 py-3 rounded-xl bg-primary text-white text-xs font-black hover:bg-primary-container transition-all shadow-md shadow-primary/10 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-center flex items-center justify-center"
                 >
-                  {simulating ? "Simulating..." : "Simulate Outflow (Rp 7.5M)"}
+                  {simulating ? "Simulating..." : "Simulate Outflow"}
                 </button>
                 
                 <button
                   onClick={handleRunReconciliation}
                   disabled={simulating}
-                  className="px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs font-bold hover:border-zinc-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-center"
+                  className="px-4 py-3 rounded-xl bg-white border border-outline text-zinc-800 text-xs font-black hover:bg-surface transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-center flex items-center justify-center gap-1"
                 >
-                  {simulating ? "Auditing..." : "Run Ledger Audit 🔍"}
+                  <Search className="w-3.5 h-3.5" />
+                  {simulating ? "Auditing..." : "Ledger Audit"}
                 </button>
               </div>
             </div>
@@ -313,43 +304,47 @@ export default function MultisigDashboard() {
 
         {/* Ledger Reconciliation Audit Output Visual */}
         {reconResult?.ran && (
-          <section className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-2xl animate-fade-in space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-850 pb-3">
-              <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                <span>🛡️</span> HASIL AUDIT REKONSILIASI MANDIRI
+          <section className="bg-white border border-outline-variant p-6 rounded-3xl shadow-sm animate-fade-in space-y-5">
+            <div className="flex items-center justify-between border-b border-outline-variant/60 pb-4">
+              <h3 className="font-black text-zinc-900 text-xs tracking-wider uppercase flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Hasil Audit Rekonsiliasi Mandiri</span>
               </h3>
-              <span className={`text-xs px-2.5 py-1 rounded-full border ${
+              <span className={`text-[10px] font-black px-2.5 py-1 rounded-full border tracking-wide uppercase ${
                 reconResult.success 
-                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
-                  : 'bg-red-500/10 border-red-500/20 text-red-400'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                  : 'bg-red-50 border-red-200 text-red-800'
               }`}>
                 {reconResult.success ? '100% INTEGRITAS TERJAGA' : 'DISCREPANCY ALERTS FOUND'}
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-850">
-                <div className="text-zinc-500 text-xs font-semibold mb-0.5">Tender Settlement Diaudit</div>
-                <div className="text-2xl font-bold text-white">{reconResult.totalSettlements} Transaksi</div>
+              <div className="p-4 rounded-2xl bg-[#F5F3EF]/60 border border-zinc-200/80">
+                <div className="text-zinc-400 text-[10px] font-bold uppercase tracking-wider mb-1">Tender Settlement Diaudit</div>
+                <div className="text-2xl font-black text-zinc-900">{reconResult.totalSettlements} Transaksi</div>
               </div>
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-850">
-                <div className="text-zinc-500 text-xs font-semibold mb-0.5">Jumlah Kejanggalan/Anomali</div>
-                <div className={`text-2xl font-bold ${reconResult.anomaliesFound > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+              <div className="p-4 rounded-2xl bg-[#F5F3EF]/60 border border-zinc-200/80">
+                <div className="text-zinc-400 text-[10px] font-bold uppercase tracking-wider mb-1">Jumlah Kejanggalan/Anomali</div>
+                <div className={`text-2xl font-black ${reconResult.anomaliesFound > 0 ? 'text-red-700' : 'text-emerald-700'}`}>
                   {reconResult.anomaliesFound} Masalah
                 </div>
               </div>
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-850">
-                <div className="text-zinc-500 text-xs font-semibold mb-0.5">Metode Perbaikan Diizinkan</div>
-                <div className="text-xs font-bold text-zinc-400 mt-1">correction_entry (Append-only Reversal)</div>
+              <div className="p-4 rounded-2xl bg-[#F5F3EF]/60 border border-zinc-200/80">
+                <div className="text-zinc-400 text-[10px] font-bold uppercase tracking-wider mb-1">Metode Perbaikan Diizinkan</div>
+                <div className="text-xs font-black text-zinc-600 mt-1 font-mono">correction_entry (Append Reversal)</div>
               </div>
             </div>
 
             {reconResult.anomalies.length > 0 && (
               <div className="space-y-2 mt-4">
-                <div className="text-xs font-bold text-red-400">Rincian Anomali Keuangan:</div>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
+                <div className="text-[10px] font-black tracking-wider uppercase text-red-700 flex items-center gap-1">
+                  <XCircle className="w-3.5 h-3.5" />
+                  <span>Rincian Anomali Keuangan:</span>
+                </div>
+                <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
                   {reconResult.anomalies.map((a, i) => (
-                    <div key={i} className="p-3 bg-red-950/20 border border-red-900/20 rounded-lg text-xs text-red-300">
+                    <div key={i} className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-800">
                       <strong>[{a.type.toUpperCase()}]</strong> Ledger ID: ...{a.ledgerId.slice(-8)} — {a.details}
                     </div>
                   ))}
@@ -361,35 +356,46 @@ export default function MultisigDashboard() {
 
         {/* Multi-Sig Pending Requests Queue */}
         <section className="space-y-6">
-          <div className="flex items-center justify-between border-b border-zinc-900 pb-4">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <span>📂</span> Antrean Persetujuan Warga ({requests.length})
+          <div className="flex items-center justify-between border-b border-outline-variant/60 pb-5">
+            <h3 className="text-2xl font-black text-zinc-900 tracking-tight flex items-center gap-2">
+              <Inbox className="w-6 h-6 text-primary" />
+              <span>Antrean Persetujuan Warga ({requests.length})</span>
             </h3>
             <button 
               onClick={fetchRequests} 
-              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1.5 bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800"
+              className="text-xs font-black text-primary hover:text-primary-container transition-all flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container px-3.5 py-2.5 rounded-xl border border-outline-variant shadow-sm"
             >
-              <span>🔄</span> Refresh Antrean
+              <RotateCw className="w-3.5 h-3.5 animate-spin-hover" />
+              <span>Refresh Antrean</span>
             </button>
           </div>
 
           {loading ? (
-            <div className="text-center py-20 text-zinc-500 text-sm animate-pulse">
-              Memuat data antrean Multi-Sig dari database berdaulat...
+            <div className="text-center py-24 text-zinc-400 text-sm font-semibold animate-pulse flex items-center justify-center gap-2">
+              <RotateCw className="w-4 h-4 animate-spin text-primary" />
+              <span>Memuat data antrean Multi-Sig dari database berdaulat...</span>
             </div>
           ) : requests.length === 0 ? (
-            <div className="text-center py-24 bg-zinc-900/20 border border-zinc-900 rounded-2xl text-zinc-500 text-sm space-y-3">
-              <div className="text-3xl">📭</div>
-              <div>Tidak ada permintaan Multi-Sig pending dalam sistem saat ini.</div>
+            <div className="text-center py-24 bg-white border border-outline-variant rounded-3xl text-zinc-500 text-sm space-y-4 max-w-xl mx-auto p-8 shadow-sm">
+              <div className="w-16 h-16 mx-auto rounded-full bg-surface-container-low border border-outline-variant flex items-center justify-center text-zinc-400">
+                <Inbox className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-base font-extrabold text-zinc-900">Tidak ada pengeluaran tertunda</h4>
+                <p className="text-zinc-500 text-xs max-w-xs mx-auto leading-relaxed">
+                  Semua transaksi pengadaan warga sudah disetujui atau belum didelegasikan dalam nominal besar.
+                </p>
+              </div>
               <button 
                 onClick={handleSimulateOutflow} 
-                className="mt-2 text-xs font-bold text-emerald-400 hover:underline"
+                className="mt-2 text-xs font-black text-primary hover:text-primary-container inline-flex items-center gap-1"
               >
-                Picu simulasi nominal besar untuk membuat permintaan ➔
+                Picu simulasi nominal besar
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {requests.map((req) => {
                 const isApproved = req.status === 'approved';
                 const isExpired = req.status === 'expired';
@@ -407,96 +413,96 @@ export default function MultisigDashboard() {
                 return (
                   <div 
                     key={req.id} 
-                    className={`flex flex-col bg-zinc-900/70 border rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 ${
+                    className={`flex flex-col bg-white border rounded-3xl shadow-sm hover:shadow-xl hover:shadow-on-surface/5 transition-all duration-300 ${
                       isApproved 
-                        ? 'border-emerald-500/30 bg-gradient-to-b from-zinc-900 to-emerald-950/10' 
+                        ? 'border-primary bg-gradient-to-b from-white to-primary/5' 
                         : isExpired
-                        ? 'border-red-500/10 opacity-70 bg-zinc-950'
-                        : 'border-zinc-800 hover:border-emerald-500/20'
+                        ? 'border-outline-variant/60 opacity-60 bg-surface-container-low'
+                        : 'border-outline-variant hover:border-primary/50'
                     }`}
                   >
                     {/* Card Header */}
-                    <div className="p-6 border-b border-zinc-850 flex items-start justify-between gap-4">
+                    <div className="p-6 border-b border-outline-variant/60 flex items-start justify-between gap-4">
                       <div className="space-y-1">
-                        <div className="text-[10px] text-zinc-500 font-mono tracking-wider">REQUEST ID: ...{req.id.slice(-12)}</div>
-                        <h4 className="text-lg font-bold text-white leading-tight">
+                        <div className="text-[9px] text-zinc-400 font-mono tracking-wider">REQUEST ID: ...{req.id.slice(-12)}</div>
+                        <h4 className="text-lg font-black text-zinc-900 leading-tight">
                           {req.tenders?.title || "Pengeluaran Kas Komunitas"}
                         </h4>
-                        <p className="text-xs text-zinc-400 line-clamp-1">
+                        <p className="text-xs text-zinc-500 line-clamp-1 font-semibold">
                           {req.tenders?.description || "Simulasi pengadaan barang RT."}
                         </p>
                       </div>
                       
-                      <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full border tracking-wide uppercase ${
+                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full border tracking-wide uppercase ${
                         isApproved 
-                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-glow' 
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
                           : isExpired
-                          ? 'bg-red-500/10 border-red-500/20 text-red-400'
-                          : 'bg-amber-500/10 border-amber-500/20 text-amber-400 animate-pulse'
+                          ? 'bg-red-50 border-red-200 text-red-800'
+                          : 'bg-amber-50 border-amber-200 text-amber-800 animate-pulse'
                       }`}>
                         {req.status}
                       </span>
                     </div>
 
                     {/* Transaction Amount Detail */}
-                    <div className="px-6 py-4 bg-zinc-950/40 border-b border-zinc-850/80 flex items-center justify-between">
-                      <div className="text-xs text-zinc-500 font-semibold">Total Pencairan Warga:</div>
-                      <div className="text-xl font-black text-emerald-400 font-mono">
+                    <div className="px-6 py-4.5 bg-[#F5F3EF]/40 border-b border-outline-variant/60 flex items-center justify-between">
+                      <div className="text-xs text-zinc-500 font-bold">Total Pencairan Warga:</div>
+                      <div className="text-xl font-black text-primary font-mono">
                         {formatCurrency(req.amount)}
                       </div>
                     </div>
 
                     {/* 70/30 Split Transparency Visualizer */}
-                    <div className="p-6 border-b border-zinc-850 space-y-3 bg-zinc-950/20">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                        <span>🛡️ TRANSPARANSI ALIRAN DANA</span>
-                        <span className="text-emerald-400 font-black">70/30 RULE</span>
+                    <div className="p-6 border-b border-outline-variant/60 space-y-3 bg-[#F5F3EF]/10">
+                      <div className="flex items-center justify-between text-[10px] font-black text-zinc-400 uppercase tracking-wider">
+                        <span>🛡️ Transparansi Aliran Dana</span>
+                        <span className="text-primary font-black">70/30 RULE</span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-zinc-900 border border-zinc-850 rounded-xl relative overflow-hidden group">
+                        <div className="p-3.5 bg-white border border-outline-variant rounded-2xl relative overflow-hidden group">
                           <div className="absolute top-0 right-0 w-12 h-12 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-colors"></div>
-                          <div className="text-[10px] text-zinc-500 font-bold mb-0.5"> Treasury Komunitas (70%)</div>
-                          <div className="text-sm font-extrabold text-white font-mono">{formatCurrency(communityShare)}</div>
-                          <div className="text-[9px] text-emerald-400 mt-1">Simpul Komunitas RT</div>
+                          <div className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Treasury Komunitas (70%)</div>
+                          <div className="text-sm font-black text-zinc-900 font-mono">{formatCurrency(communityShare)}</div>
+                          <div className="text-[9px] text-emerald-700 font-bold mt-1">Simpul Komunitas RT</div>
                         </div>
 
-                        <div className="p-3 bg-zinc-900 border border-zinc-850 rounded-xl relative overflow-hidden group">
-                          <div className="absolute top-0 right-0 w-12 h-12 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-colors"></div>
-                          <div className="text-[10px] text-zinc-500 font-bold mb-0.5">Biaya Platform URUN (30%)</div>
-                          <div className="text-sm font-extrabold text-white font-mono">{formatCurrency(platformFee)}</div>
-                          <div className="text-[9px] text-zinc-400 mt-1">URUN Ops (0% Peduli Warga)</div>
+                        <div className="p-3.5 bg-white border border-outline-variant rounded-2xl relative overflow-hidden group">
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors"></div>
+                          <div className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Biaya Platform URUN (30%)</div>
+                          <div className="text-sm font-black text-zinc-900 font-mono">{formatCurrency(platformFee)}</div>
+                          <div className="text-[9px] text-zinc-500 font-semibold mt-1">URUN Ops (0% Peduli Warga)</div>
                         </div>
                       </div>
                     </div>
 
                     {/* Consensus Progress Bar & Signatures list */}
                     <div className="p-6 flex-1 space-y-4">
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-xs font-bold text-white">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs font-black text-zinc-800">
                           <span>Progres Konsensus Pengurus</span>
-                          <span className="text-emerald-400">{req.current_sigs} / {req.required_sigs} Tanda Tangan</span>
+                          <span className="text-primary">{req.current_sigs} / {req.required_sigs} Tanda Tangan</span>
                         </div>
-                        <div className="w-full bg-zinc-950 h-3 rounded-full overflow-hidden border border-zinc-850 relative">
+                        <div className="w-full bg-[#F5F3EF] h-2.5 rounded-full overflow-hidden border border-outline-variant/60 relative">
                           <div 
-                            className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full transition-all duration-500 shadow-glow"
+                            className="bg-gradient-to-r from-primary to-primary-container h-full rounded-full transition-all duration-500"
                             style={{ width: `${progressPct}%` }}
                           ></div>
                         </div>
                       </div>
 
                       {/* Signers and Approvals detail */}
-                      <div className="space-y-2 pt-1">
-                        <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Tanda Tangan Terkumpul:</div>
+                      <div className="space-y-2.5 pt-1">
+                        <div className="text-[9px] font-black text-zinc-400 uppercase tracking-wider">Tanda Tangan Terkumpul:</div>
                         {req.approvals.length === 0 ? (
-                          <div className="text-xs text-zinc-500 italic">Belum ada pengurus yang menandatangani.</div>
+                          <div className="text-xs text-zinc-400 italic font-medium">Belum ada pengurus yang menandatangani.</div>
                         ) : (
                           <div className="flex flex-wrap gap-2">
                             {req.approvals.map((app, idx) => (
-                              <div key={idx} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-850 text-[10px] text-zinc-300 font-mono">
-                                <span className="text-emerald-400">✍️</span>
-                                <strong className="text-white">{app.full_name}</strong>
-                                <span className="text-zinc-500 text-[9px]">({app.signature})</span>
+                              <div key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface border border-outline-variant text-[10px] text-zinc-700 font-mono font-bold shadow-sm">
+                                <span className="text-primary">✍️</span>
+                                <strong className="text-zinc-900">{app.full_name}</strong>
+                                <span className="text-zinc-400 text-[9px]">({app.signature})</span>
                               </div>
                             ))}
                           </div>
@@ -505,32 +511,33 @@ export default function MultisigDashboard() {
                     </div>
 
                     {/* Card Actions Bottom */}
-                    <div className="p-6 border-t border-zinc-850/80 bg-zinc-950/30 flex items-center justify-between gap-4 rounded-b-2xl">
-                      <div className="text-[10px] text-zinc-500 flex flex-col">
+                    <div className="p-6 border-t border-outline-variant/60 bg-surface rounded-b-3xl flex items-center justify-between gap-4">
+                      <div className="text-[10px] text-zinc-400 flex flex-col font-medium">
                         <span>Batas Konsensus:</span>
-                        <strong className="text-zinc-400 font-mono">{new Date(req.expires_at).toLocaleString("id-ID")}</strong>
+                        <strong className="text-zinc-700 font-mono font-black">{new Date(req.expires_at).toLocaleString("id-ID")}</strong>
                       </div>
 
                       {isApproved ? (
-                        <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                          <span>🛡️</span> Ledg_Ref: ...{req.ledger_ref_id?.slice(-8)}
+                        <div className="text-xs font-black text-emerald-700 flex items-center gap-1 font-mono">
+                          <ShieldCheck className="w-4.5 h-4.5" />
+                          <span>Ledger: ...{req.ledger_ref_id?.slice(-8)}</span>
                         </div>
                       ) : isExpired ? (
-                        <div className="text-xs font-bold text-red-500">EXPIRED</div>
+                        <div className="text-xs font-black text-red-600 uppercase tracking-wider">EXPIRED</div>
                       ) : (
                         <button
                           onClick={() => handleApprove(req.id)}
                           disabled={actionLoadingId === req.id || signedByMe}
-                          className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          className={`px-5 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                             signedByMe 
-                              ? 'bg-zinc-900 border border-zinc-850 text-zinc-500' 
-                              : 'bg-emerald-400 text-zinc-950 hover:bg-emerald-300 shadow-lg shadow-emerald-500/10'
+                              ? 'bg-surface-container border border-outline-variant text-zinc-400' 
+                              : 'bg-primary text-white hover:bg-primary-container shadow-md shadow-primary/10'
                           }`}
                         >
                           {actionLoadingId === req.id 
                             ? "Signing..." 
                             : signedByMe 
-                            ? "SIGNED (Sudah Disetujui)" 
+                            ? "SIGNED" 
                             : `SIGN AS ${activeSigner?.name?.split(' ')[0].toUpperCase()}`
                           }
                         </button>
@@ -544,15 +551,6 @@ export default function MultisigDashboard() {
         </section>
 
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-zinc-900 bg-zinc-950 py-8 text-center text-xs text-zinc-500">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© 2026 URUN Warga. Sistem Keuangan Kolektif Terdesentralisasi.</p>
-          <p className="mt-1 text-[10px] text-zinc-600 font-mono">Row-Level Security (RLS) & Stored Procedure Ledger Isolation Enforced.</p>
-        </div>
-      </footer>
-
     </div>
   );
 }

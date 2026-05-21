@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { createHmac } from 'crypto';
+import { checkIdempotency, saveIdempotencyResult } from '@/lib/idempotency';
 
 export const dynamic = 'force-dynamic';
 
-const SHARED_SECRET = process.env.SESSION_SECRET || 'RahasiaUrunWargaSessionSecretFallback2026!';
+const SHARED_SECRET = (() => {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('❌ CRITICAL: SESSION_SECRET is missing from environment variables in production.');
+    }
+    return 'RahasiaUrunWargaSessionSecretFallback2026!';
+  }
+  return secret;
+})();
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,6 +87,13 @@ export async function POST(req: NextRequest) {
       phones.push('+628' + phoneNormal.slice(3));
     }
 
+    // 4. Idempotency Check
+    const idempotencyCheck = await checkIdempotency(supabaseAdmin, idempotency_key, community_id, '/api/v1/ledger/contribution');
+    if (idempotencyCheck.status !== 'proceed') {
+      return NextResponse.json(idempotencyCheck.response_body, { status: idempotencyCheck.response_status });
+    }
+
+    // 5. Resolve registered community member profile by phone
     const { data: memberData, error: memberErr } = await supabaseAdmin
       .from('community_members')
       .select(`
@@ -152,7 +169,7 @@ export async function POST(req: NextRequest) {
         source_system: 'api_gateway'
       });
 
-    return NextResponse.json({
+    const successResponse = {
       status: 'success',
       message: 'Kontribusi kas sukses diposting ke Buku Kas Kolektif (Ledger).',
       ledger_id: result.ledger_id,
@@ -160,7 +177,11 @@ export async function POST(req: NextRequest) {
         name: profile.full_name,
         phone: phoneNormal
       }
-    }, { status: 201 });
+    };
+    
+    await saveIdempotencyResult(supabaseAdmin, idempotency_key, 201, successResponse);
+
+    return NextResponse.json(successResponse, { status: 201 });
 
   } catch (err) {
     console.error('💥 Ledger Contribution API Critical Error:', err);

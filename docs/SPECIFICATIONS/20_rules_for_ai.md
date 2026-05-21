@@ -37,15 +37,17 @@ Setiap baris kode, arsitektur, atau keputusan strategis yang diambil dalam penge
 14. **Polymorphic Data:** Gunakan kolom `metadata` (JSONB) pada `catalog_items` atau `workflow_processes` untuk menyimpan atribut unik. Dilarang menambah kolom tabel secara fisik untuk fitur-fitur yang tidak universal.
 15. **Adapter Pattern:** Integrasi dengan pihak ketiga (Payment, WA API) wajib menggunakan *Service Adapter*. Dilarang keras melakukan *hardcode* SDK spesifik di dalam komponen UI atau logika inti.
 16. **Minimalist Payload:** API wajib mengembalikan respons JSON yang minimal. Gunakan *caching* (SWR/React Query) di frontend untuk mereduksi *traffic* pada jaringan seluler yang lambat.
-17. **Idempotency:** Setiap transaksi `POST` ke `ledger` wajib menggunakan `idempotency_key` untuk mencegah duplikasi data saat terjadi kegagalan jaringan.
-18. **Centralized Helpers:** Fungsi utility yang digunakan lebih dari satu tempat (misal: `sendWhatsappMessage`, `formatIDR`, `formatPhoneNumber`) **WAJIB** dipusatkan di `src/lib/` (contoh: `src/lib/whatsapp.ts`). Dilarang menduplikasi logika yang sama di dalam file route individual.
-19. **No Drizzle ORM:** `drizzle-orm` dan `drizzle-kit` **telah dihapus** dari proyek. Gunakan `@supabase/supabase-js` client secara langsung untuk semua interaksi database. Jangan instal kembali Drizzle.
+17. **Idempotency:** Setiap transaksi `POST` ke `ledger` wajib menggunakan `idempotency_key` untuk mencegah duplikasi data saat terjadi kegagalan jaringan.  
+18. **Centralized Helpers:** Fungsi utility yang digunakan lebih dari satu tempat (misal: `sendWhatsappMessage`, `formatIDR`, `formatPhoneNumber`) **WAJIB** dipusatkan di `src/lib/` (contoh: `src/lib/whatsapp.ts`). Dilarang menduplikasi logika yang sama di dalam file route individual.  
+19. **No Drizzle ORM:** `drizzle-orm` dan `drizzle-kit` **telah dihapus** dari proyek. Gunakan `@supabase/supabase-js` client secara langsung untuk semua interaksi database. Jangan instal kembali Drizzle.  
+20. **No BigInt Literal Suffixes (Anti-Fractional Loss):** Dilarang keras menulis literal BigInt menggunakan suffix `n` (contoh: `70n`, `30n`, `100n`) di dalam seluruh codebase TypeScript/JavaScript. Selalu gunakan constructor standard `BigInt(val)` (contoh: `BigInt(70)`, `BigInt(30)`, `BigInt(100)`). Hal ini untuk memastikan kode runtime tetap kompatibel 100% dengan build target ES yang lebih rendah (lower target standards) pada konfigurasi Next.js/Webpack dan tidak menyebabkan kegagalan static build compiler.
 
 ### **E. User Interaction & Resilience**
 
-18. **WhatsApp-First UX:** Setiap fitur yang kompleks wajib memiliki *mirror* fungsional di WhatsApp. Jangan memaksa warga membuka web jika aksi bisa diselesaikan dengan teks sederhana.  
-19. **Accessibility (A11y):** Setiap komponen UI wajib lolos pengujian *screen-reader* dan memiliki rasio kontras yang sesuai standar WCAG AAA.  
-20. **Documentation Sync:** Setiap kali arsitektur berubah, AI wajib memperbarui `10_system_architecture.md` atau `11_data_schema.md`. Dokumentasi adalah bagian dari kode; kode tanpa dokumentasi adalah hutang teknis.
+21. **WhatsApp-First UX:** Setiap fitur yang kompleks wajib memiliki *mirror* fungsional di WhatsApp. Jangan memaksa warga membuka web jika aksi bisa diselesaikan dengan teks sederhana.  
+22. **Accessibility (A11y):** Setiap komponen UI wajib lolos pengujian *screen-reader* dan memiliki rasio kontras yang sesuai standar WCAG AAA.  
+23. **Documentation Sync:** Setiap kali arsitektur berubah, AI wajib memperbarui `10_system_architecture.md` atau `11_data_schema.md`. Dokumentasi adalah bagian dari kode; kode tanpa dokumentasi adalah hutang teknis.
+24. **OptimizedImage Wrapper Mandate (LCP & Web Vitals):** Dilarang keras menggunakan tag HTML biasa `<img>` secara langsung untuk merender gambar, baik di halaman dasbor admin, panel M&E, maupun halaman katalog publik. Penggunaan tag `<img>` telanjang akan merusak nilai Largest Contentful Paint (LCP) Google Core Web Vitals dan memicu warning pemblokiran ESLint. Wajib menggunakan komponen pembungkus premium `OptimizedImage` (`src/components/OptimizedImage.tsx`) yang mengemas `Image` Next.js dengan dukungan fallback domain dinamis dan sanitasi string URL yang tangguh.
 
 ## **II. Sanksi & Kepatuhan**
 

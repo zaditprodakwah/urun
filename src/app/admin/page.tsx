@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { AdminCharts } from '@/components/admin/admin-charts';
+import { TenderTracker } from '@/components/admin/tender-tracker';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +45,24 @@ export default async function AdminPage() {
     console.error('❌ Failed to fetch community members:', membersErr);
   }
 
+  // Fetch Ledger Entries for Chart
+  const { data: ledgerEntries, error: ledgerErr } = await supabaseAdmin
+    .from('ledger')
+    .select('amount, direction, created_at')
+    .eq('community_id', adminMember.community_id)
+    .order('created_at', { ascending: true });
+
+  if (ledgerErr) console.error('❌ Failed to fetch ledger entries:', ledgerErr);
+
+  // Fetch Workflow Processes for Kanban
+  const { data: workflows, error: workflowErr } = await supabaseAdmin
+    .from('workflow_processes')
+    .select('*')
+    .eq('community_id', adminMember.community_id)
+    .order('last_updated', { ascending: false });
+
+  if (workflowErr) console.error('❌ Failed to fetch workflows:', workflowErr);
+
   const communityName = (adminMember.communities as any)?.name;
 
   return (
@@ -77,6 +97,29 @@ export default async function AdminPage() {
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-white mb-2">Manajemen Komunitas</h1>
           <p className="text-zinc-400">Atur warga, kas, dan verifikasi anggota untuk <strong className="text-emerald-400">{communityName}</strong>.</p>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+          {/* M&E Charts Section */}
+          <div className="xl:col-span-2 rounded-2xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden p-6">
+             <div className="mb-4">
+                <h2 className="text-lg font-bold text-white">Monitoring Kas Komunitas (M&E)</h2>
+                <p className="text-xs text-zinc-500">Visualisasi historis sirkulasi kas digital.</p>
+             </div>
+             <AdminCharts ledgerEntries={ledgerEntries || []} />
+          </div>
+
+          {/* Kanban / Realtime Workflow Tracker Section */}
+          <div className="xl:col-span-1 rounded-2xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden p-6">
+             <div className="mb-4">
+                <h2 className="text-lg font-bold text-white">Pelacak Proses & Tender</h2>
+                <p className="text-xs text-zinc-500">Live tracker status persetujuan.</p>
+             </div>
+             {/* Small wrapper for Kanban to look good in a column */}
+             <div className="overflow-x-auto">
+               <TenderTracker initialWorkflows={workflows || []} communityId={adminMember.community_id} />
+             </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-8">

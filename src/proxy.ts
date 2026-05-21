@@ -20,7 +20,7 @@ export async function proxy(req: NextRequest) {
   const session = token ? await decryptSession(token) : null;
 
   if (isProtectedRoute && !session) {
-    console.log(`🔒 Middleware Blocked: Unauthenticated user tried to access ${path}`);
+    console.log(`🔒 Proxy Blocked: Unauthenticated user tried to access ${path}`);
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('redirect', path);
     
@@ -33,7 +33,7 @@ export async function proxy(req: NextRequest) {
   }
 
   if (isAuthPage && session) {
-    console.log(`🔓 Middleware Redirect: Already logged in, redirecting to dashboard`);
+    console.log(`🔓 Proxy Redirect: Already logged in, redirecting to dashboard`);
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 

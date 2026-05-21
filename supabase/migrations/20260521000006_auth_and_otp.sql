@@ -29,5 +29,5 @@ CREATE POLICY "profiles_self_read" ON profiles
 DROP POLICY IF EXISTS "profiles_admin_read" ON profiles;
 CREATE POLICY "profiles_admin_read" ON profiles
   FOR ALL USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.auth_user_id = auth.uid() AND p.role IN ('admin', 'pengurus'))
+    EXISTS (SELECT 1 FROM community_members cm WHERE cm.profile_id = auth.uid() AND cm.role IN ('admin', 'pengurus'))
   );

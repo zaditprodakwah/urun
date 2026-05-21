@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
+import { supabaseAdmin } from "@/lib/supabase-server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,8 +47,22 @@ export default async function RootLayout({
 }>) {
   const session = await getSession();
   
-  // Default reputation score for now, this would normally be fetched from the database
-  const reputationScore = 0;
+  let reputationScore = 0;
+  if (session) {
+    try {
+      const { data } = await supabaseAdmin
+        .from('community_members')
+        .select('reputation_score')
+        .eq('profile_id', session.profileId)
+        .eq('community_id', session.communityId)
+        .single();
+      if (data) {
+        reputationScore = data.reputation_score;
+      }
+    } catch (err) {
+      console.error('Failed to fetch dynamic user reputation score:', err);
+    }
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -76,7 +91,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-300">
+      <body className="min-h-full flex flex-col bg-surface text-on-surface selection:bg-primary/20 selection:text-primary">
         <Navbar session={session} reputationScore={reputationScore} />
         <main className="flex-1 flex flex-col">
           {children}

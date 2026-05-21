@@ -32,9 +32,14 @@ export async function POST(req: NextRequest) {
     name = name.trim();
     token = token.trim();
 
-    // Security: Optional Webhook Secret Verification
+    // Security: Strict Webhook Secret Verification
     const webhookSecret = process.env.FONNTE_WEBHOOK_SECRET;
-    if (webhookSecret) {
+    if (!webhookSecret) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('❌ CRITICAL: FONNTE_WEBHOOK_SECRET is missing in production.');
+      }
+      console.warn('⚠️ Development Mode: Proceeding without FONNTE_WEBHOOK_SECRET.');
+    } else {
       const isHeaderMatch = req.headers.get('Authorization') === webhookSecret || req.headers.get('x-fonnte-token') === webhookSecret;
       const isBodyMatch = token === webhookSecret;
       if (!isHeaderMatch && !isBodyMatch) {

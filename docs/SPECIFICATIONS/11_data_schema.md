@@ -55,18 +55,23 @@ CREATE TABLE catalog\_items (
   CONSTRAINT item\_type\_check CHECK (item\_type IN ('product', 'service', 'asset'))  
 );
 
-\-- 4\. Ledger (Append-Only)  
+-- 4. Ledger (Append-Only)  
 CREATE TABLE ledger (  
-  id UUID PRIMARY KEY DEFAULT gen\_random\_uuid(),  
-  community\_id UUID NOT NULL REFERENCES communities(id) ON DELETE CASCADE,  
-  item\_id UUID REFERENCES catalog\_items(id) ON DELETE SET NULL,  
-  actor\_id UUID NOT NULL REFERENCES profiles(id),  
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),  
+  community_id UUID NOT NULL REFERENCES communities(id) ON DELETE CASCADE,  
+  catalog_item_id UUID REFERENCES catalog_items(id) ON DELETE SET NULL,  
+  actor_id UUID NOT NULL REFERENCES profiles(id),  
   amount DECIMAL(15,2) NOT NULL,  
   direction TEXT NOT NULL,  
-  entry\_type TEXT NOT NULL, \-- 'tender\_contribution', 'platform\_revenue', 'correction'  
-  ref\_id UUID,  
-  created\_at TIMESTAMPTZ DEFAULT NOW(),  
-  CONSTRAINT direction\_check CHECK (direction IN ('in', 'out'))  
+  entry_type TEXT NOT NULL, -- 'tender_contribution', 'platform_revenue', 'community_share', 'correction'  
+  ref_id UUID REFERENCES ledger(id),  
+  description TEXT,
+  idempotency_key UUID UNIQUE,
+  multisig_status TEXT NOT NULL DEFAULT 'not_required', -- 'not_required', 'pending', 'approved', 'rejected'
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb, -- Detail metadata e.g. source_tx_id, platform, breakdown
+  created_at TIMESTAMPTZ DEFAULT NOW(),  
+  CONSTRAINT direction_check CHECK (direction IN ('in', 'out')),
+  CONSTRAINT multisig_status_check CHECK (multisig_status IN ('not_required', 'pending', 'approved', 'rejected'))
 );
 
 \-- 5\. Workflow (State Machine)  
@@ -128,15 +133,105 @@ function generateJsonLd(item: CatalogItem, communityName: string) {
 1. **Row-Level Security (RLS):**  
    * **Isolasi Tenant:** Ledger dan tabel sensitif wajib menggunakan kebijakan RLS berbasis `community_id`.  
    * **Public Access:** Tabel `catalog_items` dengan status `'public'` wajib dapat dibaca oleh *crawler* mesin pencari.  
-2. **Fungsi Atomik (RPC):** Perubahan data wajib melalui fungsi RPC. Contoh untuk kontribusi kolektif:  
-3. SQL
+2. **Fungsi Atomik (RPC):** Perubahan data wajib melalui fungsi RPC.
 
-CREATE OR REPLACE FUNCTION process\_collective\_contribution(...) RETURNS VOID AS $$ ... $$;
+#### **A. Kontribusi Kolektif**
+```sql
+CREATE OR REPLACE FUNCTION process_collective_contribution(...) RETURNS VOID AS $$ ... $$;
+```
 
-4. **SEO/GEO Mandates:**  
+#### **B. Pembagian Komisi Afiliasi (Epic 4)**
+```sql
+CREATE OR REPLACE FUNCTION process_affiliate_commission(
+  p_idempotency_key       UUID,
+  p_community_id          UUID,
+  p_actor_id              UUID,
+  p_catalog_item_id       UUID,
+  p_platform_fee          DECIMAL(15,2),
+  p_community_share       DECIMAL(15,2),
+  p_description           TEXT,
+  p_metadata              JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_existing_status       INT;
+  v_existing_body         JSONB;
+  v_community_ledger_id   UUID;
+  v_platform_ledger_id    UUID;
+  v_platform_idem_key     UUID;
+BEGIN
+  -- 1. Idempotency Check & Lock
+  INSERT INTO idempotency_keys (idempotency_key, community_id, request_path)
+  VALUES (p_idempotency_key, p_community_id, '/api/v1/affiliate/callback')
+  ON CONFLICT (idempotency_key) DO NOTHING;
+
+  SELECT response_status, response_body
+  INTO v_existing_status, v_existing_body
+  FROM idempotency_keys
+  WHERE idempotency_key = p_idempotency_key
+  FOR UPDATE;
+
+  IF v_existing_status IS NOT NULL THEN
+    RETURN jsonb_build_object(
+      'status', 'hit',
+      'response_status', v_existing_status,
+      'response_body', v_existing_body
+    );
+  END IF;
+
+  -- 2. Derived Idempotency Key for Platform Fee Entry to maintain referential integrity
+  v_platform_idem_key := CAST(md5(p_idempotency_key::text || '-platform') AS uuid);
+
+  -- 3. Insert community_share (70% Inbound)
+  INSERT INTO ledger (
+    community_id, actor_id, catalog_item_id, amount, direction,
+    entry_type, description, idempotency_key, multisig_status, metadata
+  ) VALUES (
+    p_community_id, p_actor_id, p_catalog_item_id, p_community_share, 'in',
+    'community_share', p_description, p_idempotency_key, 'not_required', p_metadata
+  ) RETURNING id INTO v_community_ledger_id;
+
+  -- 4. Insert platform_revenue (30% Outbound)
+  INSERT INTO ledger (
+    community_id, actor_id, catalog_item_id, amount, direction,
+    entry_type, ref_id, description, idempotency_key, multisig_status, metadata
+  ) VALUES (
+    p_community_id, p_actor_id, p_catalog_item_id, p_platform_fee, 'out',
+    'platform_revenue', v_community_ledger_id,
+    'Platform operational fee (30% split from affiliate link checkout)',
+    v_platform_idem_key, 'not_required', p_metadata
+  ) RETURNING id INTO v_platform_ledger_id;
+
+  -- 5. Log to Audit Trail
+  INSERT INTO audit_log (
+    community_id, actor_id, action, table_affected, new_value, reason
+  ) VALUES (
+    p_community_id, p_actor_id, 'affiliate_revenue_split', 'ledger',
+    jsonb_build_object(
+      'community_ledger_id', v_community_ledger_id,
+      'platform_ledger_id', v_platform_ledger_id,
+      'community_share', p_community_share,
+      'platform_fee', p_platform_fee,
+      'source_tx_id', p_metadata->>'source_tx_id',
+      'platform', p_metadata->>'platform'
+    ),
+    'Processed external affiliate commission with 70/30 split directly to ledger (bypassing multi-sig)'
+  );
+
+  RETURN jsonb_build_object(
+    'status', 'success',
+    'community_ledger_id', v_community_ledger_id,
+    'platform_ledger_id', v_platform_ledger_id
+  );
+END;
+$$;
+```
+
+3. **SEO/GEO Mandates:**  
    * **Dynamic Mapping:** Larangan keras melakukan *hardcode* nilai JSON-LD. Nilai harus ditarik dinamis dari `metadata` (JSONB).  
    * **GEO Context:** Wajib menyertakan `geo_context` dari `communities` ke dalam `JSON-LD` agar mesin pencari mengenali lokasi fisik komunitas.  
    * **No-Index for Private:** Halaman katalog dengan status `private` wajib menyertakan meta tag `noindex`.  
-5. **Audit-First:** Setiap pendapatan platform wajib ditag dengan `platform_revenue` di `ledger`.  
-6. **Schema Evolution:** Gunakan kolom `metadata` (JSONB) daripada menambah kolom fisik untuk fitur baru.
+4. **Audit-First:** Setiap pendapatan platform wajib ditag dengan `platform_revenue` di `ledger`.  
+5. **Schema Evolution:** Gunakan kolom `metadata` (JSONB) daripada menambah kolom fisik untuk fitur baru.
 

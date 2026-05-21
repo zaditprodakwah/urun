@@ -165,6 +165,12 @@ If founder insists: Document concern in comments + compliance_log,
 🚨 "Copy sendWhatsappMessage logic into this route file"
    → NO. All shared utilities MUST be imported from src/lib/whatsapp.ts.
 
+🚨 "Use BigInt literals like 70n or 100n for arithmetic"
+   → NO. Literal suffix `n` is forbidden as it breaks compilation targets. Use standard constructor `BigInt(val)` runtime wrappers.
+
+🚨 "Use raw HTML <img> tags in frontend templates"
+   → NO. Wajib use `OptimizedImage` from src/components/OptimizedImage.tsx to enforce LCP metrics and satisfy linter checks.
+
 =============================================================================
                     DAILY STANDUP CHECKLIST (2 minutes)
 =============================================================================

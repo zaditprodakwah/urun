@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Masuk - URUN</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Geist Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#faf8ff",
+                        "surface-container-high": "#e2e7ff",
+                        "surface": "#faf8ff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#5a2e00",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#002113",
+                        "on-surface-variant": "#3c4a42",
+                        "on-primary-container": "#00422b",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed-variant": "#004395",
+                        "tertiary": "#904d00",
+                        "primary-fixed": "#6ffbbe",
+                        "surface-container-highest": "#dae2fd",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "outline": "#6c7a71",
+                        "tertiary-fixed": "#ffdcc3",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#dae2fd",
+                        "inverse-surface": "#283044",
+                        "surface-container": "#eaedff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#006c49",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#006c49",
+                        "inverse-primary": "#4edea3",
+                        "surface-dim": "#d2d9f4",
+                        "secondary-container": "#2170e4",
+                        "secondary": "#0058be",
+                        "on-secondary-fixed": "#001a42",
+                        "on-surface": "#131b2e",
+                        "primary-fixed-dim": "#4edea3",
+                        "primary-container": "#10b981",
+                        "tertiary-container": "#f08921",
+                        "surface-bright": "#faf8ff",
+                        "on-primary-fixed-variant": "#005236",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#131b2e",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bbcabf"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "40px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-base": ["Geist", "sans-serif"],
+                        "label-caps": ["Geist", "sans-serif"],
+                        "display-lg": ["Geist", "sans-serif"],
+                        "body-bold": ["Geist", "sans-serif"],
+                        "display-lg-mobile": ["Geist", "sans-serif"],
+                        "headline-md": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-base": ["16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-bold": ["16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "700" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-base min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-container selection:text-on-primary-container">
+<section class="flex-1 flex flex-col justify-center px-margin-mobile md:px-margin-desktop py-xl z-10">
+<div class="max-w-[420px] w-full mx-auto flex flex-col">
+<div class="flex items-center gap-sm mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assured_workload</span>
+</div>
+<span class="font-headline-md text-headline-md text-primary tracking-tighter">URUN</span>
+</div>
+<div class="mb-lg">
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-sm">Selamat Datang Kembali, Pahlawan Lokal</h1>
+<p class="font-body-base text-body-base text-on-surface-variant">Masuk untuk mengawasi kas publik dan mengusulkan inisiatif warga di lingkungan Anda.</p>
+</div>
+<div class="flex bg-surface-container-low rounded-xl p-xs mb-lg">
+<button class="flex-1 py-sm rounded-lg font-body-bold text-body-bold text-on-surface bg-surface shadow-sm ring-1 ring-outline-variant/50 transition-all focus:outline-none focus:ring-2 focus:ring-primary/50" id="tab-id" onclick="switchTab('id')">ID Warga</button>
+<button class="flex-1 py-sm rounded-lg font-body-base text-body-base text-on-surface-variant hover:text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-primary/50" id="tab-email" onclick="switchTab('email')">Email</button>
+</div>
+<form class="flex flex-col gap-md" onsubmit="event.preventDefault(); animateSubmit();">
+<div class="flex flex-col" id="field-id">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-xs ml-1 uppercase" for="nik">Nomor Induk Kependudukan (NIK)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">badge</span>
+<input class="w-full h-[48px] pl-[48px] pr-md rounded-xl border border-outline bg-surface text-on-surface font-body-base text-body-base focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-outline-variant" id="nik" placeholder="Masukkan 16 digit NIK" type="text"/>
+</div>
+</div>
+<div class="flex flex-col hidden" id="field-email">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-xs ml-1 uppercase" for="email">Alamat Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full h-[48px] pl-[48px] pr-md rounded-xl border border-outline bg-surface text-on-surface font-body-base text-body-base focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-outline-variant" id="email" placeholder="nama@email.com" type="email"/>
+</div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between items-end mb-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-1 uppercase" for="password">Kata Sandi</label>
+<a class="font-label-caps text-label-caps text-primary hover:text-primary-fixed-dim transition-colors" href="#">Lupa Sandi?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full h-[48px] pl-[48px] pr-[48px] rounded-xl border border-outline bg-surface text-on-surface font-body-base text-body-base focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-outline-variant" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-on-surface focus:outline-none" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined" id="eye-icon">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center mt-sm mb-sm">
+<input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary/20 bg-surface cursor-pointer" id="remember" type="checkbox"/>
+<label class="ml-sm font-body-base text-body-base text-on-surface-variant cursor-pointer select-none" for="remember">Ingat saya di perangkat ini</label>
+</div>
+<button class="relative w-full h-[48px] bg-primary text-on-primary font-body-bold text-body-bold rounded-xl hover:bg-surface-tint focus:ring-4 focus:ring-primary/20 transition-all overflow-hidden flex items-center justify-center group" id="submit-btn" type="submit">
+<span class="transition-transform duration-300 group-active:scale-95" id="submit-text">Masuk ke Portal</span>
+<span class="absolute inset-0 flex items-center justify-center bg-primary opacity-0 pointer-events-none transition-opacity duration-300" id="submit-loader">
+<span class="material-symbols-outlined animate-spin">progress_activity</span>
+</span>
+</button>
+</form>
+<div class="mt-xl text-center">
+<p class="font-body-base text-body-base text-on-surface-variant">Belum memiliki akses? <a class="font-body-bold text-body-bold text-primary hover:underline underline-offset-4 decoration-primary/30" href="#">Daftar sebagai Warga</a></p>
+</div>
+</div>
+</section>
+<section class="hidden lg:flex flex-1 relative bg-surface-container-low overflow-hidden items-center justify-center border-l border-outline-variant/30">
+<div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 70%);"></div>
+<div class="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiM2YzdhNzEiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
+<div class="relative w-full max-w-[600px] aspect-square rounded-full flex items-center justify-center p-xl">
+<div class="absolute w-[80%] h-[80%] rounded-full border border-outline-variant/50 animate-[spin_60s_linear_infinite]"></div>
+<div class="absolute w-[60%] h-[60%] rounded-full border border-primary/20 animate-[spin_40s_linear_infinite_reverse]"></div>
+<img alt="Gotong Royong Digital" class="w-full h-full object-cover rounded-[2rem] shadow-2xl shadow-primary/5 ring-1 ring-outline-variant/30 relative z-10 mix-blend-multiply" data-alt="A striking digital illustration representing 'gotong royong' (collaborative community effort) in a modern, abstract style. The artwork features interconnected geometric shapes, clean lines, and minimalist human-like silhouettes working together to build a structured network. The color palette relies heavily on pristine white, light slate-50 backgrounds, and vibrant accents of deep emerald green to match a clean, trustworthy civic-tech platform. The lighting is soft, high-key, and diffused, creating a serene, optimistic, and highly legible light-mode aesthetic that conveys transparency and institutional reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAsaXq1GzojXpFD4ehFcZvhxjJ615osFeWKVSDJVnV-_DOFUpZJ-QeOktNm6MIeAwV_nc33OwGlX_htu7PU8AJC2aKbfqQ--I-c4LqfWvLTHGzuNt1zq2YP23RufOXHv6Czk9goN_qGeOD2s8ml4VxMwmM7ryd5jpiJGmC1MsvKgJ9dsPda9rKXg0lkATgNp-6b_H-22fiRmjoYxKHarOH9m1I1ZGJQvQ7RlEASHJ4H3zKrI-BIdb638kdUFFWM_xuHpFDDBbJAABt"/>
+</div>
+<div class="absolute bottom-xl left-xl right-xl p-lg bg-surface/80 backdrop-blur-md rounded-2xl border border-outline-variant shadow-sm max-w-[400px]">
+<div class="flex items-center gap-sm mb-xs text-primary">
+<span class="material-symbols-outlined">security</span>
+<span class="font-label-caps text-label-caps uppercase">Transparansi Terjamin</span>
+</div>
+<p class="font-body-base text-body-base text-on-surface-variant">Platform ini menggunakan enkripsi end-to-end untuk melindungi data pribadi dan usulan publik Anda.</p>
+</div>
+</section>
+<script>
+        function switchTab(tab) {
+            const btnId = document.getElementById('tab-id');
+            const btnEmail = document.getElementById('tab-email');
+            const fieldId = document.getElementById('field-id');
+            const fieldEmail = document.getElementById('field-email');
+
+            const activeClassList = ['font-body-bold', 'text-body-bold', 'text-on-surface', 'bg-surface', 'shadow-sm', 'ring-1', 'ring-outline-variant/50'];
+            const inactiveClassList = ['font-body-base', 'text-body-base', 'text-on-surface-variant', 'hover:text-on-surface'];
+
+            if (tab === 'id') {
+                btnId.classList.remove(...inactiveClassList);
+                btnId.classList.add(...activeClassList);
+                btnEmail.classList.remove(...activeClassList);
+                btnEmail.classList.add(...inactiveClassList);
+                
+                fieldId.classList.remove('hidden');
+                fieldEmail.classList.add('hidden');
+            } else {
+                btnEmail.classList.remove(...inactiveClassList);
+                btnEmail.classList.add(...activeClassList);
+                btnId.classList.remove(...activeClassList);
+                btnId.classList.add(...inactiveClassList);
+                
+                fieldEmail.classList.remove('hidden');
+                fieldId.classList.add('hidden');
+            }
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+        function animateSubmit() {
+            const btn = document.getElementById('submit-btn');
+            const text = document.getElementById('submit-text');
+            const loader = document.getElementById('submit-loader');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            text.classList.add('opacity-0');
+            loader.classList.remove('opacity-0');
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                text.classList.remove('opacity-0');
+                loader.classList.add('opacity-0');
+                // Simulate redirect
+                // window.location.href = '/dashboard';
+            }, 1500);
+        }
+    </script>
+</body></html>

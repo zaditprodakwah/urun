@@ -77,7 +77,7 @@ PostgreSQL dan Next.js Serverless/Edge Runtime dioptimalkan untuk performa ekstr
   * *Urun Context:* Semua query tabel (`ledger`, `community_members`, `workflow_processes`) menggunakan client ini secara langsung. **Drizzle ORM telah dihapus** dari dependensi karena redundan — supabase-js sudah mencukupi kebutuhan tipe-safe query dengan dukungan penuh PostgREST filter dan join.
 * **jose (JWT Session Signing):**
   * *Fungsi:* Library JWT/JWE/JWS yang sepenuhnya kompatibel dengan Edge Runtime Next.js (tidak bergantung pada Node.js `crypto` module).
-  * *Urun Context:* Digunakan untuk menandatangani dan memverifikasi cookie sesi `urun_session` menggunakan algoritma HS256 dengan kunci `SESSION_SECRET`. Wajib digunakan di `src/lib/auth.ts` dan diverifikasi di `src/proxy.ts` (middleware).
+  * *Urun Context:* Digunakan untuk menandatangani dan memverifikasi cookie sesi `urun_session` menggunakan algoritma HS256 dengan kunci `SESSION_SECRET`. Wajib digunakan di `src/lib/auth.ts` dan diverifikasi di `src/proxy.ts` (proxy).
 * **Supabase Vault (pg\_vault):**
   * *Fungsi:* Ekstensi PostgreSQL untuk enkripsi baris data tingkat tinggi menggunakan algoritma AES-GCM.
   * *Urun Context:* Mengamankan penyimpanan `FONNTE_TOKEN` atau kunci API Google secara terenkripsi langsung di basis data.

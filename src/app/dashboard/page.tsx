@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import CatalogManager from '@/components/dashboard/CatalogManager';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +41,30 @@ export default async function DashboardPage() {
 
   const profile = member.profiles as any;
   const community = member.communities as any;
+
+  // Fetch user's catalog items
+  const { data: catalogItems } = await supabaseAdmin
+    .from('catalog_items')
+    .select('*')
+    .eq('community_id', session.communityId)
+    .eq('created_by', member.id)
+    .order('created_at', { ascending: false });
+
+  const initialItems = (catalogItems || []).map((item: any) => ({
+    id: item.id,
+    title: item.title,
+    description: item.description || '',
+    checkout_type: item.checkout_type,
+    external_url: item.external_url,
+    whatsapp_form_fields: item.whatsapp_form_fields || [],
+    metadata: {
+      price: item.metadata?.price || 0,
+      category: item.metadata?.category || 'Sembako',
+      sku: item.metadata?.sku || '',
+      image: item.metadata?.image || '',
+    },
+    created_at: item.created_at,
+  }));
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-hidden">
@@ -119,6 +144,11 @@ export default async function DashboardPage() {
                   </button>
                 </form>
               </div>
+            </section>
+
+            {/* Catalog Manager / Dagangan Warga */}
+            <section className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm">
+              <CatalogManager initialItems={initialItems} />
             </section>
 
             {/* Role Specific Actions */}

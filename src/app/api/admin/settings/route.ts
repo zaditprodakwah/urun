@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { z } from 'zod';
+import { checkIdempotency, saveIdempotencyResult } from '@/lib/idempotency';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +45,18 @@ export async function GET(_req: NextRequest) {
   }
 }
 
+// Zod schema for rigorous validation
+const SettingsSchema = z.object({
+  multisig_threshold: z.number().min(0).optional(),
+  platform_fee_pct: z.number().min(0).max(100).optional(),
+  community_share_pct: z.number().min(0).max(100).optional(),
+  revenue_destination_account: z.string().nullable().optional(),
+  mode: z.enum(['normal', 'manual']).optional(),
+  reputation_alpha: z.number().min(0).max(10).optional(),
+  reputation_beta: z.number().min(0).max(10).optional(),
+  reputation_gamma: z.number().min(0).max(10).optional(),
+});
+
 // PATCH: Update community settings
 export async function PATCH(req: NextRequest) {
   try {
@@ -51,9 +65,29 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
     }
 
+    const idempotencyKey = req.headers.get('idempotency-key') || req.headers.get('Idempotency-Key');
+    if (!idempotencyKey) {
+      return NextResponse.json({ error: 'BAD REQUEST: Header Idempotency-Key wajib disertakan.' }, { status: 400 });
+    }
+
     const { communityId, profileId } = authCheck.session!;
+    
+    // Idempotency Check
+    const idempotencyCheck = await checkIdempotency(supabaseAdmin, idempotencyKey, communityId, '/api/admin/settings');
+    if (idempotencyCheck.status !== 'proceed') {
+      return NextResponse.json(idempotencyCheck.response_body, { status: idempotencyCheck.response_status });
+    }
+
     const body = await req.json().catch(() => ({}));
-    const { multisig_threshold, platform_fee_pct, community_share_pct, revenue_destination_account } = body;
+    const parsedBody = SettingsSchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      const errorMsg = 'Validasi parameter gagal: ' + parsedBody.error.issues.map(e => e.path.join('.') + ' ' + e.message).join(', ');
+      await saveIdempotencyResult(supabaseAdmin, idempotencyKey, 400, { error: errorMsg });
+      return NextResponse.json({ error: errorMsg }, { status: 400 });
+    }
+
+    const payload = parsedBody.data;
 
     // Fetch existing settings
     const { data: community, error: fetchErr } = await supabaseAdmin
@@ -63,23 +97,25 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (fetchErr || !community) {
+      await saveIdempotencyResult(supabaseAdmin, idempotencyKey, 404, { error: 'Komunitas tidak ditemukan.' });
       return NextResponse.json({ error: 'Komunitas tidak ditemukan.' }, { status: 404 });
     }
 
     const existingSettings = community.settings || {};
     
-    // Validate inputs
+    // Merge Settings
     const updatedSettings = {
       ...existingSettings,
-      multisig_threshold: typeof multisig_threshold === 'number' ? multisig_threshold : existingSettings.multisig_threshold,
-      platform_fee_pct: typeof platform_fee_pct === 'number' ? platform_fee_pct : existingSettings.platform_fee_pct,
-      community_share_pct: typeof community_share_pct === 'number' ? community_share_pct : existingSettings.community_share_pct,
-      revenue_destination_account: typeof revenue_destination_account === 'string' ? revenue_destination_account : existingSettings.revenue_destination_account,
+      ...payload,
     };
 
-    // Ensure sum of platform_fee and community_share is exactly 100%
-    if (updatedSettings.platform_fee_pct + updatedSettings.community_share_pct !== 100) {
-      return NextResponse.json({ error: 'Platform Fee % dan Community Share % harus berjumlah tepat 100%.' }, { status: 400 });
+    // Ensure sum of platform_fee and community_share is exactly 100% (if provided)
+    if (updatedSettings.platform_fee_pct !== undefined && updatedSettings.community_share_pct !== undefined) {
+      if (updatedSettings.platform_fee_pct + updatedSettings.community_share_pct !== 100) {
+        const errObj = { error: 'Platform Fee % dan Community Share % harus berjumlah tepat 100%.' };
+        await saveIdempotencyResult(supabaseAdmin, idempotencyKey, 400, errObj);
+        return NextResponse.json(errObj, { status: 400 });
+      }
     }
 
     // Update settings in database
@@ -90,7 +126,9 @@ export async function PATCH(req: NextRequest) {
 
     if (updateErr) {
       console.error('❌ Failed to update community settings:', updateErr);
-      return NextResponse.json({ error: 'Gagal memperbarui pengaturan komunitas.' }, { status: 500 });
+      const errObj = { error: 'Gagal memperbarui pengaturan komunitas.' };
+      await saveIdempotencyResult(supabaseAdmin, idempotencyKey, 500, errObj);
+      return NextResponse.json(errObj, { status: 500 });
     }
 
     // Log to audit_log
@@ -101,15 +139,19 @@ export async function PATCH(req: NextRequest) {
         actor_id: profileId,
         action: 'settings_changed',
         table_affected: 'communities',
-        reason: `Pengurus mengubah pengaturan global komunitas: Threshold Multi-Sig = ${updatedSettings.multisig_threshold}, Split Kas = ${updatedSettings.community_share_pct}/${updatedSettings.platform_fee_pct}.`,
+        reason: 'Pengurus mengubah pengaturan global komunitas melalui Dasbor (Zod Validated).',
         new_value: { old_settings: existingSettings, new_settings: updatedSettings }
       });
 
-    return NextResponse.json({
+    const successResponse = {
       status: true,
       message: 'Pengaturan komunitas berhasil diperbarui.',
       settings: updatedSettings
-    });
+    };
+
+    await saveIdempotencyResult(supabaseAdmin, idempotencyKey, 200, successResponse);
+
+    return NextResponse.json(successResponse, { status: 200 });
 
   } catch (err: any) {
     console.error('💥 Settings PATCH critical error:', err);

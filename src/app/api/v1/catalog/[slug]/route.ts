@@ -4,7 +4,16 @@ import { jwtVerify } from 'jose';
 
 export const dynamic = 'force-dynamic';
 
-const SESSION_SECRET = process.env.SESSION_SECRET;
+const SESSION_SECRET = (() => {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('❌ CRITICAL: SESSION_SECRET is missing from environment variables in production.');
+    }
+    return 'RahasiaUrunWargaSessionSecretFallback2026!';
+  }
+  return secret;
+})();
 
 async function verifyScope(req: NextRequest, requiredScope: string): Promise<{ communityId: string } | null> {
   try {
@@ -13,7 +22,7 @@ async function verifyScope(req: NextRequest, requiredScope: string): Promise<{ c
       return null;
     }
     const token = authHeader.substring(7);
-    const secretKey = new TextEncoder().encode(SESSION_SECRET || 'RahasiaUrunWargaSessionSecretFallback2026!');
+    const secretKey = new TextEncoder().encode(SESSION_SECRET);
     
     const { payload } = await jwtVerify(token, secretKey, {
       algorithms: ['HS256'],
