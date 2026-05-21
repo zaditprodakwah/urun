@@ -27,7 +27,8 @@ AI Coder wajib merujuk secara kaku pada daftar pustaka berikut dan dilarang meng
 |  | Vaul | [github.com/emilkowalski/vaul](https://github.com/emilkowalski/vaul) |
 |  | Embla Carousel | [embla-carousel.com](https://www.embla-carousel.com/) |
 |  | Framer Motion | [framer.com/motion](https://www.framer.com/motion/) |
-| **Data & Logic** | Drizzle ORM | [orm.drizzle.team](https://orm.drizzle.team/) |
+| **Data & Logic** | @supabase/supabase-js | [supabase.com/docs/reference/javascript](https://supabase.com/docs/reference/javascript) |
+|  | jose | [github.com/panva/jose](https://github.com/panva/jose) |
 |  | Supabase Vault | [supabase.com/docs/guides/database/vault](https://supabase.com/docs/guides/database/vault) |
 |  | pg\_cron | [github.com/citusdata/pg\_cron](https://github.com/citusdata/pg_cron) |
 |  | pgaudit | [github.com/pgaudit/pgaudit](https://github.com/pgaudit/pgaudit) |
@@ -71,22 +72,25 @@ Dirancang untuk menghadirkan kenyamanan interaksi mobile-first yang sehalus apli
 
 PostgreSQL dan Next.js Serverless/Edge Runtime dioptimalkan untuk performa ekstrim dan keamanan otonom.
 
-* **Drizzle ORM (drizzle-orm):**  
-  * *Fungsi:* ORM TypeScript teringan dengan dukungan penuh tipe data JSONB Postgres secara *type-safe*.  
-  * *Urun Context:* Menjalankan query transaksi Buku Kas Kolektif (`ledger`) dengan latensi di bawah 10ms.  
-* **Supabase Vault (pg\_vault):**  
-  * *Fungsi:* Ekstensi PostgreSQL untuk enkripsi baris data tingkat tinggi menggunakan algoritma AES-GCM.  
-  * *Urun Context:* Mengamankan penyimpanan `FONNTE_TOKEN` atau kunci API Google secara terenkripsi langsung di basis data.  
-* **pg\_cron:**  
-  * *Fungsi:* Penjadwal tugas kronologis (*cron jobs*) di level PostgreSQL.  
-  * *Urun Context:* Otomasi penalti reputasi harian dan pembersihan tender kedaluwarsa secara internal di level database tanpa memicu panggilan API eksternal.  
-* **pgaudit & supautils:**  
-  * *Fungsi:* Pustaka audit sistem dan pengamanan struktur hak akses *superuser*.  
-  * *Urun Context:* Melacak kepatuhan manipulasi database untuk dicatat secara kronologis di audit_log.  
-* **ts-pattern:**  
-  * *Fungsi:* Pustaka *pattern matching* TypeScript untuk menjamin transisi status yang ketat.  
-  * *Urun Context:* Mengunci status siklus hidup pada mesin status tabel `tenders` dan `workflow_processes`.  
-* **Zod:**  
+* **@supabase/supabase-js (Client Resmi):**
+  * *Fungsi:* Client TypeScript resmi untuk berinteraksi dengan PostgreSQL via PostgREST API dan RLS.
+  * *Urun Context:* Semua query tabel (`ledger`, `community_members`, `workflow_processes`) menggunakan client ini secara langsung. **Drizzle ORM telah dihapus** dari dependensi karena redundan — supabase-js sudah mencukupi kebutuhan tipe-safe query dengan dukungan penuh PostgREST filter dan join.
+* **jose (JWT Session Signing):**
+  * *Fungsi:* Library JWT/JWE/JWS yang sepenuhnya kompatibel dengan Edge Runtime Next.js (tidak bergantung pada Node.js `crypto` module).
+  * *Urun Context:* Digunakan untuk menandatangani dan memverifikasi cookie sesi `urun_session` menggunakan algoritma HS256 dengan kunci `SESSION_SECRET`. Wajib digunakan di `src/lib/auth.ts` dan diverifikasi di `src/proxy.ts` (middleware).
+* **Supabase Vault (pg\_vault):**
+  * *Fungsi:* Ekstensi PostgreSQL untuk enkripsi baris data tingkat tinggi menggunakan algoritma AES-GCM.
+  * *Urun Context:* Mengamankan penyimpanan `FONNTE_TOKEN` atau kunci API Google secara terenkripsi langsung di basis data.
+* **pg\_cron:**
+  * *Fungsi:* Penjadwal tugas kronologis (*cron jobs*) di level PostgreSQL.
+  * *Urun Context:* Otomasi penalti reputasi harian dan pembersihan tender kedaluwarsa secara internal di level database tanpa memicu panggilan API eksternal.
+* **pgaudit & supautils:**
+  * *Fungsi:* Pustaka audit sistem dan pengamanan struktur hak akses *superuser*.
+  * *Urun Context:* Melacak kepatuhan manipulasi database untuk dicatat secara kronologis di audit_log.
+* **ts-pattern:**
+  * *Fungsi:* Pustaka *pattern matching* TypeScript untuk menjamin transisi status yang ketat.
+  * *Urun Context:* Mengunci status siklus hidup pada mesin status tabel `tenders` dan `workflow_processes`.
+* **Zod:**
   * *Fungsi:* Skema validasi runtime TypeScript yang ketat untuk seluruh muatan payload API / Webhook.
 
 ### **3. Core Web Vitals, SEO, & AEO (Akses Informasi)**
@@ -168,7 +172,8 @@ Di mana konstanta $C_{interaction}$ dipetakan secara absolut berdasarkan tipe in
 
 ## **IV. Mandat Mandatori untuk AI Coder**
 
-1. **Gunakan ORM Standar:** Seluruh interaksi PostgreSQL wajib menggunakan Drizzle ORM untuk menjamin keamanan tipe data dan pencegahan SQL Injection (kecuali jika instruksi khusus menggunakan `@supabase/supabase-js` service role admin).
-2. **No Extravagant Packages:** Jangan menginstal pustaka di luar dokumen ini tanpa izin. Jika Anda membutuhkan alat utilitas baru, mintalah izin terlebih dahulu.
-3. **Kepatuhan RLS & pgTAP:** Sebelum menyelesaikan pekerjaan pengodean database, tulis *unit test* di pgTAP untuk menguji isolasi data `community_id` di bawah kebijakan RLS.
-4. **Logging Semua Webhook:** Pastikan setiap payloads dari Fonnte divalidasi dengan Zod dan kegagalan respons dicatat dengan Pino.
+1. **Gunakan Supabase Client Langsung:** Seluruh interaksi PostgreSQL wajib menggunakan `@supabase/supabase-js` client untuk menjamin keamanan tipe data dan pencegahan SQL Injection. `drizzle-orm` dan `drizzle-kit` telah **dihapus** dari dependensi — jangan instal kembali.
+2. **Gunakan `jose` untuk Session Signing:** Semua operasi signing/verifikasi JWT sesi wajib menggunakan library `jose`. Jangan menggunakan library yang memerlukan Node.js runtime `crypto` module karena tidak kompatibel dengan Edge Runtime.
+3. **No Extravagant Packages:** Jangan menginstal pustaka di luar dokumen ini tanpa izin. Jika Anda membutuhkan alat utilitas baru, mintalah izin terlebih dahulu.
+4. **Kepatuhan RLS & pgTAP:** Sebelum menyelesaikan pekerjaan pengodean database, tulis *unit test* di pgTAP untuk menguji isolasi data `community_id` di bawah kebijakan RLS.
+5. **Logging Semua Webhook:** Pastikan setiap payload dari Fonnte divalidasi dengan Zod dan kegagalan respons dicatat dengan Pino.

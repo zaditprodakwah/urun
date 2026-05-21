@@ -84,7 +84,8 @@ RULE 5: MULTI-SIG ENFORCED FOR LARGE TRANSACTIONS
    - THIS IS NOT OPTIONAL.
 
 RULE 6: FRAUD DETECTION RUNS DAILY
-   - reconcile_ledger.js runs every day (00:00 UTC)
+   - reconcile_ledger runs every day (00:00 UTC) via Vercel Cron
+   - Endpoint: GET /api/multisig/reconcile (protected by CRON_SECRET)
    - Checks: Double-spending, ghost transactions, velocity abuse
    - DAILY, AUTOMATICALLY, WITH AUDIT TRAIL
 
@@ -152,6 +153,18 @@ If founder insists: Document concern in comments + compliance_log,
 🚨 "We'll delete user data, keep reputation scores"
    → NO. Rule 7: User deletion must be transparent + complete.
 
+🚨 "Hardcode community_id = 'abc-123' inside the route"
+   → NO. community_id MUST come from verified session JWT, never hardcoded.
+
+🚨 "Add CRON_SECRET = 'default-secret' as fallback"
+   → NO. All secrets MUST come from environment variables only. No fallbacks.
+
+🚨 "Use drizzle-orm for database queries"
+   → NO. drizzle-orm has been REMOVED. Use @supabase/supabase-js client directly.
+
+🚨 "Copy sendWhatsappMessage logic into this route file"
+   → NO. All shared utilities MUST be imported from src/lib/whatsapp.ts.
+
 =============================================================================
                     DAILY STANDUP CHECKLIST (2 minutes)
 =============================================================================
@@ -191,6 +204,7 @@ docs/SPECIFICATIONS/   → 00_master_roadmap.md  (timeline & phases)
                          11_data_schema.md       (database structure)
                          12_protocol_spec.md     (API endpoints)
                          13_external_services.md (integration rules)
+                         14_approved_open_source_stack.md (approved libs: jose, supabase-js; NO drizzle)
                          20_rules_for_ai.md      (AI operational rules)
                          21_automation_scripts.md (cron & batch jobs)
                          22_algorithm_spec.md    (reputation, fraud)
@@ -200,6 +214,7 @@ docs/SPECIFICATIONS/   → 00_master_roadmap.md  (timeline & phases)
                          40_code_style_guide.md  (coding standards)
                          50_growth_engine.md     (viral loop logic)
                          51_marketplace_parser_handbook.md (ethical scraping)
+                         60_build_deploy_guide.md (build, env vars, deploy)
 
 docs/AUDIT_FINDINGS/   → 01_URUN_AUDIT_REPORT.md (full audit)
                          02_URUN_REFINED_SECTIONS.md (recommendations)

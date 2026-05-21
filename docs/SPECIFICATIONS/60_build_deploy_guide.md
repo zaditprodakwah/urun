@@ -98,8 +98,15 @@ Variabel ini wajib dikonfigurasi di **Vercel Project Settings → Environment Va
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only | Kunci service role (RAHASIA, hanya server) |
 | `FONNTE_TOKEN` | Server-only | Token autentikasi WhatsApp Fonnte |
 | `FONNTE_WEBHOOK_SECRET` | Server-only | Secret validasi payload webhook Fonnte |
+| `CRON_SECRET` | Server-only | Token authorization Vercel Cron (min. 32 karakter) |
+| `SESSION_SECRET` | Server-only | Kunci signing JWT `jose` untuk cookie sesi (min. 32 karakter) |
+| `NEXT_PUBLIC_SITE_URL` | Public | URL produksi situs (`https://urunwarga.vercel.app`) |
 
-> **Keamanan:** `SUPABASE_SERVICE_ROLE_KEY` dan `FONNTE_TOKEN` tidak boleh pernah ter-expose ke browser. Pastikan prefix `NEXT_PUBLIC_` hanya digunakan untuk variabel yang memang public.
+> **Keamanan Berlapis:**
+> - `SUPABASE_SERVICE_ROLE_KEY`, `FONNTE_TOKEN`, `CRON_SECRET`, dan `SESSION_SECRET` adalah **RAHASIA KRITIS** yang tidak boleh pernah ter-expose ke browser atau dikodekan *hardcode* di source code.
+> - `CRON_SECRET` digunakan untuk mengamankan endpoint Vercel Cron (`/api/multisig/reconcile`, `/api/cron/digest`, `/api/cron/tender-remind`). Tanpa variabel ini, endpoint akan merespons HTTP 500.
+> - `SESSION_SECRET` adalah kunci kriptografi untuk menandatangani dan memverifikasi cookie sesi `urun_session` menggunakan library `jose` (HS256 algorithm). Tanpa variabel ini, seluruh autentikasi sesi akan gagal.
+> - Pastikan prefix `NEXT_PUBLIC_` hanya digunakan untuk variabel yang memang public.
 
 ---
 
@@ -108,14 +115,28 @@ Variabel ini wajib dikonfigurasi di **Vercel Project Settings → Environment Va
 | Route | Build Type | Revalidasi | Keterangan |
 |-------|-----------|-----------|-----------|
 | `/` | Static (SSG) | — | Homepage |
+| `/login` | Static (SSG) | — | Halaman login OTP WhatsApp |
 | `/catalog` | ISR | 60 detik | Katalog publik |
-| `/catalog/[slug]` | SSR | On-demand | Detail produk + JSON-LD |
-| `/leaderboard` | SSR | On-demand | Papan keaktifan warga |
-| `/multisig` | Client-side | — | Multi-Sig Command Center |
+| `/catalog/[slug]` | Dynamic (SSR) | — | Detail produk + JSON-LD |
+| `/dashboard` | Dynamic (SSR) | — | Dashboard personal warga (auth required) |
+| `/admin` | Dynamic (SSR) | — | Panel admin pengurus komunitas (auth required) |
+| `/leaderboard` | Static (SSG) | — | Papan keaktifan warga |
+| `/multisig` | Static (SSG) | — | Multi-Sig Command Center |
+| `/sitemap.xml` | ISR | 1 jam | Sitemap Next.js native |
+| `/robots.txt` | Static | — | Robots.txt |
+| `/api/auth/send-otp` | Dynamic | — | Kirim OTP ke WhatsApp (rate-limited 60s/nomor) |
+| `/api/auth/verify-otp` | Dynamic | — | Verifikasi OTP (max 5 attempt) |
+| `/api/auth/logout` | Dynamic | — | Hapus sesi & redirect ke origin |
 | `/api/webhook/whatsapp` | Dynamic | — | Endpoint webhook Fonnte |
-| `/api/multisig/*` | Dynamic | — | API Multi-Sig backend |
+| `/api/multisig/requests` | Dynamic | — | Daftar permintaan Multi-Sig (session-scoped) |
+| `/api/multisig/approve` | Dynamic | — | Prosesor persetujuan Multi-Sig |
+| `/api/multisig/simulate` | Dynamic | — | Simulator transaksi besar (session-scoped) |
+| `/api/multisig/reconcile` | Dynamic | — | Engine rekonsiliasi kas (GET/POST, CRON_SECRET) |
+| `/api/cron/digest` | Dynamic | — | Weekly digest WhatsApp (Vercel Cron, CRON_SECRET) |
+| `/api/cron/tender-remind` | Dynamic | — | Pengingat tender harian (Vercel Cron, CRON_SECRET) |
 | `/api/parser` | Dynamic | — | Ethical marketplace parser |
-| `/api/reconcile` | Dynamic | — | Engine rekonsiliasi kas |
+| `/api/profile/export` | Dynamic | — | Export data pribadi warga (JSON) |
+| `/api/profile/delete` | Dynamic | — | Hapus data PII warga (anonymization) |
 
 ---
 
@@ -189,7 +210,16 @@ npx vercel --prod --yes
 [ ] git config user.email = dakuprodakwah@gmail.com
 [ ] git config user.name  = zaditprodakwah
 [ ] npm run build → tidak ada error
-[ ] Semua environment variable sudah di-set di Vercel
+[ ] Semua environment variable sudah di-set di Vercel:
+    [ ] NEXT_PUBLIC_SUPABASE_URL
+    [ ] NEXT_PUBLIC_SUPABASE_ANON_KEY
+    [ ] SUPABASE_SERVICE_ROLE_KEY
+    [ ] FONNTE_TOKEN
+    [ ] FONNTE_WEBHOOK_SECRET
+    [ ] CRON_SECRET          ← BARU (min. 32 karakter)
+    [ ] SESSION_SECRET       ← BARU (min. 32 karakter)
+    [ ] NEXT_PUBLIC_SITE_URL ← BARU (https://urunwarga.vercel.app)
+[ ] Tidak ada hardcoded secret/key di source code
 [ ] .env.local tidak ter-commit (ada di .gitignore)
 [ ] Branch aktif adalah `main`
 ```

@@ -17,11 +17,13 @@ Setiap baris kode, arsitektur, atau keputusan strategis yang diambil dalam penge
 
 ### **B. Arsitektur & Keamanan Data (Data Stewardship)**
 
-5. **Strict Multi-Tenant Isolation:** Setiap tabel **WAJIB** memiliki kolom `community_id`. Setiap query SQL wajib menyertakan filter `community_id` yang divalidasi oleh kebijakan RLS (Row-Level Security) Supabase.  
-6. **Ledger-First Principle:** Semua perubahan status keuangan wajib tercatat di tabel `ledger` dengan tipe data `DECIMAL` (bukan float). Kode tidak boleh melakukan update saldo secara manual di tabel profil.  
-7. **Stateless Logic:** *Edge Functions* tidak boleh menyimpan status di memori. Semua status harus ditarik dari basis data (source of truth).  
-8. **Graceful Degradation:** Sistem wajib berfungsi dalam "Mode Manual" jika layanan pihak ketiga (Payment Gateway/AI API) mengalami gangguan. Transaksi komunitas tidak boleh berhenti.  
+5. **Strict Multi-Tenant Isolation:** Setiap tabel **WAJIB** memiliki kolom `community_id`. Setiap query SQL wajib menyertakan filter `community_id` yang divalidasi oleh kebijakan RLS (Row-Level Security) Supabase. **Dilarang keras hardcode `community_id` dengan nilai statis** di dalam kode—community_id harus selalu dibaca dari sesi pengguna yang terautentikasi.
+6. **Ledger-First Principle:** Semua perubahan status keuangan wajib tercatat di tabel `ledger` dengan tipe data `DECIMAL` (bukan float). Kode tidak boleh melakukan update saldo secara manual di tabel profil.
+7. **Stateless Logic:** *Edge Functions* tidak boleh menyimpan status di memori. Semua status harus ditarik dari basis data (source of truth).
+8. **Graceful Degradation:** Sistem wajib berfungsi dalam "Mode Manual" jika layanan pihak ketiga (Payment Gateway/AI API) mengalami gangguan. Transaksi komunitas tidak boleh berhenti.
 9. **Audit-First:** Tidak ada aksi sistematis yang tidak tercatat. Setiap interaksi kunci harus memiliki *audit trail* di `interaction_log` atau `ledger`.
+10. **Session JWT via `jose`:** Autentikasi sesi wajib menggunakan cookie `urun_session` yang ditandatangani dengan library `jose` (HS256, `SESSION_SECRET`). Dilarang menggunakan Supabase Phone Auth atau autentikasi pihak ketiga lain untuk sesi OTP WhatsApp.
+11. **No Hardcoded Secrets:** Semua kunci/token (CRON_SECRET, SESSION_SECRET, FONNTE_TOKEN, SUPABASE_SERVICE_ROLE_KEY) wajib dibaca dari `process.env`. Tidak boleh ada fallback string, placeholder, atau nilai default di dalam source code.
 
 ### **C. SEO, AEO, & GEO (Growth Engineering)**
 
@@ -32,10 +34,12 @@ Setiap baris kode, arsitektur, atau keputusan strategis yang diambil dalam penge
 
 ### **D. Coding Standards & Scalability**
 
-14. **Polymorphic Data:** Gunakan kolom `metadata` (JSONB) pada `catalog_items` atau `workflow_processes` untuk menyimpan atribut unik. Dilarang menambah kolom tabel secara fisik untuk fitur-fitur yang tidak universal.  
-15. **Adapter Pattern:** Integrasi dengan pihak ketiga (Payment, WA API) wajib menggunakan *Service Adapter*. Dilarang keras melakukan *hardcode* SDK spesifik di dalam komponen UI atau logika inti.  
-16. **Minimalist Payload:** API wajib mengembalikan respons JSON yang minimal. Gunakan *caching* (SWR/React Query) di frontend untuk mereduksi *traffic* pada jaringan seluler yang lambat.  
+14. **Polymorphic Data:** Gunakan kolom `metadata` (JSONB) pada `catalog_items` atau `workflow_processes` untuk menyimpan atribut unik. Dilarang menambah kolom tabel secara fisik untuk fitur-fitur yang tidak universal.
+15. **Adapter Pattern:** Integrasi dengan pihak ketiga (Payment, WA API) wajib menggunakan *Service Adapter*. Dilarang keras melakukan *hardcode* SDK spesifik di dalam komponen UI atau logika inti.
+16. **Minimalist Payload:** API wajib mengembalikan respons JSON yang minimal. Gunakan *caching* (SWR/React Query) di frontend untuk mereduksi *traffic* pada jaringan seluler yang lambat.
 17. **Idempotency:** Setiap transaksi `POST` ke `ledger` wajib menggunakan `idempotency_key` untuk mencegah duplikasi data saat terjadi kegagalan jaringan.
+18. **Centralized Helpers:** Fungsi utility yang digunakan lebih dari satu tempat (misal: `sendWhatsappMessage`, `formatIDR`, `formatPhoneNumber`) **WAJIB** dipusatkan di `src/lib/` (contoh: `src/lib/whatsapp.ts`). Dilarang menduplikasi logika yang sama di dalam file route individual.
+19. **No Drizzle ORM:** `drizzle-orm` dan `drizzle-kit` **telah dihapus** dari proyek. Gunakan `@supabase/supabase-js` client secara langsung untuk semua interaksi database. Jangan instal kembali Drizzle.
 
 ### **E. User Interaction & Resilience**
 

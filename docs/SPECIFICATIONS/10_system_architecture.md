@@ -10,11 +10,13 @@ URUN mengadopsi arsitektur **Event-Driven Serverless** yang dipadukan dengan **R
 
 ### **Komponen Utama:**
 
-* **Frontend (The Interface):** Next.js (App Router) yang di-deploy di Vercel. Fokus pada performa *client-side* dan *static generation*.  
-* **Backend & Auth (The Source of Truth):** Supabase (PostgreSQL). Implementasi **Row-Level Security (RLS)** adalah mekanisme utama untuk isolasi data antar-komunitas.  
-* **Communication Layer (The Lobby):** API WhatsApp yang dihubungkan ke *Webhook Handler* sebagai gerbang interaksi natural warga.  
-* **Compute & Automation (The Engine):** \* Vercel Edge Functions untuk logika bisnis *real-time*.  
-  * GitHub Actions / Cron Jobs untuk tugas administratif otonom.
+* **Frontend (The Interface):** Next.js 16 (App Router, Turbopack) yang di-deploy di Vercel. Fokus pada performa *client-side* dan *static generation*.
+* **Authentication (The Gate):** Sistem OTP kustom berbasis WhatsApp via Fonnte. Tidak menggunakan Supabase Auth native—sesi pengguna dikelola melalui cookie `urun_session` yang ditandatangani secara kriptografis menggunakan library `jose` (HS256, `SESSION_SECRET`). Middleware `src/proxy.ts` memverifikasi sesi di Edge sebelum setiap request protected route.
+* **Backend & Auth (The Source of Truth):** Supabase (PostgreSQL). Implementasi **Row-Level Security (RLS)** adalah mekanisme utama untuk isolasi data antar-komunitas.
+* **Communication Layer (The Lobby):** API WhatsApp yang dihubungkan ke *Webhook Handler* sebagai gerbang interaksi natural warga dan pengiriman OTP.
+* **Compute & Automation (The Engine):**
+  * Vercel Edge Functions untuk logika bisnis *real-time*.
+  * Vercel Cron Jobs untuk tugas administratif otonom (reconcile harian, digest mingguan, pengingat tender harian).
 
 ## **II. Advanced Resilience & Intelligence Layer**
 
@@ -89,5 +91,10 @@ AI Coder wajib mematuhi aturan berikut saat merancang sub-sistem:
 * **Horizontal Partitioning:** Basis data dapat di-*shard* berdasarkan `community_id` jika jumlah komunitas mencapai ribuan tanpa mengubah arsitektur inti.  
 * **Protocol-First Development:** Setiap modul (Ledger, Stok, Tender) wajib dibangun sebagai *Service* independen yang dapat dipanggil oleh SDK pihak ketiga atau Bot, memastikan interoperabilitas protokol.
 
-*Instruksi untuk AI Coder:* "Pastikan setiap fungsi basis data mencantumkan validasi `community_id`. Gunakan RLS Supabase sebagai pertahanan utama. Hindari penyimpanan sesi yang berat; gunakan token JWT dari Supabase Auth yang terintegrasi native".
+*Instruksi untuk AI Coder:*
+1. Pastikan setiap fungsi basis data mencantumkan validasi `community_id` yang dibaca dari sesi JWT—DILARANG hardcode ID komunitas.
+2. Gunakan RLS Supabase sebagai pertahanan utama antar komunitas.
+3. Autentikasi sesi menggunakan cookie `urun_session` ditandatangani `jose`. Jangan gunakan Supabase Auth native untuk alur OTP WhatsApp.
+4. Middleware `src/proxy.ts` adalah penjaga sesi di Edge Runtime. Setiap halaman protected (dashboard, admin, multisig) harus melewati verifikasi di sini.
+5. `community_id` harus selalu diekstrak dari session token, bukan dari query parameter, body request, atau nilai hardcoded.
 

@@ -71,13 +71,18 @@ Deployment berjalan **otomatis** via GitHub Actions setiap kali ada push ke bran
 
 Variabel berikut **wajib** tersedia di Vercel Environment Variables dan `.env.local`:
 
-| Variable | Keterangan |
-|----------|-----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | URL Supabase project |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only) |
-| `FONNTE_TOKEN` | Token WhatsApp gateway Fonnte |
-| `FONNTE_WEBHOOK_SECRET` | Secret validasi webhook Fonnte |
+| Variable | Scope | Keterangan |
+|----------|---------|-----------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Public | URL Supabase project |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public | Supabase anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only 🔒 | Supabase service role key (RAHASIA) |
+| `FONNTE_TOKEN` | Server-only 🔒 | Token WhatsApp gateway Fonnte |
+| `FONNTE_WEBHOOK_SECRET` | Server-only 🔒 | Secret validasi webhook Fonnte |
+| `CRON_SECRET` | Server-only 🔒 | Token otorisasi Vercel Cron (min. 32 karakter) |
+| `SESSION_SECRET` | Server-only 🔒 | Kunci signing JWT `jose` untuk sesi (min. 32 karakter) |
+| `NEXT_PUBLIC_SITE_URL` | Public | URL produksi (`https://urunwarga.vercel.app`) |
+
+> ⚠️ **Keamanan:** Variabel berlabel 🔒 tidak boleh pernah ter-expose ke browser. `CRON_SECRET` dan `SESSION_SECRET` adalah **variabel baru** yang wajib ditambahkan di Vercel Dashboard sebelum deploy.
 
 ---
 
@@ -86,16 +91,27 @@ Variabel berikut **wajib** tersedia di Vercel Environment Variables dan `.env.lo
 | Route | Tipe | Keterangan |
 |-------|------|-----------|
 | `/` | Static | Homepage & navigasi utama |
+| `/login` | Static | Halaman login OTP WhatsApp |
 | `/catalog` | ISR (60s) | Katalog produk publik (SEO/AEO ready) |
 | `/catalog/[slug]` | SSR | Detail produk dengan JSON-LD schema |
-| `/leaderboard` | SSR | Papan keaktifan warga |
-| `/multisig` | Client | Multi-Sig Command Center pengurus |
+| `/dashboard` | SSR | Dashboard personal warga (auth required) |
+| `/admin` | SSR | Panel admin pengurus komunitas (auth required) |
+| `/leaderboard` | Static | Papan keaktifan warga |
+| `/multisig` | Static | Multi-Sig Command Center pengurus |
+| `/sitemap.xml` | ISR (1h) | Sitemap native Next.js |
+| `/api/auth/send-otp` | Dynamic | Kirim OTP ke WhatsApp (rate-limit 60s) |
+| `/api/auth/verify-otp` | Dynamic | Verifikasi OTP (max 5 attempt) |
+| `/api/auth/logout` | Dynamic | Hapus sesi & redirect |
 | `/api/webhook/whatsapp` | Dynamic | Webhook penerima pesan WhatsApp |
 | `/api/multisig/requests` | Dynamic | Daftar permintaan Multi-Sig |
 | `/api/multisig/approve` | Dynamic | Prosesor persetujuan Multi-Sig |
 | `/api/multisig/simulate` | Dynamic | Simulator transaksi besar |
+| `/api/multisig/reconcile` | Dynamic | Engine rekonsiliasi kas (Cron endpoint) |
+| `/api/cron/digest` | Dynamic | Weekly WhatsApp digest (Vercel Cron) |
+| `/api/cron/tender-remind` | Dynamic | Pengingat tender harian (Vercel Cron) |
 | `/api/parser` | Dynamic | Ethical marketplace parser |
-| `/api/reconcile` | Dynamic | Engine rekonsiliasi kas harian |
+| `/api/profile/export` | Dynamic | Export data pribadi warga |
+| `/api/profile/delete` | Dynamic | Hapus data PII warga |
 
 ---
 
@@ -111,6 +127,9 @@ Lihat folder [`docs/`](docs/README.md) untuk dokumentasi teknis, arsitektur, dan
 - **Database:** Supabase (PostgreSQL + RLS)
 - **Hosting:** Vercel (Edge Network)
 - **WhatsApp Gateway:** Fonnte
+- **Session Auth:** Custom OTP WhatsApp + `jose` (JWT HS256)
 - **Language:** TypeScript
+
+> ⚠️ **Catatan:** `drizzle-orm` dan `drizzle-kit` telah **dihapus** dari proyek. Semua interaksi database menggunakan `@supabase/supabase-js` client secara langsung.
 
 Lihat [`docs/SPECIFICATIONS/14_approved_open_source_stack.md`](docs/SPECIFICATIONS/14_approved_open_source_stack.md) untuk daftar lengkap.

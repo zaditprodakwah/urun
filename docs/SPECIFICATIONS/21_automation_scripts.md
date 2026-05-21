@@ -12,13 +12,15 @@ Automasi dalam URUN berfungsi sebagai *steward* (penjaga aset digital) yang bert
 
 Automasi dijalankan melalui **Vercel Cron Jobs** atau **GitHub Actions** untuk memastikan *serverless execution* yang efisien.
 
-| Kategori | Nama Script | Deskripsi | Frekuensi |
-| :---- | :---- | :---- | :---- |
-| **Financial** | reconcile\_ledger.js | Memvalidasi saldo total (ledger) vs workflow\_processes untuk mendeteksi anomali. | Harian (00:00) |
-| **Engagement** | notify\_community\_digest.js | Merangkum aktivitas (tender/kontribusi) dan mengirim notifikasi via Webhook WhatsApp. | Mingguan |
-| **SEO/GEO** | generate\_sitemap.js | Memindai catalog\_items publik dan memperbarui sitemap.xml untuk *search engine*. | Harian |
-| **System** | cleanup\_garbage.js | Menghapus entri workflow\_processes yang kadaluarsa (gagal/dibatalkan). | Bulanan |
-| **Engagement** | remind\_pending\_tender.js | Mengirim pengingat otomatis untuk tender yang mendekati batas waktu (due\_date). | Harian |
+| Kategori | Nama Script | Deskripsi | Frekuensi | Endpoint |
+| :---- | :---- | :---- | :---- | :---- |
+| **Financial** | reconcile\_ledger | Memvalidasi saldo total (ledger) vs workflow\_processes untuk mendeteksi anomali. | Harian (00:00 UTC) | `GET /api/multisig/reconcile` |
+| **Engagement** | notify\_community\_digest | Merangkum aktivitas (tender/kontribusi) dan mengirim notifikasi via WhatsApp Fonnte. | Mingguan (Senin 07:00) | `GET /api/cron/digest` |
+| **Engagement** | remind\_pending\_tender | Mengirim pengingat otomatis untuk tender yang mendekati batas waktu (due\_date). | Harian (09:00 UTC) | `GET /api/cron/tender-remind` |
+| **System** | cleanup\_garbage | Menghapus entri workflow\_processes yang kadaluarsa (gagal/dibatalkan). | Bulanan | *(manual/pg\_cron)* |
+| ~~**SEO/GEO**~~ | ~~generate\_sitemap~~ | ~~Memindai catalog\_items publik dan memperbarui sitemap.xml.~~ | ~~Dihapus~~ | ~~(ditangani Next.js native ISR)~~ |
+
+> **Keamanan Cron:** Semua endpoint Vercel Cron (`/api/multisig/reconcile`, `/api/cron/digest`, `/api/cron/tender-remind`) dilindungi oleh header `Authorization: Bearer <CRON_SECRET>`. Tanpa nilai `CRON_SECRET` yang valid di environment variables, endpoint akan merespons **HTTP 401 Unauthorized**.
 
 ## **III. Spesifikasi Script Inti**
 
