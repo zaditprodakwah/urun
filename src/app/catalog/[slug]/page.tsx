@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { getSession } from '@/lib/auth';
 import ProductInteractiveSection from '@/components/catalog/ProductInteractiveSection';
+import PollWidget from '@/components/polls/PollWidget';
 import { Product, WithContext } from 'schema-dts';
 import { 
   ChevronLeft, 
@@ -15,6 +17,53 @@ import {
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const { slug } = await params;
+
+  const { data: item } = await supabaseAdmin
+    .from('catalog_items')
+    .select('title, description, metadata, communities(name)')
+    .eq('slug', slug)
+    .eq('status', 'public')
+    .single();
+
+  if (!item) {
+    return {
+      title: 'Katalog Warga - Tidak Ditemukan',
+    };
+  }
+
+  const imageUrl = item.metadata?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80';
+  const price = item.metadata?.price ? `Rp ${item.metadata.price.toLocaleString('id-ID')}` : '';
+  const communityName = (item.communities as any)?.name || 'Komunitas URUN';
+
+  return {
+    title: `${item.title} | Katalog ${communityName}`,
+    description: item.description || `Komoditas ${price} yang dijamin ketersediaannya oleh pengurus ${communityName}.`,
+    openGraph: {
+      title: `${item.title} | Katalog ${communityName}`,
+      description: item.description || `Komoditas ${price} yang dijamin ketersediaannya oleh pengurus ${communityName}.`,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: item.title,
+        }
+      ],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: item.title,
+      description: item.description || '',
+      images: [imageUrl],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
@@ -230,6 +279,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 </span>
               </div>
             </div>
+
+            {/* Active Pre-Tender Poll */}
+            <PollWidget 
+              communityId={item.community_id}
+              catalogItemId={item.id}
+            />
           </div>
 
           {/* Right Column: Product Info & Dynamic Interactive Actions */}
@@ -281,7 +336,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {/* Dynamic Client Actions Box and Reviews Sub-system */}
             <ProductInteractiveSection 
               slug={slug}
-              checkoutType={item.checkout_type as any || 'link_toko'}
               externalUrl={item.external_url}
               whatsappFormFields={item.whatsapp_form_fields || []}
               sellerPhone={sellerPhone}

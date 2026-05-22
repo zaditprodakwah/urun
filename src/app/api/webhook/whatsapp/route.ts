@@ -198,9 +198,22 @@ export async function POST(req: NextRequest) {
 
       const unitPrice = parseFloat(tender.unit_price_target as unknown as string) || 0;
       const totalAmount = unitPrice * qty;
-      const idempotencyKey = crypto.randomUUID();
+      // A. Call secure subscribe_tender RPC to atomically reserve quota and create subscription
+      const { data: subResult, error: subRpcErr } = await supabaseAdmin.rpc('subscribe_tender', {
+        p_tender_id: tender.id,
+        p_member_id: memberId,
+        p_quantity: qty
+      });
 
-      // Write transaction using our secure RPC gateway
+      if (subRpcErr || !subResult || !(subResult as any).success) {
+        const errorMsg = (subResult as any)?.error || 'Gagal mendaftar subskripsi tender (Kuota penuh atau terjadi kendala sistem).';
+        console.error('❌ subscribe_tender RPC Error:', subRpcErr || subResult);
+        await sendWhatsappMessage(sender, `❌ ${errorMsg}`);
+        return NextResponse.json({ status: true });
+      }
+
+      // B. Write transaction using our secure RPC gateway (after quota is secured)
+      const idempotencyKey = crypto.randomUUID();
       const { data: rpcResult, error: rpcErr } = await supabaseAdmin.rpc('process_ledger_entry', {
         p_community_id: communityId,
         p_actor_id: memberId,
@@ -233,21 +246,6 @@ export async function POST(req: NextRequest) {
       if (result && result.status === 'error') {
         await sendWhatsappMessage(sender, `❌ Gagal mencatat transaksi: ${result.message}`);
         return NextResponse.json({ status: true });
-      }
-
-      // Record subscription mapping
-      const { error: subErr } = await supabaseAdmin
-        .from('tender_subscriptions')
-        .upsert({
-          tender_id: tender.id,
-          community_id: communityId,
-          member_id: memberId,
-          quantity: qty,
-          status: 'confirmed'
-        }, { onConflict: 'tender_id,member_id' });
-
-      if (subErr) {
-        console.error('❌ Subscription mapping err:', subErr);
       }
 
       // Record interaction log for reputation update

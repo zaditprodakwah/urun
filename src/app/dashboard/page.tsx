@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import CatalogManager from '@/components/dashboard/CatalogManager';
+import PollWidget from '@/components/polls/PollWidget';
 
 export const dynamic = 'force-dynamic';
 
@@ -114,6 +115,9 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Community Decision Poll */}
+            <PollWidget communityId={session.communityId} />
+
             {/* Quick Actions / Kedaulatan Data */}
             <section className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm">
               <h2 className="text-lg font-bold text-white mb-6">Hak Kedaulatan Data (PDP)</h2>

@@ -53,10 +53,12 @@ export async function runLedgerReconciliation(targetCommunityId: string): Promis
     // 3. Perform integrity checks per settlement
     for (const settlement of settlementsList) {
       const settlementId = settlement.id;
-      const settlementAmount = parseFloat(settlement.amount);
+      // Convert to cents to avoid floating point errors
+      const settlementAmountCents = Math.round(Number(settlement.amount) * 100);
+      const settlementAmount = settlementAmountCents / 100;
 
       // Check negative amount anomaly
-      if (settlementAmount <= 0) {
+      if (settlementAmountCents <= 0) {
         anomalies.push({
           type: 'negative_amount',
           ledgerId: settlementId,
@@ -79,31 +81,32 @@ export async function runLedgerReconciliation(targetCommunityId: string): Promis
         continue;
       }
 
-      // Sum the splits
-      let platformRevenue = 0;
-      let communityShare = 0;
+      // Sum the splits using cents
+      let platformRevenueCents = 0;
+      let communityShareCents = 0;
 
       for (const s of linkedSplits) {
-        const amt = parseFloat(s.amount);
+        const amtCents = Math.round(Number(s.amount) * 100);
         if (s.entry_type === 'platform_revenue') {
-          platformRevenue += amt;
+          platformRevenueCents += amtCents;
         } else if (s.entry_type === 'community_share') {
-          communityShare += amt;
+          communityShareCents += amtCents;
         }
       }
 
-      const totalSplitSum = platformRevenue + communityShare;
+      const totalSplitSumCents = platformRevenueCents + communityShareCents;
+      const totalSplitSum = totalSplitSumCents / 100;
 
       // Check for split sum mismatch
-      // Allow minor floating point difference of 0.05 IDR due to rounding
-      if (Math.abs(totalSplitSum - settlementAmount) > 0.05) {
+      // Using exact integer cents comparison prevents floating point discrepancies
+      if (Math.abs(totalSplitSumCents - settlementAmountCents) > 0) {
         anomalies.push({
           type: 'split_sum_mismatch',
           ledgerId: settlementId,
           amount: settlementAmount,
           expectedSum: settlementAmount,
           actualSum: totalSplitSum,
-          details: `Sum of split entries (${formatIDR(totalSplitSum)}) does not match the parent settlement amount (${formatIDR(settlementAmount)}). Platform fee: ${formatIDR(platformRevenue)}, Community share: ${formatIDR(communityShare)}`
+          details: `Sum of split entries (${formatIDR(totalSplitSum)}) does not match the parent settlement amount (${formatIDR(settlementAmount)}). Platform fee: ${formatIDR(platformRevenueCents / 100)}, Community share: ${formatIDR(communityShareCents / 100)}`
         });
       }
     }
@@ -149,12 +152,17 @@ export async function runLedgerReconciliation(targetCommunityId: string): Promis
 
         const alertMessage = `🚨 *P1 SYSTEM ALERT: LEDGER DISCREPANCY DETECTED* 🚨\n\nSistem audit mandiri URUN mendeteksi kejanggalan integritas Buku Kas Kolektif:\n\n• *Jumlah Masalah*: ${anomalies.length} anomali keuangan\n\n*Rincian Anomali*:\n${anomalySummary}\n\n⚠️ *PANDUAN INTEGRITAS KEAMANAN*:\n• *JANGAN* melakukan UPDATE/DELETE langsung pada tabel ledger (Immutability Rule #2).\n• Periksa entri dan lakukan perbaikan menggunakan metode *correction_entry* (reversal) jika terdapat kesalahan input manual.\n• Hubungi developer sistem jika trigger auto-split mengalami gangguan.`;
 
-        for (const signer of signers) {
+        const messagePromises = signers.map(signer => {
           const profile = signer.profiles as { phone?: string } | null | undefined;
           if (profile && profile.phone) {
-            await sendWhatsappMessage(profile.phone, alertMessage);
+            return sendWhatsappMessage(profile.phone, alertMessage).catch(err => {
+              console.error(`Failed to send WhatsApp alert to ${profile.phone}:`, err);
+            });
           }
-        }
+          return Promise.resolve();
+        });
+        
+        await Promise.allSettled(messagePromises);
       }
 
       return {

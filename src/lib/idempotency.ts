@@ -18,7 +18,16 @@ export async function checkIdempotency(
   communityId: string,
   requestPath: string
 ): Promise<IdempotencyResult> {
-  // Try to find existing key
+  // A. Fetch dynamic expiry configurations from global_settings table
+  const { data: expirySetting } = await supabaseAdmin
+    .from('global_settings')
+    .select('value')
+    .eq('key', 'idempotency_settings')
+    .single();
+
+  const expiryHours = (expirySetting?.value as Record<string, number> | null)?.expiry_hours || 24;
+
+  // B. Try to find existing key
   const { data, error } = await supabaseAdmin
     .from('idempotency_keys')
     .select('*')
@@ -31,27 +40,52 @@ export async function checkIdempotency(
   }
 
   if (data) {
-    // Key exists. If it has a response, it's a 'hit', otherwise it's pending so 'conflict'
-    if (data.response_status) {
+    // Check if key is expired
+    const createdAt = new Date(data.created_at).getTime();
+    const now = new Date().getTime();
+    const ageHours = (now - createdAt) / (1000 * 60 * 60);
+
+    if (ageHours > expiryHours) {
+      // Key expired, delete it and proceed
+      await supabaseAdmin
+        .from('idempotency_keys')
+        .delete()
+        .eq('idempotency_key', idempotencyKey);
+    } else {
+      // Key exists and is valid. If it has a response, it's a 'hit', otherwise it's pending so 'conflict'
+      if (data.response_status) {
+        return {
+          status: 'hit',
+          response_body: data.response_body,
+          response_status: data.response_status,
+        };
+      }
       return {
-        status: 'hit',
-        response_body: data.response_body,
-        response_status: data.response_status,
+        status: 'conflict',
+        response_body: { error: 'Request is already processing' },
+        response_status: 409,
       };
     }
-    return {
-      status: 'conflict',
-      response_body: { error: 'Request is already processing' },
-      response_status: 409,
-    };
   }
 
-  // Key doesn't exist, create it as pending
-  await supabaseAdmin.from('idempotency_keys').insert({
+  // C. Key doesn't exist, create it as pending
+  const { error: insertError } = await supabaseAdmin.from('idempotency_keys').insert({
     idempotency_key: idempotencyKey,
     community_id: communityId,
     request_path: requestPath,
   });
+
+  if (insertError) {
+    // If unique constraint violation (e.g. 23505), it means another request just inserted it.
+    if (insertError.code === '23505') {
+      return {
+        status: 'conflict',
+        response_body: { error: 'Request is already processing (race condition caught)' },
+        response_status: 409,
+      };
+    }
+    throw insertError;
+  }
 
   return { status: 'proceed' };
 }

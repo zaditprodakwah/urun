@@ -25,6 +25,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [devBypassCode, setDevBypassCode] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   // Pengurus State
   const [email, setEmail] = useState('');
@@ -179,9 +180,23 @@ export default function LoginPage() {
                       Pastikan nomor WhatsApp Anda sudah terdaftar di kepengurusan RT/RW setempat agar dapat diverifikasi secara otomatis.
                     </p>
                   </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <input 
+                      type="checkbox" 
+                      id="terms-warga"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-0.5 rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500/30"
+                    />
+                    <label htmlFor="terms-warga" className="text-[10px] text-zinc-400 leading-relaxed cursor-pointer">
+                      Saya menyetujui <Link href="/syarat-ketentuan" className="text-emerald-500 hover:underline">Syarat Ketentuan</Link>, <Link href="/kebijakan-privasi" className="text-emerald-500 hover:underline">Kebijakan Privasi</Link>, dan memahami <Link href="/dokumentasi" className="text-emerald-500 hover:underline">Dokumentasi URUN</Link>.
+                    </label>
+                  </div>
+
                   <button 
                     type="submit" 
-                    disabled={loading || !phone}
+                    disabled={loading || !phone || !acceptedTerms}
                     className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-bold hover:from-emerald-400 hover:to-emerald-300 transition-all shadow-lg shadow-emerald-500/15 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                   >
                     {loading ? 'Mengirim Kode...' : 'Dapatkan Kode Masuk (OTP)'}
@@ -254,9 +269,23 @@ export default function LoginPage() {
                       Metode ini khusus untuk pengurus RT/RW yang telah memiliki kredensial resmi pada Pusat Kendali URUN.
                     </p>
                   </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <input 
+                      type="checkbox" 
+                      id="terms-pengurus"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-0.5 rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500/30"
+                    />
+                    <label htmlFor="terms-pengurus" className="text-[10px] text-zinc-400 leading-relaxed cursor-pointer">
+                      Saya menyetujui <Link href="/syarat-ketentuan" className="text-emerald-500 hover:underline">Syarat Ketentuan</Link>, <Link href="/kebijakan-privasi" className="text-emerald-500 hover:underline">Kebijakan Privasi</Link>, dan memahami <Link href="/dokumentasi" className="text-emerald-500 hover:underline">Dokumentasi URUN</Link>.
+                    </label>
+                  </div>
+
                   <button 
                     type="submit" 
-                    disabled={loading || !email}
+                    disabled={loading || !email || !acceptedTerms}
                     className="w-full py-3.5 rounded-xl bg-zinc-100 text-zinc-900 font-bold hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                   >
                     {loading ? 'Mengirim Tautan...' : 'Dapatkan Tautan Masuk Instan'}

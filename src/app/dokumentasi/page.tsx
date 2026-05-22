@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Users, Building2, Terminal, Search, Shield, EyeOff, Lock, Code, 
   Smartphone, Award, Store, ShieldCheck, Webhook, Link as LinkIcon, 
   HelpCircle, BookOpen, ChevronDown, ChevronUp, MessageSquare, 
   RefreshCw, Sparkles, Send, CheckCircle2
 } from 'lucide-react';
+import { supabaseBrowser } from '@/lib/supabase';
+import PollInteractiveClient from '@/components/polls/PollInteractiveClient';
 
 interface DocItem {
   id: string;
@@ -30,6 +32,80 @@ export default function DokumentasiPage() {
   const [contactMessage, setContactMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Poll state
+  const [docPoll, setDocPoll] = useState<any>(null);
+  const [docMemberId, setDocMemberId] = useState<string | null>(null);
+  const [docHasVoted, setDocHasVoted] = useState(false);
+  const [docUserVoteOptionId, setDocUserVoteOptionId] = useState<string | null>(null);
+  const [isPollLoading, setIsPollLoading] = useState(true);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  useEffect(() => {
+    async function loadDocPoll() {
+      try {
+        const { data: { session: supabaseSession } } = await supabaseBrowser.auth.getSession();
+        const profileId = supabaseSession?.user?.id || null;
+        setIsUserLoggedIn(!!supabaseSession?.user);
+
+        // Fetch the active public documentation poll
+        const { data: polls } = await supabaseBrowser
+          .from('polls')
+          .select(`
+            *,
+            poll_options(*),
+            poll_votes(*)
+          `)
+          .eq('is_public', true)
+          .eq('status', 'active')
+          .ilike('title', '%Dokumentasi%')
+          .limit(1);
+
+        const activePoll = polls && polls.length > 0 ? polls[0] : null;
+
+        if (activePoll) {
+          const total = activePoll.poll_votes?.length || 0;
+          const optionsWithVotes = activePoll.poll_options.map((opt: any) => {
+            const votesForOption = activePoll.poll_votes?.filter((v: any) => v.option_id === opt.id) || [];
+            return {
+              ...opt,
+              votesCount: votesForOption.length,
+              percentage: total > 0 ? Math.round((votesForOption.length / total) * 100) : 0,
+            };
+          });
+
+          activePoll.optionsWithVotes = optionsWithVotes;
+          activePoll.totalVotes = total;
+
+          if (profileId) {
+            // Find user membership to let them vote
+            const { data: member } = await supabaseBrowser
+              .from('community_members')
+              .select('id')
+              .eq('profile_id', profileId)
+              .eq('community_id', activePoll.community_id)
+              .single();
+
+            if (member) {
+              setDocMemberId(member.id);
+              const vote = activePoll.poll_votes?.find((v: any) => v.member_id === member.id);
+              if (vote) {
+                setDocHasVoted(true);
+                setDocUserVoteOptionId(vote.option_id);
+              }
+            }
+          }
+          setDocPoll(activePoll);
+        }
+      } catch (err) {
+        console.error('Error loading doc poll:', err);
+      } finally {
+        setIsPollLoading(false);
+      }
+    }
+
+    loadDocPoll();
+  }, []);
 
   // Full Knowledge Base Database
   const docDatabase: DocItem[] = useMemo(() => [
@@ -523,6 +599,42 @@ export default function DokumentasiPage() {
             })}
           </div>
         </section>
+
+        {/* 📊 INTERACTIVE PUBLIC EVALUATION POLL */}
+        {!isPollLoading && docPoll && (
+          <section className="mt-20 max-w-4xl mx-auto space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-extrabold text-white tracking-tight">Evaluasi Dokumen & Fitur</h2>
+              <p className="text-sm text-zinc-400">Suara Anda menentukan prioritas pengembangan ekosistem URUN.</p>
+            </div>
+            
+            <div className="bg-zinc-950/40 border border-zinc-800/60 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden group">
+              <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#006c49]/10 rounded-full blur-3xl group-hover:bg-[#006c49]/15 transition-all duration-500" />
+              
+              <div className="relative z-10 space-y-4">
+                <div>
+                  <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded border border-emerald-500/30">
+                    Jajak Pendapat Publik
+                  </span>
+                  <h3 className="text-lg font-bold text-white mt-3 leading-snug">{docPoll.title}</h3>
+                  {docPoll.description && (
+                    <p className="text-zinc-400 text-xs sm:text-sm mt-1 leading-relaxed">{docPoll.description}</p>
+                  )}
+                </div>
+
+                <PollInteractiveClient
+                  pollId={docPoll.id}
+                  initialOptions={docPoll.optionsWithVotes}
+                  initialTotalVotes={docPoll.totalVotes}
+                  hasVoted={docHasVoted}
+                  initialUserVoteOptionId={docUserVoteOptionId}
+                  memberId={docMemberId}
+                  isLoggedIn={isUserLoggedIn}
+                />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* 📬 HELPDESK & ONBOARDING CONTACT FORM */}
         <section id="onboarding" className="mt-28 bg-zinc-900 text-white rounded-[2.5rem] p-8 sm:p-12 shadow-2xl relative overflow-hidden max-w-6xl mx-auto">

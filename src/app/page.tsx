@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import EcosystemBenchmarking from '@/components/landing/EcosystemBenchmarking';
+import LivingSocialProof from '@/components/landing/LivingSocialProof';
 import { 
   ArrowRight, 
   Check, 
@@ -854,6 +856,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <EcosystemBenchmarking />
+
       {/* ========================================================
           3. KOMPONEN EDUKASI: PARADIGMA SISTEM GENERATIVE
           ======================================================== */}
@@ -1274,6 +1278,8 @@ function verifikasiLogistikCallback(reqHeaders: any, rawPayload: string): boolea
 
         </div>
       </section>
+
+      <LivingSocialProof />
 
       {/* ========================================================
           6. CLOSING AND CALL TO ACTION (CTA) MATRIX
