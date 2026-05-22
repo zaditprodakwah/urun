@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase-server';
 import { getSession } from '@/lib/auth';
 import ProductInteractiveSection from '@/components/catalog/ProductInteractiveSection';
 import PollWidget from '@/components/polls/PollWidget';
+import CollapsibleMap from '@/components/gateway/CollapsibleMap';
 import { Product, WithContext } from 'schema-dts';
 import { 
   ChevronLeft, 
@@ -272,12 +273,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 </div>
               </div>
               
-              <div className="pt-4 border-t border-zinc-100 flex items-center justify-between text-xs">
-                <span className="text-zinc-400 font-bold uppercase tracking-wider text-[10px]">Koordinat Pemetaan RT/RW</span>
-                <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                  {coords.lat?.toFixed(5)}, {coords.lng?.toFixed(5)}
-                </span>
-              </div>
+              {/* Collapsible Interactive Map */}
+              <CollapsibleMap 
+                lat={coords.lat || -6.32} 
+                lng={coords.lng || 106.86} 
+                locationName={village} 
+              />
             </div>
 
             {/* Active Pre-Tender Poll */}

@@ -316,9 +316,9 @@ export default function LandingPage() {
       
       {/* WRAPPER HERO & BLOB - Mencegah Offside */}
       <div className="relative w-full overflow-hidden">
-        {/* Background Radial Glow accents */}
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse duration-[8000ms]"></div>
-        <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+        {/* Background Radial Glow accents - Removed heavy blur and pulse for mobile stability */}
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+        <div className="absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
       {/* ========================================================
           1. HERO SECTION: THE HOOK
@@ -627,13 +627,13 @@ export default function LandingPage() {
       )}
 
       {/* ========================================================
-          2. HUB SEGMENTASI AUDIENS (NAVIGASI SUGESTIF MODULAR)
+          2. FITUR KHUSUS UNTUK SETIAP PERAN
           ======================================================== */}
       <section className="py-24 bg-white border-t border-b border-outline-variant/30">
         <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
           
           <div className="text-center flex flex-col items-center gap-3">
-            <span className="text-xs font-black text-primary uppercase tracking-widest font-mono">Navigasi Sugestif Modular</span>
+            <span className="text-xs font-black text-primary uppercase tracking-widest font-mono">Fitur Khusus Untuk Setiap Peran</span>
             <h2 className="text-3xl md:text-4xl font-black text-on-surface font-sans">Satu Platform. Solusi Tiga Arah.</h2>
             <p className="text-sm text-on-surface-variant max-w-xl leading-relaxed">
               URUN dirancang dengan kriteria antarmuka dan hak istimewa khusus yang didedikasikan untuk menguraikan pain point warga, pengurus, serta mitra sponsor.
@@ -1290,7 +1290,7 @@ function verifikasiLogistikCallback(reqHeaders: any, rawPayload: string): boolea
       <section className="py-24 bg-white relative overflow-hidden">
         {/* Background ambient accents */}
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
           

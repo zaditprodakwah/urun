@@ -170,8 +170,8 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                 key={item.id}
                 className="group relative rounded-3xl border border-outline-variant bg-surface-container-lowest hover:shadow-xl hover:shadow-on-surface/5 hover:border-outline/50 transition-all duration-300 overflow-hidden flex flex-col shadow-sm"
               >
-                {/* Product Image */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-surface-container border-b border-outline-variant">
+                {/* Product Image (Clickable) */}
+                <Link href={`/catalog/${item.slug}`} className="relative aspect-[16/10] overflow-hidden bg-surface-container border-b border-outline-variant block">
                   <OptimizedImage
                     src={image} 
                     alt={item.title} 
@@ -191,7 +191,7 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                       <span>{rating.toFixed(1)} ({reviewCount})</span>
                     </div>
                   )}
-                </div>
+                </Link>
 
                 {/* Product Content */}
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
@@ -204,9 +204,11 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                       </span>
                     </div>
                     
-                    <h3 className="text-lg font-black text-on-surface group-hover:text-primary transition-colors line-clamp-1">
-                      {item.title}
-                    </h3>
+                    <Link href={`/catalog/${item.slug}`}>
+                      <h3 className="text-lg font-black text-on-surface hover:text-primary transition-colors line-clamp-1">
+                        {item.title}
+                      </h3>
+                    </Link>
                     
                     <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-2">
                       {item.description || 'Barang dagangan warga dengan jaminan kualitas terbaik dan harga gotong-royong.'}
