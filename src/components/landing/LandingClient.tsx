@@ -751,7 +751,7 @@ export default function LandingClient() {
                       <li>Sisa Kas Proyek Drainase: <strong className="text-on-surface">Rp1.850.000</strong></li>
                       <li>Dana Terkumpul Pembangunan: <strong className="text-primary">80% Terpenuhi</strong></li>
                     </ul>
-                    <p className="text-[9px] text-secondary underline cursor-pointer">Klik disini untuk kelengkapan file e-faktur & kwitansi fisik semen.</p>
+                    <p className="text-[9px] text-secondary underline cursor-pointer">Klik disini untuk kelengkapan file e-faktur &amp; kwitansi fisik semen.</p>
                   </div>
                 </div>
               )}
