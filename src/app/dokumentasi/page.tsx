@@ -3,11 +3,10 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Users, Building2, Terminal, Search, Shield, EyeOff, Lock, Code, 
-  Smartphone, Award, Store, ShieldCheck, ChevronRight, Webhook, Link as LinkIcon, 
-  ArrowRightLeft, HelpCircle, BookOpen, ChevronDown, ChevronUp, MessageSquare, 
-  RefreshCw, Sparkles, Send, CheckCircle2, ArrowRight
+  Smartphone, Award, Store, ShieldCheck, Webhook, Link as LinkIcon, 
+  HelpCircle, BookOpen, ChevronDown, ChevronUp, MessageSquare, 
+  RefreshCw, Sparkles, Send, CheckCircle2
 } from 'lucide-react';
-import Link from 'next/link';
 
 interface DocItem {
   id: string;
@@ -526,7 +525,7 @@ export default function DokumentasiPage() {
         </section>
 
         {/* 📬 HELPDESK & ONBOARDING CONTACT FORM */}
-        <section className="mt-28 bg-zinc-900 text-white rounded-[2.5rem] p-8 sm:p-12 shadow-2xl relative overflow-hidden max-w-6xl mx-auto">
+        <section id="onboarding" className="mt-28 bg-zinc-900 text-white rounded-[2.5rem] p-8 sm:p-12 shadow-2xl relative overflow-hidden max-w-6xl mx-auto">
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl opacity-70 pointer-events-none"></div>
           
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

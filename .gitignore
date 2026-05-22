@@ -43,3 +43,6 @@ next-env.d.ts
 # scratch folder
 /scratch
 
+# documentation and context
+/.context/
+/docs/

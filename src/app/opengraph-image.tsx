@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og';
  
-export const runtime = 'edge';
 export const alt = 'URUN - Sistem Operasi Mikro-Komunitas Berdaulat';
 export const size = {
   width: 1200,

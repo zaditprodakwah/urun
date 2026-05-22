@@ -46,6 +46,7 @@ export default function TermsOfServiceClient() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -409,7 +410,7 @@ export default function TermsOfServiceClient() {
                   <strong className="text-zinc-200">Layer 2 (Eksekutif/Investor):</strong> Hanya diberikan hak akses visual pada dasbor agregat volume kas, demografi pendaftaran komunitas skala besar, dan Return of Investment. Hak edit, mutasi, serta identitas rinci warga di-*block* sepenuhnya oleh sistem.
                 </li>
                 <li>
-                  <strong className="text-zinc-200">Layer 3 (Auditor/Compliance):</strong> Diberikan kewenangan membaca log transaksi mentah (`ledger`) guna menelusuri dugaan korupsi. Akan tetapi, nama dan identitas Personal Identifiable Information (PII) wajib disamarkan oleh sistem menjadi entitas anonim ("Warga_Anonim").
+                  <strong className="text-zinc-200">Layer 3 (Auditor/Compliance):</strong> Diberikan kewenangan membaca log transaksi mentah (`ledger`) guna menelusuri dugaan korupsi. Akan tetapi, nama dan identitas Personal Identifiable Information (PII) wajib disamarkan oleh sistem menjadi entitas anonim (&quot;Warga_Anonim&quot;).
                 </li>
               </ul>
             </div>

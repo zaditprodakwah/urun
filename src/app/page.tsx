@@ -20,7 +20,6 @@ import {
   RefreshCw,
   Clock,
   Smartphone,
-  CheckCircle2,
   AlertTriangle,
   Send,
   X,
