@@ -5,9 +5,9 @@ export default function NotFound() {
   return (
     <div className="flex-1 w-full flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-6">
-        <div className="text-emerald-500 font-mono text-8xl font-bold">404</div>
-        <h1 className="text-2xl font-bold text-white">Halaman Tidak Ditemukan</h1>
-        <p className="text-zinc-400 text-sm leading-relaxed">
+        <div className="text-emerald-600 font-mono text-8xl font-bold">404</div>
+        <h1 className="text-2xl font-bold text-[#131b2e]">Halaman Tidak Ditemukan</h1>
+        <p className="text-zinc-650 text-sm leading-relaxed">
           Sistem gagal memverifikasi lokasi halaman ini di dalam node komunitas kami. Mungkin telah dipindahkan atau Anda tidak memiliki akses.
         </p>
         <div className="pt-4">

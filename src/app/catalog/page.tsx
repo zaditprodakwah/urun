@@ -1,7 +1,5 @@
-import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { 
-  ShoppingBag, 
   Sparkles, 
   ShieldCheck 
 } from 'lucide-react';
@@ -33,40 +31,7 @@ export default async function CatalogPage() {
       <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none -z-10 animate-pulse duration-[10000ms]"></div>
       <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
 
-      {/* Navigation Header (Premium warm translucent) */}
-      <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-[#FCFBF9]/90 backdrop-blur-md transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-md shadow-emerald-700/10 group-hover:scale-105 transition-all duration-300">
-              <ShoppingBag className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-black tracking-tight text-zinc-900 group-hover:text-emerald-700 transition-colors">URUN</span>
-                <span className="text-[10px] font-bold bg-emerald-600/10 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-600/20">
-                  Etalase Warga
-                </span>
-              </div>
-              <p className="text-[10px] font-semibold text-zinc-500 tracking-wide uppercase">Simpul Ekonomi Mandiri</p>
-            </div>
-          </Link>
-          
-          <div className="flex items-center gap-6">
-            <Link href="/leaderboard" className="text-xs font-bold text-zinc-600 hover:text-emerald-700 transition-colors flex items-center gap-1">
-              Papan Keaktifan
-            </Link>
-            <Link href="/dashboard" className="text-xs font-bold text-zinc-600 hover:text-emerald-700 transition-colors">
-              Dasbor Saya
-            </Link>
-            <Link 
-              href="/" 
-              className="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 transition-all duration-200 shadow-sm"
-            >
-              Kembali ke Beranda
-            </Link>
-          </div>
-        </div>
-      </header>
+
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">

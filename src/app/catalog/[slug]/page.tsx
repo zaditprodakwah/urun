@@ -165,37 +165,19 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {/* Soft bright warm ambient glows */}
       <div className="absolute top-[-20%] right-[10%] w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none -z-10 animate-pulse duration-[10000ms]"></div>
       
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-[#FCFBF9]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/catalog" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-md shadow-emerald-700/10 group-hover:scale-105 transition-all duration-300">
-              <ChevronLeft className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black tracking-tight text-zinc-900 group-hover:text-emerald-700 transition-colors">Katalog Warga</span>
-                <span className="text-[10px] font-bold bg-[#F5F3EF] text-zinc-700 px-2 py-0.5 rounded-full border border-zinc-200">
-                  Kembali
-                </span>
-              </div>
-              <p className="text-[10px] font-semibold text-zinc-500 tracking-wide uppercase">Detail Komoditas</p>
-            </div>
-          </Link>
-          
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-xs font-bold text-zinc-600 hover:text-emerald-700 transition-colors">
-              Dasbor Saya
-            </Link>
-            <Link href="/" className="text-xs font-bold text-zinc-600 hover:text-emerald-700 transition-colors">
-              Beranda URUN
-            </Link>
-          </div>
-        </div>
-      </header>
-
       {/* Product Detail Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Elegant Back Breadcrumb */}
+        <div className="mb-8">
+          <Link 
+            href="/catalog" 
+            className="inline-flex items-center gap-2 text-xs font-bold text-zinc-650 hover:text-emerald-700 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Kembali ke Katalog Warga</span>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
           {/* Left Column: Product Image & Geo Context */}

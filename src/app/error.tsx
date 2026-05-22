@@ -21,8 +21,8 @@ export default function Error({
         <div className="mx-auto w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
           <AlertTriangle className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-bold text-white">Kegagalan Sistem Internal</h1>
-        <p className="text-zinc-400 text-sm leading-relaxed">
+        <h1 className="text-2xl font-bold text-[#131b2e]">Kegagalan Sistem Internal</h1>
+        <p className="text-zinc-650 text-sm leading-relaxed">
           Sovereign Core mendeteksi kesalahan fatal saat memproses permintaan Anda. Hal ini bisa terjadi karena anomali jaringan atau kegagalan otorisasi RLS.
         </p>
         <div className="pt-4">
