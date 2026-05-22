@@ -1,150 +1,106 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
-import crypto from 'crypto';
-import { encryptSession } from '@/lib/auth';
 import { formatPhoneNumber } from '@/lib/whatsapp';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone, otp } = await req.json();
-
+    const body = await req.json();
+    const { phone, otp, redirectUrl } = body;
+    
     if (!phone || !otp) {
-      return NextResponse.json({ status: false, error: 'Nomor WhatsApp dan OTP wajib diisi' }, { status: 400 });
+      return NextResponse.json({ error: 'Nomor WhatsApp dan OTP wajib diisi' }, { status: 400 });
     }
 
     const formattedPhone = formatPhoneNumber(phone);
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
 
-    // 1. Brute-Force Protection (Max 5 failed attempts in the last 5 minutes)
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const { count: failedCount, error: countErr } = await supabaseAdmin
-      .from('audit_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('action', 'otp_verify_failed')
-      .eq('reason', `otp_verify_failed:${formattedPhone}`)
-      .gt('created_at', fiveMinutesAgo);
-
-    if (!countErr && failedCount !== null && failedCount >= 5) {
-      return NextResponse.json({
-        status: false,
-        error: 'Nomor Anda diblokir sementara karena terlalu banyak memasukkan OTP salah. Silakan coba lagi dalam 5 menit.'
-      }, { status: 429 });
-    }
-
-    const hashedOtp = crypto.createHash('sha256').update(otp.trim()).digest('hex');
-
-    // Query valid OTP session
-    const { data: otpData, error: otpErr } = await supabaseAdmin
-      .from('otp_sessions')
-      .select('*')
+    // 1. Verifikasi Hash OTP
+    const { data: challenges, error: challengeErr } = await supabaseAdmin
+      .from('otp_challenges')
+      .select('id, expires_at')
       .eq('phone', formattedPhone)
-      .eq('otp_hash', hashedOtp)
-      .eq('used', false)
-      .gt('expires_at', new Date().toISOString())
+      .eq('otp_hash', otpHash)
+      .gte('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(1);
 
-    if (otpErr || !otpData || otpData.length === 0) {
-      // Record failed attempt in audit_log
-      await supabaseAdmin
-        .from('audit_log')
-        .insert({
-          action: 'otp_verify_failed',
-          table_affected: 'otp_sessions',
-          reason: `otp_verify_failed:${formattedPhone}`,
-          new_value: { phone: formattedPhone, attemptedAt: new Date().toISOString() }
-        });
-
-      return NextResponse.json({ status: false, error: 'Kode OTP tidak valid atau telah kedaluwarsa' }, { status: 400 });
+    if (challengeErr || !challenges || challenges.length === 0) {
+      return NextResponse.json({ error: 'Kode OTP tidak valid atau sudah kedaluwarsa. Silakan minta kode baru.' }, { status: 401 });
     }
 
-    const otpSession = otpData[0];
+    const challengeId = challenges[0].id;
 
-    // Mark OTP as used
-    await supabaseAdmin
-      .from('otp_sessions')
-      .update({ used: true })
-      .eq('id', otpSession.id);
+    // Hapus OTP agar tidak bisa digunakan ulang (Single-Use)
+    await supabaseAdmin.from('otp_challenges').delete().eq('id', challengeId);
 
-    // Fetch corresponding profile and join community_members
-    const { data: profiles, error: profErr } = await supabaseAdmin
+    // 2. Eksekusi Shadow Email Logic untuk Pembuatan Sesi
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
-      .select(`
-        id,
-        full_name,
-        phone,
-        community_members (
-          community_id,
-          role
-        )
-      `)
-      .or(`phone.eq.${formattedPhone},phone.eq.0${formattedPhone.slice(2)}`)
-      .limit(1);
+      .select('id, full_name')
+      .eq('phone', formattedPhone)
+      .single();
 
-    if (profErr || !profiles || profiles.length === 0) {
-      return NextResponse.json({ status: false, error: 'Profil tidak ditemukan' }, { status: 404 });
+    if (!profile) {
+      return NextResponse.json({ error: 'Profil tidak ditemukan di Sovereign Core.' }, { status: 404 });
     }
 
-    const profileObj = profiles[0];
-    const memberObj = profileObj.community_members?.[0];
+    const shadowEmail = `${formattedPhone}@warga.urun.local`;
+    let targetEmail = shadowEmail;
 
-    if (!memberObj) {
-      return NextResponse.json({
-        status: false,
-        error: 'Akun Anda belum terdaftar sebagai anggota komunitas manapun.'
-      }, { status: 403 });
-    }
+    // Periksa eksistensi pengguna di sistem auth.users
+    const { data: authUser, error: authUserErr } = await supabaseAdmin.auth.admin.getUserById(profile.id);
 
-    const citizen = {
-      id: profileObj.id,
-      name: profileObj.full_name,
-      phone: profileObj.phone,
-      community_id: memberObj.community_id,
-      role: memberObj.role
-    };
-
-    // Log login action to audit_log
-    await supabaseAdmin
-      .from('audit_log')
-      .insert({
-        community_id: citizen.community_id,
-        actor_id: citizen.id,
-        action: 'user_login',
-        table_affected: 'profiles',
-        reason: 'User authenticated successfully via custom WhatsApp OTP validation.',
-        new_value: { phone: formattedPhone, role: citizen.role }
+    if (authUserErr || !authUser.user) {
+      // Warga belum memiliki akun di auth.users (Shadow Account Creation)
+      const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
+        email: shadowEmail,
+        phone: formattedPhone,
+        email_confirm: true,
+        phone_confirm: true,
+        user_metadata: { full_name: profile.full_name }
       });
 
-    // Create session payload
-    const sessionPayload = {
-      userId: citizen.id,
-      profileId: citizen.id,
-      phone: formattedPhone,
-      role: citizen.role,
-      communityId: citizen.community_id,
-      name: citizen.name
-    };
+      if (createErr) {
+        // Coba periksa apakah email/phone sudah terikat pada UID lain
+        console.error('Shadow Account Creation fallback needed:', createErr);
+      }
+    } else {
+      // Warga sudah ada. Gunakan email aslinya jika punya, atau update dengan shadow email jika kosong
+      targetEmail = authUser.user.email || shadowEmail;
+      
+      if (!authUser.user.email) {
+        await supabaseAdmin.auth.admin.updateUserById(profile.id, { 
+          email: shadowEmail, 
+          email_confirm: true 
+        });
+      }
+    }
 
-    // Encrypt the session payload to a secure JWT using jose
-    const encryptedToken = await encryptSession(sessionPayload);
-
-    const response = NextResponse.json({
-      status: true,
-      message: 'Login berhasil',
-      session: sessionPayload
+    // 3. Terbitkan Sesi via Magic Link Hack
+    const finalRedirect = redirectUrl || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard`;
+    
+    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'magiclink',
+      email: targetEmail,
+      options: {
+        redirectTo: finalRedirect
+      }
     });
 
-    // Save signed JWT in HTTP-only cookie
-    response.cookies.set('urun_session', encryptedToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/'
+    if (linkErr || !linkData.properties?.action_link) {
+      console.error('Magic Link Hack Failed:', linkErr);
+      return NextResponse.json({ error: 'Gagal membangun terowongan sesi aman (Session Tunnel Error).' }, { status: 500 });
+    }
+
+    // Berikan tautan aksi ke client. Client akan langsung menggunakan URL ini untuk menginjeksi cookies.
+    return NextResponse.json({ 
+      success: true, 
+      sessionUrl: linkData.properties.action_link 
     });
 
-    return response;
   } catch (err: any) {
-    console.error('💥 OTP verification critical error:', err);
-    return NextResponse.json({ status: false, error: err.message }, { status: 500 });
+    console.error('Verify OTP Critical Error:', err);
+    return NextResponse.json({ error: 'Terjadi kegagalan komunikasi internal.' }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import EcosystemBenchmarking from '@/components/landing/EcosystemBenchmarking';
 import LivingSocialProof from '@/components/landing/LivingSocialProof';
@@ -70,6 +70,13 @@ export default function LandingPage() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (emulatorTab === "whatsapp") {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isTyping, emulatorTab]);
   const [activeExplain, setActiveExplain] = useState<Message["underTheHood"] | null>(null);
 
   // 3. Automated Circular Ledger Feed States
@@ -548,6 +555,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                     )}
+                    <div ref={messagesEndRef} />
                   </div>
 
                   {/* Command quick buttons inside phone */}

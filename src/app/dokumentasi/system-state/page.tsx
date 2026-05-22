@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, FileCode, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Settings, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 // Cache agresif: Konfigurasi sistem global (hardcoded/env) amat jarang berubah.
 export const revalidate = 3600; 

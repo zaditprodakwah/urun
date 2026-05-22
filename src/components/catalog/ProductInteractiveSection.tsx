@@ -5,15 +5,12 @@ import {
   MessageSquare, 
   Link2, 
   Star, 
-  Calendar, 
-  Check, 
   X, 
   Send, 
   ShoppingBag,
   Sparkles,
   Phone,
   MessageCircle,
-  ThumbsUp,
   HelpCircle,
   Gift
 } from 'lucide-react';

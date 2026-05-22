@@ -16,18 +16,17 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [tab, setTab] = useState<'warga' | 'pengurus'>('warga');
+  const [tab, setTab] = useState<'whatsapp' | 'email'>('whatsapp');
   
-  // Warga State
+  // Warga State (WhatsApp OTP)
   const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [devBypassCode, setDevBypassCode] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  // Pengurus State
+  // Email / Google State
   const [email, setEmail] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
@@ -44,22 +43,11 @@ export default function LoginPage() {
       });
       const data = await res.json();
       
-      if (!res.ok || !data.status) {
-        // DEMO BYPASS: Jika nomor demo, paksakan berhasil
-        if (phone === '081111111111') {
-          setOtpSent(true);
-          setDevBypassCode('123456');
-          return;
-        }
+      if (!res.ok) {
         throw new Error(data.error || 'Gagal mengirim kode masuk');
       }
       
       setOtpSent(true);
-      if (data.devBypass) {
-        setDevBypassCode(data.devBypass); // For local dev bypass
-      } else if (phone === '081111111111') {
-        setDevBypassCode('123456'); // Hardcoded demo bypass
-      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -80,20 +68,19 @@ export default function LoginPage() {
       });
       const data = await res.json();
       
-      if (!res.ok || !data.status) {
-        if (phone === '081111111111' && otp === '123456') {
-          // Bypass successful for demo
-        } else {
-          throw new Error(data.error || 'Kode verifikasi tidak cocok. Silakan periksa kembali.');
-        }
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Kode verifikasi tidak valid.');
       }
       
-      // Redirect to dashboard on success
-      router.push('/dashboard');
-      router.refresh();
+      // Auto-login via Magic Link URL returned from server
+      if (data.sessionUrl) {
+        window.location.href = data.sessionUrl;
+      } else {
+        router.push('/dashboard');
+        router.refresh();
+      }
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -104,6 +91,7 @@ export default function LoginPage() {
     setError('');
     
     try {
+      // Mocking Email Auth for Demo
       await new Promise(resolve => setTimeout(resolve, 1000));
       setMagicLinkSent(true);
     } catch (err: any) {
@@ -113,236 +101,219 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-300 relative flex items-center justify-center p-4">
-      {/* Radial Background Glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[128px] pointer-events-none -z-10 animate-pulse duration-[8000ms]"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-600/5 rounded-full blur-[128px] pointer-events-none -z-10"></div>
+  const handleGoogleLogin = () => {
+    // Implement Google OAuth via Supabase
+    alert('Integrasi Google OAuth akan memanggil supabase.auth.signInWithOAuth({ provider: "google" })');
+  };
 
-      <div className="w-full max-w-md">
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-primary/20 selection:text-primary relative flex items-center justify-center p-4">
+      {/* Light-Clean-Industrial Background Shapes */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-primary/5 -skew-y-3 origin-top-left -z-10 border-b border-primary/10"></div>
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-[128px] pointer-events-none -z-10"></div>
+
+      <div className="w-full max-w-md z-10">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 shadow-lg shadow-emerald-500/20 mb-4 hover:scale-105 transition-transform">
-            <span className="text-2xl font-bold text-zinc-950">U</span>
+          <Link href="/" className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-sm border border-primary/20 mb-5 hover:scale-105 transition-transform">
+            <span className="text-3xl font-black text-primary font-serif italic">U</span>
           </Link>
-          <h1 className="text-2xl font-extrabold text-white mb-2">Masuk Simpul Warga</h1>
-          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed px-4">
-            Silakan masuk untuk mengelola iuran, memantau buku kas RT/RW secara terbuka, atau memasarkan dagangan Anda.
+          <h1 className="text-2xl font-black text-slate-900 mb-2 font-sans tracking-tight">Kedaulatan Warga</h1>
+          <p className="text-sm text-slate-500 leading-relaxed px-4">
+            Akses Buku Kas Terkunci dan panel komunitas Anda dengan keamanan berstandar institusi.
           </p>
         </div>
 
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
           
-          {/* Tabs */}
-          <div className="flex p-1 bg-zinc-950 rounded-xl mb-8 border border-zinc-800">
+          {/* Dual-Auth Tab Switcher */}
+          <div className="flex p-1.5 bg-slate-100 rounded-xl mb-8 border border-slate-200/60">
             <button 
-              onClick={() => { setTab('warga'); setError(''); }}
-              className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${tab === 'warga' ? 'bg-zinc-800 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}
+              onClick={() => { setTab('whatsapp'); setError(''); }}
+              className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${tab === 'whatsapp' ? 'bg-white text-primary shadow-sm border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
             >
-              <Smartphone className="w-3.5 h-3.5" />
-              Untuk Warga (WhatsApp)
+              <Smartphone className="w-4 h-4" />
+              WhatsApp OTP
             </button>
             <button 
-              onClick={() => { setTab('pengurus'); setError(''); }}
-              className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${tab === 'pengurus' ? 'bg-zinc-800 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}
+              onClick={() => { setTab('email'); setError(''); }}
+              className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${tab === 'email' ? 'bg-white text-secondary shadow-sm border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
             >
-              <Mail className="w-3.5 h-3.5" />
-              Bagi Pengurus (Email)
+              <Mail className="w-4 h-4" />
+              Email / Google
             </button>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-xs font-medium flex items-start gap-2.5">
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-medium flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{error}</span>
+              <span className="leading-relaxed">{error}</span>
             </div>
           )}
 
-          {tab === 'warga' && (
-            <div className="space-y-6">
+          {tab === 'whatsapp' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-left-2 duration-300">
               {!otpSent ? (
                 <form onSubmit={handleSendOTP} className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Nomor WhatsApp Aktif</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Nomor WhatsApp Anda</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
-                        <Smartphone className="w-4.5 h-4.5" />
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                        <Smartphone className="w-5 h-5" />
                       </span>
                       <input 
-                        type="text" 
+                        type="tel" 
                         placeholder="Contoh: 081234567890" 
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-sm text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-400 placeholder:font-normal"
                         required
                       />
                     </div>
-                    <p className="text-[10px] text-zinc-500 leading-normal">
-                      Pastikan nomor WhatsApp Anda sudah terdaftar di kepengurusan RT/RW setempat agar dapat diverifikasi secara otomatis.
-                    </p>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
                     <input 
                       type="checkbox" 
-                      id="terms-warga"
+                      id="terms-wa"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-0.5 rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500/30"
+                      className="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary border-slate-300"
                     />
-                    <label htmlFor="terms-warga" className="text-[10px] text-zinc-400 leading-relaxed cursor-pointer">
-                      Saya menyetujui <Link href="/syarat-ketentuan" className="text-emerald-500 hover:underline">Syarat Ketentuan</Link>, <Link href="/kebijakan-privasi" className="text-emerald-500 hover:underline">Kebijakan Privasi</Link>, dan memahami <Link href="/dokumentasi" className="text-emerald-500 hover:underline">Dokumentasi URUN</Link>.
+                    <label htmlFor="terms-wa" className="text-xs text-slate-500 leading-relaxed cursor-pointer select-none">
+                      Saya menyetujui <Link href="/syarat" className="text-primary hover:underline font-medium">Syarat Layanan</Link> dan menjunjung tinggi kejujuran bertransaksi di lingkungan RT/RW.
                     </label>
                   </div>
 
                   <button 
                     type="submit" 
                     disabled={loading || !phone || !acceptedTerms}
-                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-bold hover:from-emerald-400 hover:to-emerald-300 transition-all shadow-lg shadow-emerald-500/15 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    className="w-full py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {loading ? 'Mengirim Kode...' : 'Dapatkan Kode Masuk (OTP)'}
+                    {loading ? 'Menghubungkan ke Gateway...' : 'Kirim Kode Keamanan'}
                     {!loading && <ArrowRight className="w-4 h-4" />}
                   </button>
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOTP} className="space-y-5">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block text-center">Masukkan 6 Digit Kode Masuk</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
-                        <KeyRound className="w-4.5 h-4.5" />
-                      </span>
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold text-slate-700 block text-center">
+                      Cek WhatsApp Anda untuk kode 6-digit.
+                    </label>
+                    <div className="relative max-w-xs mx-auto">
                       <input 
                         type="text" 
-                        placeholder="000 000" 
+                        placeholder="000000" 
                         value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
+                        onChange={(e) => setOtp(e.target.value.replace(/\\D/g, ''))}
                         maxLength={6}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all placeholder:text-zinc-800 tracking-[0.4em] text-center text-lg font-mono"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-300 tracking-[0.5em] text-center text-2xl font-black font-mono shadow-inner"
                         required
                       />
                     </div>
-                    {devBypassCode && (
-                      <div className="mt-3 p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-900/30 text-[10px] text-emerald-400 font-mono text-center">
-                        MODE UJI COBA (BYPASS CODE): {devBypassCode}
-                      </div>
-                    )}
                   </div>
                   <button 
                     type="submit" 
                     disabled={loading || otp.length !== 6}
-                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-bold hover:from-emerald-400 hover:to-emerald-300 transition-all shadow-lg shadow-emerald-500/15 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    className="w-full py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {loading ? 'Memverifikasi...' : 'Verifikasi & Masuk Sekarang'}
+                    {loading ? 'Memverifikasi Identitas...' : 'Verifikasi & Masuk'}
                   </button>
                   <button 
                     type="button" 
-                    onClick={() => { setOtpSent(false); setOtp(''); setDevBypassCode(''); }}
-                    className="w-full text-xs text-zinc-500 hover:text-zinc-300 transition-colors py-1 text-center font-semibold"
+                    onClick={() => { setOtpSent(false); setOtp(''); }}
+                    className="w-full text-xs text-slate-400 hover:text-slate-600 transition-colors py-2 text-center font-medium"
                   >
-                    Ganti Nomor WhatsApp
+                    Ubah Nomor Telepon
                   </button>
                 </form>
               )}
             </div>
           )}
 
-          {tab === 'pengurus' && (
-            <div className="space-y-6">
+          {tab === 'email' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
+              
+              <button 
+                onClick={handleGoogleLogin}
+                className="w-full py-3.5 rounded-xl bg-white border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Lanjutkan dengan Google
+              </button>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink-0 mx-4 text-xs font-medium text-slate-400 uppercase tracking-widest">Atau via Email</span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
+
               {!magicLinkSent ? (
                 <form onSubmit={handleSendMagicLink} className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Alamat Email Pengurus</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Alamat Email Terdaftar</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
-                        <Mail className="w-4.5 h-4.5" />
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                        <Mail className="w-5 h-5" />
                       </span>
                       <input 
                         type="email" 
-                        placeholder="Contoh: ketua.rt@komunitas.id" 
+                        placeholder="Contoh: bendahara@komunitas.id" 
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-sm text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary/40 transition-all placeholder:text-slate-400 placeholder:font-normal"
                         required
                       />
                     </div>
-                    <p className="text-[10px] text-zinc-500 leading-normal">
-                      Metode ini khusus untuk pengurus RT/RW yang telah memiliki kredensial resmi pada Pusat Kendali URUN.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <input 
-                      type="checkbox" 
-                      id="terms-pengurus"
-                      checked={acceptedTerms}
-                      onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-0.5 rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500/30"
-                    />
-                    <label htmlFor="terms-pengurus" className="text-[10px] text-zinc-400 leading-relaxed cursor-pointer">
-                      Saya menyetujui <Link href="/syarat-ketentuan" className="text-emerald-500 hover:underline">Syarat Ketentuan</Link>, <Link href="/kebijakan-privasi" className="text-emerald-500 hover:underline">Kebijakan Privasi</Link>, dan memahami <Link href="/dokumentasi" className="text-emerald-500 hover:underline">Dokumentasi URUN</Link>.
-                    </label>
                   </div>
 
                   <button 
                     type="submit" 
-                    disabled={loading || !email || !acceptedTerms}
-                    className="w-full py-3.5 rounded-xl bg-zinc-100 text-zinc-900 font-bold hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    disabled={loading || !email}
+                    className="w-full py-4 rounded-xl bg-slate-800 text-white font-bold hover:bg-slate-900 transition-all shadow-lg shadow-slate-800/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {loading ? 'Mengirim Tautan...' : 'Dapatkan Tautan Masuk Instan'}
-                    {!loading && <ArrowRight className="w-4 h-4 text-zinc-900" />}
+                    {loading ? 'Mengirim Tautan...' : 'Kirim Tautan Masuk Instan'}
                   </button>
                 </form>
               ) : (
-                <div className="text-center py-6 space-y-4">
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
-                    <Inbox className="w-6 h-6" />
+                <div className="text-center py-6 space-y-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-2">
+                    <Inbox className="w-8 h-8" />
                   </div>
-                  <h3 className="text-white font-extrabold text-base">Periksa Kotak Masuk Email Anda</h3>
-                  <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed px-2">
-                    Tautan masuk rahasia yang aman telah dikirimkan ke alamat email pengurus berikut:<br/>
-                    <strong className="text-zinc-300 font-bold block mt-1.5 break-all">{email}</strong>
+                  <h3 className="text-slate-800 font-black text-lg">Cek Kotak Masuk Anda</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed px-4">
+                    Tautan aman satu-klik telah kami kirimkan ke:<br/>
+                    <strong className="text-slate-700 mt-1 block">{email}</strong>
                   </p>
-                  <div className="pt-4 flex flex-col gap-2">
-                    {email.endsWith('@urun.demo') && (
-                      <Link 
-                        href="/dashboard"
-                        className="mb-2 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold transition-all text-xs flex items-center justify-center shadow-lg shadow-emerald-500/20"
-                      >
-                        🚀 Demo: Masuk Tanpa Email
-                      </Link>
-                    )}
-                    <button 
-                      onClick={() => setMagicLinkSent(false)}
-                      className="text-xs text-emerald-400 hover:text-emerald-300 font-bold transition-colors"
-                    >
-                      Kirim Ulang Email Masuk
-                    </button>
-                    <button 
-                      onClick={() => { setMagicLinkSent(false); setEmail(''); }}
-                      className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-                    >
-                      Kembali dan Ganti Email
-                    </button>
-                  </div>
+                  <button 
+                    onClick={() => { setMagicLinkSent(false); setEmail(''); }}
+                    className="text-xs text-secondary hover:text-secondary/80 font-bold transition-colors mt-2"
+                  >
+                    Gunakan Email Lain
+                  </button>
                 </div>
               )}
             </div>
           )}
 
           {/* Privacy Footnote */}
-          <div className="mt-8 pt-5 border-t border-zinc-800/60 flex items-start gap-2.5 text-[10px] text-zinc-500 leading-normal font-medium">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="mt-8 pt-5 border-t border-slate-100 flex items-start gap-3 text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+            <ShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
             <span>
-              Sistem ini sepenuhnya patuh pada regulasi perlindungan data pribadi **UU PDP No. 27/2022**. Keamanan kedaulatan data warga terjamin secara mutlak.
+              Sistem ini mematuhi standar perlindungan privasi tertinggi. Data komunikasi dan catatan buku kas Anda dienkripsi secara mutlak.
             </span>
           </div>
 
         </div>
         
         {/* Help block */}
-        <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-zinc-500">
-          <HelpCircle className="w-4 h-4 text-zinc-600" />
-          <span>Mengalami kendala masuk? Hubungi <Link href="/kontak" className="text-emerald-500 hover:underline">Layanan Bantuan Warga</Link>.</span>
+        <div className="mt-8 flex items-center justify-center gap-2 text-xs font-medium text-slate-500">
+          <HelpCircle className="w-4 h-4 text-slate-400" />
+          <span>Butuh bantuan akses? <Link href="/tentang#edukasi" className="text-primary hover:underline font-bold">Pusat Belajar Warga</Link></span>
         </div>
       </div>
     </div>

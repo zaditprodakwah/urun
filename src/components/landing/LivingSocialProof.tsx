@@ -51,7 +51,7 @@ async function getTestimonials() {
         };
       });
     }
-  } catch (err) {}
+  } catch (_err) {}
   return null;
 }
 

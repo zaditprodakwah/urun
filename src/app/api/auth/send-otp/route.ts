@@ -1,128 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
+import { sendWhatsappMessageAsync, formatPhoneNumber } from '@/lib/whatsapp';
 import crypto from 'crypto';
-import { formatPhoneNumber, sendWhatsappMessage } from '@/lib/whatsapp';
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone } = await req.json();
+    const body = await req.json();
+    const { phone } = body;
+    
     if (!phone) {
-      return NextResponse.json({ status: false, error: 'Nomor WhatsApp wajib diisi' }, { status: 400 });
+      return NextResponse.json({ error: 'Nomor WhatsApp wajib diisi' }, { status: 400 });
     }
 
     const formattedPhone = formatPhoneNumber(phone);
 
-    // 1. Rate limit checks (Cooldown & Daily Limit)
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: recentSessions, error: cooldownErr } = await supabaseAdmin
-      .from('otp_sessions')
-      .select('created_at')
-      .eq('phone', formattedPhone)
-      .gte('created_at', oneDayAgo)
-      .order('created_at', { ascending: false });
-
-    if (!cooldownErr && recentSessions) {
-      if (recentSessions.length >= 5) {
-         return NextResponse.json({
-           status: false,
-           error: 'Batas permintaan OTP harian tercapai. Silakan coba lagi besok (Maks 5x/hari).'
-         }, { status: 429 });
-      }
-
-      if (recentSessions.length > 0) {
-        const lastCreatedAt = new Date(recentSessions[0].created_at).getTime();
-        const diffSeconds = (Date.now() - lastCreatedAt) / 1000;
-        if (diffSeconds < 60) {
-          return NextResponse.json({
-            status: false,
-            error: `Mohon tunggu ${Math.ceil(60 - diffSeconds)} detik sebelum meminta kode OTP kembali.`
-          }, { status: 429 });
-        }
-      }
-    }
-
-    // Find profile in profiles table by phone
-    const { data: profiles, error: profErr } = await supabaseAdmin
+    // 1. Kedaulatan Profil: Pastikan nomor terdaftar di Sovereign Core
+    const { data: profile, error } = await supabaseAdmin
       .from('profiles')
-      .select(`
-        id,
-        full_name,
-        phone,
-        community_members (
-          community_id,
-          role
-        )
-      `)
-      .or(`phone.eq.${formattedPhone},phone.eq.0${formattedPhone.slice(2)}`)
-      .limit(1);
+      .select('id, full_name')
+      .eq('phone', formattedPhone)
+      .single();
 
-    if (profErr || !profiles || profiles.length === 0) {
-      console.warn(`⚠️ Phone ${formattedPhone} is not registered in profiles`);
-      return NextResponse.json({ 
-        status: false, 
-        error: 'Nomor WhatsApp Anda belum terdaftar di Simpul Komunitas URUN. Hubungi Pengurus RT/RW Anda.' 
-      }, { status: 404 });
+    if (error || !profile) {
+      return NextResponse.json({ error: 'Nomor WhatsApp Anda belum terdaftar. Silakan hubungi Pengurus Lingkungan.' }, { status: 404 });
     }
 
-    const profileObj = profiles[0];
-    const memberObj = profileObj.community_members?.[0];
-    
-    if (!memberObj) {
-      return NextResponse.json({
-        status: false,
-        error: 'Akun Anda belum terdaftar sebagai anggota komunitas manapun.'
-      }, { status: 403 });
-    }
-
-    const citizen = {
-      id: profileObj.id,
-      name: profileObj.full_name,
-      phone: profileObj.phone,
-      community_id: memberObj.community_id,
-      role: memberObj.role
-    };
-
-    // Generate 6-digit cryptographically secure OTP
-    const otp = crypto.randomInt(100000, 999999).toString();
-    
-    // Hash OTP using a simple SHA-256 hash (or bcrypt-alternative)
+    // 2. Buat Tantangan OTP (6 Digit Angka Numerik)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes TTL
+    const idempotencyKey = crypto.randomUUID();
+    
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 3);
 
-    // Store in otp_sessions table
-    const { error: otpErr } = await supabaseAdmin
-      .from('otp_sessions')
+    const { error: insertErr } = await supabaseAdmin
+      .from('otp_challenges')
       .insert({
         phone: formattedPhone,
         otp_hash: otpHash,
-        community_id: citizen.community_id,
-        expires_at: expiresAt,
-        used: false
+        idempotency_key: idempotencyKey,
+        expires_at: expiresAt.toISOString()
       });
 
-    if (otpErr) {
-      console.error('❌ Failed to store OTP session:', otpErr);
-      return NextResponse.json({ status: false, error: 'Gagal membuat sesi OTP' }, { status: 500 });
+    if (insertErr) {
+      console.error('Insert OTP Error:', insertErr);
+      return NextResponse.json({ error: 'Terjadi kegagalan sistem saat mencatat sesi keamanan.' }, { status: 500 });
     }
 
-    // Send OTP via WhatsApp
-    console.log(`📤 Sending OTP to ${formattedPhone} (Citizen: ${citizen.name})...`);
-    const message = `🔐 *KODE OTP URUN*\n\n` +
-      `Kode verifikasi Anda adalah: *${otp}*\n\n` +
-      `Berlaku selama 5 menit. Jangan bagikan kode ini kepada siapapun demi keamanan akun warga Anda.`;
+    // 3. Kirim via Fonnte Gateway secara Asinkron
+    const msg = `*URUN DANA - KODE KEAMANAN*\n\nHalo ${profile.full_name}, kode masuk Anda adalah:\n\n*${otp}*\n\nJANGAN berikan kode ini kepada siapapun, termasuk pengurus. Kode hanya berlaku selama 3 menit.`;
+    sendWhatsappMessageAsync(formattedPhone, msg);
 
-    await sendWhatsappMessage(formattedPhone, message);
+    return NextResponse.json({ success: true, message: 'OTP berhasil dikirim ke WhatsApp Anda.' });
 
-    // For local development and fallback/testing, print to terminal
-    console.log(`🔑 [OTP DEV BYPASS] Phone: ${formattedPhone} | Code: ${otp}`);
-
-    return NextResponse.json({ 
-      status: true, 
-      message: 'Kode OTP telah dikirim melalui WhatsApp',
-      devBypass: process.env.NODE_ENV === 'development' ? otp : undefined
-    });
   } catch (err: any) {
-    console.error('💥 OTP generation critical error:', err);
-    return NextResponse.json({ status: false, error: err.message }, { status: 500 });
+    console.error('Send OTP Critical Error:', err);
+    return NextResponse.json({ error: 'Terjadi kegagalan komunikasi internal.' }, { status: 500 });
   }
 }

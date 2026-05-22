@@ -22,8 +22,9 @@ VALUES
   -- Layer 2: Investor / Eksekutif (Akses via Email investor@urun.demo)
   ('uuid-demo-investor', '084444444444', 'Pak Harjo Investor (Demo)', 'investor'),
   
-  -- Layer 1: Founder / Developer (Akses via Email founder@urun.demo)
-  ('uuid-demo-founder', '085555555555', 'Developer Admin (Demo)', 'founder')
+  -- Layer 1: Founder / Developer (Akses tertinggi. Bisa mengontrol system state & melihat audit)
+  -- Silakan ubah nomor HP ini dengan nomor asli Anda jika sudah mengaktifkan OTP Supabase
+  ('uuid-demo-founder', '089999999999', 'Zadit (Founder URUN)', 'founder')
 ON CONFLICT (id) DO UPDATE SET 
   global_role = EXCLUDED.global_role,
   full_name = EXCLUDED.full_name;

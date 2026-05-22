@@ -40,11 +40,11 @@ export default function CollapsibleMap({ lat, lng, locationName }: CollapsibleMa
               src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik&marker=${lat}%2C${lng}`}
             ></iframe>
             <div className="absolute bottom-2 left-2 right-2 flex justify-between pointer-events-none">
-                <span className="bg-white/90 backdrop-blur-sm text-zinc-600 text-[9px] px-2 py-0.5 rounded shadow-sm border border-zinc-200 pointer-events-auto">
-                    {lat.toFixed(5)}, {lng.toFixed(5)}
+                <span className="bg-white/90 backdrop-blur-sm text-zinc-700 font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-sm border border-zinc-200 pointer-events-auto flex items-center gap-1.5 uppercase tracking-wider">
+                    Lokasi: {locationName}
                 </span>
-                <a href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`} target="_blank" rel="noreferrer" className="bg-emerald-600/90 hover:bg-emerald-700 backdrop-blur-sm text-white font-bold uppercase tracking-wider text-[9px] px-3 py-1 rounded shadow-sm pointer-events-auto transition-colors">
-                    Perbesar Peta
+                <a href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`} target="_blank" rel="noreferrer" className="bg-emerald-600/90 hover:bg-emerald-700 backdrop-blur-sm text-white font-bold uppercase tracking-wider text-[9px] px-3 py-1 rounded shadow-sm pointer-events-auto transition-colors flex items-center">
+                    Buka Peta Maps
                 </a>
             </div>
           </div>

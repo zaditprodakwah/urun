@@ -170,8 +170,11 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                 key={item.id}
                 className="group relative rounded-3xl border border-outline-variant bg-surface-container-lowest hover:shadow-xl hover:shadow-on-surface/5 hover:border-outline/50 transition-all duration-300 overflow-hidden flex flex-col shadow-sm"
               >
-                {/* Product Image (Clickable) */}
-                <Link href={`/catalog/${item.slug}`} className="relative aspect-[16/10] overflow-hidden bg-surface-container border-b border-outline-variant block">
+                {/* Full Card Clickable Overlay */}
+                <Link href={`/catalog/${item.slug}`} className="absolute inset-0 z-10" aria-label={`Buka detail ${item.title}`} />
+                
+                {/* Product Image */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-surface-container border-b border-outline-variant block">
                   <OptimizedImage
                     src={image} 
                     alt={item.title} 
@@ -191,7 +194,7 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                       <span>{rating.toFixed(1)} ({reviewCount})</span>
                     </div>
                   )}
-                </Link>
+                </div>
 
                 {/* Product Content */}
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
@@ -204,11 +207,11 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                       </span>
                     </div>
                     
-                    <Link href={`/catalog/${item.slug}`}>
-                      <h3 className="text-lg font-black text-on-surface hover:text-primary transition-colors line-clamp-1">
+                    <div className="relative z-20">
+                      <h3 className="text-lg font-black text-on-surface group-hover:text-primary transition-colors line-clamp-1">
                         {item.title}
                       </h3>
-                    </Link>
+                    </div>
                     
                     <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-2">
                       {item.description || 'Barang dagangan warga dengan jaminan kualitas terbaik dan harga gotong-royong.'}
@@ -223,13 +226,12 @@ export default function CatalogClient({ initialItems }: CatalogClientProps) {
                       </div>
                     </div>
                     
-                    <Link 
-                      href={`/catalog/${item.slug}`}
-                      className="px-4.5 py-2.5 text-xs font-black rounded-xl bg-primary text-white hover:bg-primary-container hover:shadow-md hover:shadow-primary/10 transition-all flex items-center gap-1 group/btn"
+                    <div 
+                      className="px-4.5 py-2.5 text-xs font-black rounded-xl bg-primary text-white group-hover:bg-primary-container group-hover:shadow-md group-hover:shadow-primary/10 transition-all flex items-center gap-1"
                     >
                       Beli & Detail
-                      <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </Link>
+                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
                 </div>
 

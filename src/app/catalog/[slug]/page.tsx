@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { getSession } from '@/lib/auth';
 import ProductInteractiveSection from '@/components/catalog/ProductInteractiveSection';
@@ -367,21 +367,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </div>
       </main>
 
-      {/* Visual Footer */}
-      <footer className="border-t border-zinc-200 bg-[#F5F3EF] py-16 text-center text-xs text-zinc-500 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 space-y-4">
-          <div className="flex items-center justify-center gap-2 text-zinc-700 font-bold">
-            <ShieldCheck className="w-4.5 h-4.5 text-emerald-600" />
-            <span>Sovereign Community Ledger Active</span>
-          </div>
-          <p className="max-w-md mx-auto leading-relaxed">
-            © 2026 URUN Warga. Platform logistik & perdagangan mandiri warga berdaulat. Seluruh data transaksi diaudit secara terbuka dan diamankan menggunakan PostgreSQL Row-Level Security.
-          </p>
-          <div className="text-[10px] text-zinc-400 font-mono">
-            Compliant with UU PDP No. 27/2022 • Powered by Supabase Admin Client
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

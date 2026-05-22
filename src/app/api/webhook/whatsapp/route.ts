@@ -275,34 +275,40 @@ export async function POST(req: NextRequest) {
 
     // Command 3: #kas (Show Buku Kas Kolektif summary)
     if (message.toLowerCase() === '#kas') {
+      const { data: metrics, error: metricsErr } = await supabaseAdmin
+        .from('view_community_metrics')
+        .select('total_balance, total_inflow, total_outflow')
+        .eq('community_id', communityId)
+        .single();
+
       const { data: ledgerEntries, error: ledgerErr } = await supabaseAdmin
         .from('ledger')
         .select('amount, direction, entry_type, description, created_at')
         .eq('community_id', communityId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(5);
 
-      if (ledgerErr || !ledgerEntries) {
+      if (ledgerErr || !ledgerEntries || metricsErr) {
         await sendWhatsappMessage(sender, `❌ Gagal mengambil mutasi Buku Kas Kolektif.`);
         return NextResponse.json({ status: true });
       }
 
-      let balance = 0;
-      ledgerEntries.forEach(entry => {
-        const mult = entry.direction === 'in' ? 1 : -1;
-        balance += (parseFloat(entry.amount as unknown as string) || 0) * mult;
-      });
+      const balance = parseFloat(metrics?.total_balance || '0');
+      const inflow = parseFloat(metrics?.total_inflow || '0');
+      const outflow = parseFloat(metrics?.total_outflow || '0');
 
       let reply = `📊 *BUKU KAS KOLEKTIF*\n`;
       reply += `Simpul Komunitas Transparan & Append-Only\n`;
       reply += `-------------------------------\n`;
-      reply += `*Saldo Kas Saat Ini:* *${formatIDR(balance)}*\n\n`;
+      reply += `*Saldo Kas Saat Ini:* *${formatIDR(balance)}*\n`;
+      reply += `Total Pemasukan: ${formatIDR(inflow)}\n`;
+      reply += `Total Pengeluaran: ${formatIDR(outflow)}\n\n`;
       reply += `*5 Mutasi Kas Terakhir:*\n`;
 
-      const lastFive = ledgerEntries.slice(0, 5);
-      if (lastFive.length === 0) {
+      if (ledgerEntries.length === 0) {
         reply += `_(Belum ada mutasi keuangan recorded)_`;
       } else {
-        lastFive.forEach((entry, i) => {
+        ledgerEntries.forEach((entry, i) => {
           const sign = entry.direction === 'in' ? '🟢 (+)' : '🔴 (-)';
           const dateStr = new Date(entry.created_at).toLocaleDateString('id-ID', {
             day: 'numeric',
@@ -366,8 +372,9 @@ export async function POST(req: NextRequest) {
       const requestId = match[1];
 
       // Verify authorization
-      if (!permissions.can_approve_multisig) {
-        await sendWhatsappMessage(sender, `❌ *AKSES DITOLAK*\n\nAnda tidak memiliki wewenang Multi-Sig untuk menyetujui pengeluaran keuangan.`);
+      const isAuthorized = ['admin', 'pengurus', 'founder'].includes(member.role) || permissions.can_approve_multisig;
+      if (!isAuthorized) {
+        await sendWhatsappMessage(sender, `❌ *AKSES DITOLAK*\n\nAnda tidak memiliki wewenang (Persetujuan Bersama) untuk menyetujui pengeluaran keuangan komunitas.`);
         return NextResponse.json({ status: true });
       }
 

@@ -20,10 +20,10 @@ export default async function PollWidget({
   const activeCommunityId = communityId || session?.communityId;
   const currentUserId = session?.profileId;
 
-  if (!activeCommunityId && !isPublicOnly) {
+    if (!activeCommunityId && !isPublicOnly) {
     return (
-      <div className="bg-zinc-950/20 border border-zinc-800/40 rounded-2xl p-6 text-center">
-        <p className="text-zinc-400 text-sm">Masuk ke komunitas Anda untuk melihat polling warga.</p>
+      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-center">
+        <p className="text-zinc-500 text-sm">Masuk ke komunitas Anda untuk melihat polling warga.</p>
       </div>
     );
   }
@@ -154,7 +154,7 @@ export default async function PollWidget({
   // 5. Render jika tidak ada polling sama sekali
   if (!activePoll) {
     return (
-      <div className="bg-zinc-950/20 border border-zinc-800/40 rounded-2xl p-6 text-center">
+      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-center">
         <p className="text-zinc-500 text-sm">Tidak ada polling aktif di komunitas saat ini.</p>
       </div>
     );
@@ -192,9 +192,9 @@ export default async function PollWidget({
   }
 
   return (
-    <div className="w-full space-y-6 bg-zinc-950/30 border border-zinc-800/60 rounded-2xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden group">
+    <div className="w-full space-y-6 bg-white border border-outline-variant/60 shadow-sm rounded-2xl p-6 sm:p-8 relative overflow-hidden group">
       {/* Glow Effect Decorative background */}
-      <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/15 transition-all duration-500" />
+      <div className="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/15 transition-all duration-500" />
       
       {schemaJson && (
         <script
@@ -206,20 +206,20 @@ export default async function PollWidget({
       <div className="relative z-10 space-y-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="bg-primary/20 text-primary-container text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded border border-primary/30">
+            <span className="bg-emerald-50 text-emerald-700 text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded border border-emerald-200">
               {catalogItemId ? 'Voting Pra-Tender' : 'Kedaulatan Suara'}
             </span>
             {activePoll.is_public && (
-              <span className="bg-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded border border-zinc-700">
-                Publik (SEO/AEO)
+              <span className="bg-zinc-100 text-zinc-500 text-[10px] font-bold px-2 py-0.5 rounded border border-zinc-200">
+                Akses Publik
               </span>
             )}
           </div>
-          <h3 className="text-lg sm:text-xl font-extrabold text-white mt-2 leading-snug">
+          <h3 className="text-lg sm:text-xl font-extrabold text-zinc-900 mt-2 leading-snug">
             {activePoll.title}
           </h3>
           {activePoll.description && (
-            <p className="text-zinc-400 text-xs sm:text-sm mt-1.5 leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-sm mt-1.5 leading-relaxed font-medium">
               {activePoll.description}
             </p>
           )}
@@ -235,10 +235,10 @@ export default async function PollWidget({
           isLoggedIn={!!session}
         />
 
-        <div className="flex items-center justify-between text-[11px] text-zinc-500 font-medium pt-3 border-t border-zinc-800/50">
-          <span>Total Partisipasi: <strong className="text-zinc-300 font-semibold font-mono">{totalVotes} warga</strong></span>
+        <div className="flex items-center justify-between text-[11px] text-zinc-500 font-medium pt-3 border-t border-zinc-200/80">
+          <span>Total Partisipasi: <strong className="text-zinc-900 font-semibold font-mono">{totalVotes} warga</strong></span>
           {activePoll.expires_at && (
-            <span>Berakhir pada: <strong className="text-zinc-400 font-semibold">{new Date(activePoll.expires_at).toLocaleDateString('id-ID')}</strong></span>
+            <span>Berakhir pada: <strong className="text-zinc-600 font-semibold">{new Date(activePoll.expires_at).toLocaleDateString('id-ID')}</strong></span>
           )}
         </div>
       </div>
