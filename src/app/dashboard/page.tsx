@@ -166,7 +166,7 @@ export default async function DashboardPage() {
                 </div>
                 <p className="text-sm text-zinc-400 mb-6">Anda memiliki akses verifikasi Multi-Sig untuk {community.name}.</p>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Link href="/admin" className="block p-4 rounded-xl border border-emerald-800 bg-emerald-900/20 hover:bg-emerald-900/40 transition-colors group">
                     <h3 className="font-bold text-emerald-400 mb-1">Manajemen Komunitas</h3>
                     <p className="text-xs text-zinc-500">Atur warga, kas, dan verifikasi anggota.</p>
@@ -174,6 +174,10 @@ export default async function DashboardPage() {
                   <Link href="/multisig" className="block p-4 rounded-xl border border-emerald-800 bg-emerald-900/20 hover:bg-emerald-900/40 transition-colors group">
                     <h3 className="font-bold text-emerald-400 mb-1">Multi-Sig Panel</h3>
                     <p className="text-xs text-zinc-500">Setujui pengadaan logistik atau pencairan kas.</p>
+                  </Link>
+                  <Link href="/system/monitoring" className="block p-4 rounded-xl border border-blue-800 bg-blue-900/20 hover:bg-blue-900/40 transition-colors group lg:col-span-1 sm:col-span-2">
+                    <h3 className="font-bold text-blue-400 mb-1">Observasi Sistem</h3>
+                    <p className="text-xs text-zinc-500">Akses riwayat integritas Audit Log waktu nyata.</p>
                   </Link>
                 </div>
               </section>

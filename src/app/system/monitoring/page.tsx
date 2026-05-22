@@ -1,10 +1,19 @@
 import React from 'react';
+import { redirect } from 'next/navigation';
+import { getSession } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { Activity, AlertTriangle, ShieldCheck, Database, Clock } from 'lucide-react';
 
 export const revalidate = 0; // Dynamic rendering untuk data realtime
 
 export default async function SystemMonitoringPage() {
+  const session = await getSession();
+  
+  // RBAC (Role-Based Access Control) Protection: Hanya Pengurus & Admin
+  if (!session || (session.role !== 'pengurus' && session.role !== 'admin')) {
+    redirect('/dashboard');
+  }
+
   // 1. Tarik log audit terbaru (Max 50)
   const { data: logs, error: logsError } = await supabaseAdmin
     .from('audit_log')

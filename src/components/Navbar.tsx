@@ -111,10 +111,16 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
                         </Link>
                         
                         {(session.role === 'pengurus' || session.role === 'admin') && (
-                          <Link href="/admin" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
-                            <Shield className="w-4 h-4 text-primary" />
-                            Pusat Kendali
-                          </Link>
+                          <>
+                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+                              <Shield className="w-4 h-4 text-primary" />
+                              Pusat Kendali
+                            </Link>
+                            <Link href="/system/monitoring" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-secondary hover:bg-surface-container-low rounded-lg transition-colors">
+                              <Info className="w-4 h-4 text-secondary" />
+                              Observasi Sistem
+                            </Link>
+                          </>
                         )}
                       </div>
                       
