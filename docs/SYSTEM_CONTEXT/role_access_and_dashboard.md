@@ -1,59 +1,52 @@
-# Role Access & Dashboard Alignment
+# Role Access & Dashboard Alignment (5-Layer Architecture)
 
 ## Ringkasan
-Dokumen ini menjelaskan **kesesuaian antara peran (role) akses**, **struktur data riil (PostgreSQL + RLS)**, dan **panel dasbor UI** pada sistem URUN.  Tujuannya agar semua kontributor dapat memverifikasi bahwa hak‑akses yang ditampilkan pada antarmuka selaras dengan kebijakan keamanan basis data.
+Dokumen ini menjelaskan **kesesuaian antara peran (role) akses**, **struktur data riil (PostgreSQL + RLS)**, dan **panel dasbor UI** pada sistem URUN. Tujuannya agar semua kontributor dapat memverifikasi bahwa hak-akses yang ditampilkan pada antarmuka selaras dengan kebijakan keamanan basis data. Terdapat pemisahan tegas antara **Role Global (`profiles.global_role`)** dan **Role Lokal (`community_members.role`)**.
 
 ---
 
-### 1. Mapping Peran ↔ Data Riil (RLS)
-| Peran | Kebijakan RLS (SQL) | Tabel yang dapat di‑akses |
-|-------|----------------------|---------------------------|
-| **Founder / Super Admin** | `FOR ALL USING (TRUE)` pada semua tabel | Semua tabel (`profiles`, `communities`, `ledger`, `idempotency_keys`, dll.) |
-| **Admin / Pengurus RT‑RW** | `profiles_admin_read` (baris 30‑33 pada `auth_and_otp.sql`) | `profiles`, `community_members`, `ledger` (melalui transaction procedure) |
-| **Warga (Member)** | `profiles_self_read` (baris 26‑27) | Baris `profiles` miliknya sendiri, `ledger` melalui webhook yang tervalidasi |
-| **Mitra / Partner** | Tidak memiliki baris di `profiles`; akses **hanya** melalui webhook yang menulis ke `ledger` (idempotency) |
-| **Developer / Integrator** | Service‑role token dengan hak `SELECT` pada view `api_docs` |
+### 1. 5-Layer Access Mapping
+
+Sistem dibagi menjadi 5 layer utama:
+
+| Layer | Peran | Basis Akses Data | Tabel Utama / Routing |
+|-------|-------|------------------|----------------------|
+| **1. System Tier** | Founder / DevOps | `SUPABASE_SERVICE_ROLE_KEY` / Bypass RLS | Akses CLI backend, Migrasi Database |
+| **2. Strategy Tier** | Investor / Eksekutif | `profiles.global_role = 'investor'` | `/admin/exec-center` / `public.view_investor_analytics` |
+| **3. Oversight Tier** | Auditor / Pemerintah | `profiles.global_role = 'auditor'` | `/compliance` / `public.view_compliance_audit` |
+| **4. Local Operational** | Pengurus & Bendahara | `community_members.role IN ('admin', 'pengurus')` | `/communities/[id]/dashboard` & `/multisig` |
+| **5. User Tier** | Warga & Tenan Lokal | `profiles.global_role = 'user'` & `community_members.role = 'warga'` | `/` (PWA) & WhatsApp Bot |
 
 ---
 
-### 2. UI Panels ↔ Role
-| UI Panel (TSX) | File | Role yang menampilkan panel |
-|---------------|------|----------------------------|
-| **Founder‑Center** | `src/app/admin/*` | `founder` |
-| **Community Dashboard** | `src/app/communities/[id]/page.tsx` | `admin`, `pengurus` |
-| **User Home** | `src/app/page.tsx` | `member` |
-| **Partner Portal** | `partner/*` (repo terpisah) | `partner` |
-| **Docs & Playground** | `src/app/docs/*` | `developer` |
+### 2. UI Panels ↔ Role Pemisahan
 
-> **Catatan:** Panel dipilih melalui fungsi `getUserRole()` di `src/lib/auth.ts` yang memeriksa tabel `community_members` atau token JWT.
+| UI Panel (TSX) | File | Akses Role Diizinkan |
+|---------------|------|---------------------|
+| **Executive Center** | `src/app/admin/exec-center/*` | `investor`, `founder` (Global Role) |
+| **Compliance & Audit** | `src/app/compliance/*` | `auditor`, `founder` (Global Role) |
+| **Community Dashboard** | `src/app/communities/[id]/page.tsx` | `admin`, `pengurus` (Local Role di komunitas tsb) |
+| **User Home** | `src/app/page.tsx` | `user` (Global Role) |
+| **Docs & Playground** | `src/app/docs/*` | `developer` (Sistem Eksternal) |
+
+> **Catatan Middleware:** Panel diproteksi melalui `src/middleware.ts` untuk memastikan Warga tidak dapat mengakses rute Investor/Auditor. Selain itu, fungsi auth internal memeriksa kecocokan ID komunitas dan profil.
 
 ---
 
-### 3. Modul‑Modul Utama yang Menggunakan Role Check
-- **`src/lib/auth.ts`** – mengekstrak `role` dari JWT dan menyimpan di `session.role`.
-- **`src/app/api/ledger/route.ts`** – menolak request bila `X‑Urun‑Signature` tidak valid atau `X‑Urun‑Timestamp` > 300 detik.
-- **`src/app/ledger/*`** – query Supabase otomatis terfilter oleh RLS.
-- **`src/app/tenders/*`** – status workflow memakai `ts-pattern` dan hanya dapat dipicu oleh `admin`/`pengurus`.
+### 3. Modul-Modul Utama yang Menggunakan Role Check
+- **`src/middleware.ts`** – Menjaga rute `/admin` dan `/compliance` agar hanya dapat diakses oleh global_role yang memiliki wewenang.
+- **`src/lib/auth.ts`** – Mengekstrak `global_role` dan role komunal.
+- **`src/app/api/ledger/route.ts`** – Menolak request tidak sah pada ledger publik atau transaksi Multi-Sig.
+- **`supabase/migrations/*`** – RLS memastikan `community_members` hanya melihat wilayah mereka. Auditor hanya melihat data yang diagregasi di view terpisah.
 
 ---
 
 ### 4. Verifikasi & Pengujian
-1. **pgTAP tests** (`tests/rls_tests.sql`) memastikan bahwa:
+1. **Middleware Tests:** Memastikan warga yang mencoba mengakses `/admin/exec-center` menerima `HTTP 403 Forbidden` / Redirect.
+2. **pgTAP tests** (`tests/rls_tests.sql`):
    - Warga tidak dapat membaca profil warga lain.
-   - Admin dapat meng‑update ledger pada komunitasnya.
-2. **Unit test UI** (`__tests__/roleBasedRender.test.tsx`) memverifikasi bahwa komponen menu berubah sesuai `role`.
-
----
-
-### 5. Prosedur Update
-1. **Menambah peran baru:**
-   - Tambahkan kebijakan RLS pada tabel yang relevan.
-   - Perbarui `getUserRole()` dengan klausa baru.
-   - Buat/ubah UI panel dan daftarkan di tabel mapping di atas.
-2. **Sinkronisasi dokumen:**
-   - Jalankan `npm run test:pg` untuk pgTAP.
-   - Jalankan `npm run test:ui`.
-   - Commit perubahan dokumen bersama dengan kode.
+   - Admin dapat meng-update ledger pada komunitasnya.
+   - Role 'warga' tidak bisa masuk ke API /admin.
 
 ---
 

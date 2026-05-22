@@ -41,7 +41,7 @@ export async function sendTenderReminder(
     `*Sisa Waktu:* *${hoursRemaining} Jam*\n` +
     `*Status Konsensus:* *${currentSigs}/${requiredSigs}* Tanda Tangan Disetujui\n\n` +
     `Mohon segera kunjungi Multi-Sig Command Center untuk melakukan review dan pembubuhan tanda tangan agar tender tidak deadlock.\n\n` +
-    `🔗 https://urunwarga.vercel.app/multisig`;
+    `🔗 ${process.env.NEXT_PUBLIC_SITE_URL || 'https://urunwarga.vercel.app'}/multisig`;
 
   return sendWhatsappMessage(phone, text);
 }

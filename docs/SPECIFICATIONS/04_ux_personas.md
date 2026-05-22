@@ -29,6 +29,20 @@ Ekosistem URUN dibangun berdasarkan pemahaman mendalam terhadap profil pengguna 
 * **Expectation:** Otomatisasi pembayaran (e-wallet), cara cepat berkontribusi dana, dan transparansi kas yang dapat diakses kapan saja.  
 * **Mandat untuk AI:** Fokus pada *Command-based interaction* (via bot WhatsApp) atau *shortcut* UI agar interaksi dapat dilakukan tanpa membuka dasbor yang berat.
 
+### **4\. Pak Harjo (50 thn, Investor / Eksekutif Strategis)**
+
+* **Karakter:** Memikirkan *Return of Investment* secara makro, memonitor perputaran kas, dan mengawasi skala pertumbuhan aplikasi secara agregat (Level Nasional/Provinsi).
+* **Pain Points:** Terlalu banyak detail mikro (transaksi individu warga), butuh *bird's-eye view* atau metrik performa (KPI).
+* **Expectation:** Dasbor *Executive Center* yang menyediakan visualisasi grafik dan volume kas tanpa mengekspos privasi data warga secara spesifik.
+* **Mandat untuk AI:** UI *Executive Dashboard* fokus pada High-Level Data (SVG/Canvas Charts) dan *readonly* total. Tidak ada tombol edit atau delete data.
+
+### **5\. Bu Dewi (45 thn, Auditor / Pemerintah)**
+
+* **Karakter:** Fokus pada kepatuhan aturan (Compliance), akuntabilitas, transparansi, dan verifikasi aliran dana (Ledger).
+* **Pain Points:** Kesulitan memverifikasi apakah laporan keuangan telah dimanipulasi atau tidak. Kekhawatiran atas privasi data pribadi (*PII*).
+* **Expectation:** Modul *Compliance* khusus yang bisa mengaudit ledger wilayah tertentu (Kecamatan/Desa) menggunakan rekonsiliasi hash kriptografi untuk membuktikan integritas, namun data warga disamarkan menjadi "Warga_Anonim".
+* **Mandat untuk AI:** Tabel data berdensitas tinggi (*High-Density*) khusus untuk verifikasi bukti, serta masking mutlak pada NIK dan Nama Lengkap warga.
+
 ## **II. Interaction Matrix (The "How They Use URUN")**
 
 | Fitur | Ibu Aminah | Pak Budi | Mas Rio |

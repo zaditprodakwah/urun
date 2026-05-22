@@ -86,21 +86,21 @@ export default function SyncStatusIndicator() {
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all duration-500 ${
           isOnline
             ? queueCount > 0
-              ? 'bg-amber-950/20 border-amber-500/20 text-amber-400'
-              : 'bg-emerald-950/20 border-emerald-500/20 text-emerald-400'
-            : 'bg-zinc-900 border-zinc-800 text-zinc-500'
+              ? 'bg-amber-50 border-amber-200 text-amber-700'
+              : 'bg-primary/10 border-primary/20 text-primary'
+            : 'bg-surface-container-low border-outline-variant text-on-surface-variant'
         }`}
       >
         {isOnline ? (
           <>
-            <Wifi className={`w-3.5 h-3.5 ${queueCount > 0 ? 'animate-pulse text-amber-400' : 'text-emerald-400'}`} />
+            <Wifi className={`w-3.5 h-3.5 ${queueCount > 0 ? 'animate-pulse text-amber-600' : 'text-primary'}`} />
             <span className="font-semibold select-none">
               {queueCount > 0 ? `Online (Tertunda: ${queueCount})` : 'Online'}
             </span>
           </>
         ) : (
           <>
-            <WifiOff className="w-3.5 h-3.5 text-zinc-500 animate-bounce" />
+            <WifiOff className="w-3.5 h-3.5 text-on-surface-variant animate-bounce" />
             <span className="font-semibold select-none">
               Offline {queueCount > 0 && `(${queueCount} Mutasi Lokal)`}
             </span>
@@ -112,7 +112,7 @@ export default function SyncStatusIndicator() {
             onClick={handleManualSync}
             disabled={syncing}
             title="Klik untuk paksa sinkronisasi sekarang"
-            className="ml-1 p-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 disabled:opacity-50 transition-colors"
+            className="ml-1 p-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 disabled:opacity-50 transition-colors cursor-pointer border-0"
           >
             <RefreshCw className={`w-3 h-3 ${syncing ? 'animate-spin' : ''}`} />
           </button>

@@ -47,6 +47,9 @@ export default function Footer() {
                 <Link href="/leaderboard" className="text-sm text-on-surface-variant hover:text-primary transition-colors">Papan Dedikasi Warga</Link>
               </li>
               <li>
+                <Link href="/dokumentasi" className="text-sm text-on-surface-variant hover:text-primary transition-colors">Dokumentasi & Bantuan</Link>
+              </li>
+              <li>
                 <Link href="/tentang" className="text-sm text-on-surface-variant hover:text-primary transition-colors">Tentang Gerakan Kami</Link>
               </li>
             </ul>

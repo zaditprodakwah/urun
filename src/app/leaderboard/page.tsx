@@ -164,7 +164,7 @@ export default function LeaderboardPage() {
             Pahlawan Lokal <span className="text-[#006c49]">Gotong Royong</span>
           </h1>
           <p className="text-sm sm:text-base text-zinc-500 leading-relaxed max-w-2xl">
-            Apresiasi nyata bagi seluruh warga yang paling andil dalam gotong-royong bertetangga. Skor reputasi (Civic Points) diproses secara transparan demi kedaulatan komunitas mandiri.
+            Apresiasi nyata bagi seluruh warga yang paling aktif dalam gotong-royong bertetangga. Skor Poin Gotong Royong (Civic Points) dihitung secara transparan dan adil untuk menghargai setiap kepedulian Anda.
           </p>
         </div>
       </section>
@@ -336,9 +336,9 @@ export default function LeaderboardPage() {
           <div className="rounded-3xl border border-[#bbcabf]/40 bg-white p-6 sm:p-8 space-y-5 shadow-sm">
             <div>
               <h2 className="text-lg font-black text-[#131b2e] flex items-center gap-2">
-                <Activity className="w-5 h-5 text-[#006c49]" /> Real-time Social Proof Feed
+                <Activity className="w-5 h-5 text-[#006c49]" /> Riwayat Keaktifan Warga (Langsung)
               </h2>
-              <p className="text-xs text-zinc-500 font-semibold">Log audit perubahan reputasi warga ter-otentikasi Postgres RLS</p>
+              <p className="text-xs text-zinc-500 font-semibold">Catatan terbuka penambahan skor gotong royong warga</p>
             </div>
 
             {loading ? (
@@ -385,11 +385,11 @@ export default function LeaderboardPage() {
             
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#006c49]/5 border border-[#006c49]/20 text-[10px] font-black text-[#006c49] tracking-wider uppercase">
-                🧪 Referral Loop Engine
+                🧪 Simulasi Ajak Warga
               </div>
-              <h2 className="text-base font-extrabold text-[#131b2e]">Simulasikan Pengaruh</h2>
+              <h2 className="text-base font-extrabold text-[#131b2e]">Ajak Tetangga Ikut Urunan</h2>
               <p className="text-xs text-zinc-500 leading-relaxed font-semibold">
-                Uji fungsionalitas rujukan finansial warga. Di URUN, rujukan tender menghasilkan skor reputasi (+2 CP), bukan dividen uang adiktif, memicu kultur gotong-royong sehat.
+                Uji coba simulasi ketika tetangga yang Anda ajak berhasil ikut iuran gotong-royong. Di URUN, mengajak tetangga akan meningkatkan Poin Gotong Royong Anda sebesar +2 poin, memicu semangat partisipasi sosial yang sehat.
               </p>
             </div>
 
@@ -452,19 +452,13 @@ export default function LeaderboardPage() {
             </button>
 
             {/* Technical Context audit info */}
-            <div className="p-4 rounded-2xl bg-[#FCFBF9] border border-[#bbcabf]/40 text-[9px] space-y-2 font-mono text-zinc-500 leading-relaxed">
-              <div className="text-zinc-800 font-black text-[9px] uppercase tracking-wider flex items-center gap-1.5 border-b border-zinc-200 pb-1.5 mb-1.5">
+            <div className="p-4 rounded-2xl bg-[#FCFBF9] border border-[#bbcabf]/40 text-[9px] space-y-2 text-zinc-500 leading-relaxed">
+              <div className="text-zinc-800 font-black text-[9px] uppercase tracking-wider flex items-center gap-1.5 border-b border-zinc-200 pb-1.5 mb-1.5 font-mono">
                 <Terminal className="w-3.5 h-3.5 text-[#006c49]" />
-                <span>Postgres Sovereignty:</span>
+                <span>Sistem Transparansi URUN:</span>
               </div>
-              <p>Memicu API POST `/api/simulator/referral` yang menulis log `successful_referral` di database Supabase.</p>
-              <p>Trigger `reputation_engine_trigger` di Postgres menghitung:</p>
-              <pre className="text-[#006c49] text-[8.5px] bg-white p-2.5 rounded-xl overflow-x-auto border border-[#bbcabf]/30">
-{`C_successful_referral = +2
-UPDATE community_members
-SET reputation_score = reputation_score + 2
-WHERE id = actor_id;`}
-              </pre>
+              <p className="font-semibold text-xs">Sistem otomatis menambahkan <span className="font-bold text-[#006c49]">+2 Poin Gotong Royong</span> untuk Anda setiap kali ada warga (yang Anda ajak) berhasil menyelesaikan pembayaran iuran atau ikut patungan.</p>
+              <p className="font-semibold">Buku kas dan poin ini dijamin oleh keamanan sistem sehingga tidak bisa dimanipulasi atau diubah secara sepihak oleh pengurus mana pun.</p>
             </div>
             
           </div>

@@ -23,6 +23,7 @@ export default function TermsOfServiceClient() {
     "skor-dedikasi": useRef<HTMLElement>(null),
     "moderasi-konten": useRef<HTMLElement>(null),
     "tender-kolektif": useRef<HTMLElement>(null),
+    "kebijakan-korporat": useRef<HTMLElement>(null),
   };
 
   // Scrollspy logic
@@ -156,6 +157,17 @@ export default function TermsOfServiceClient() {
                 }`}
               >
                 Tender Kolektif
+              </button>
+
+              <button 
+                onClick={() => scrollToSection("kebijakan-korporat")}
+                className={`w-full text-left px-3 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all mt-4 border-t border-zinc-200 pt-4 ${
+                  activeSection === "kebijakan-korporat" 
+                    ? "text-[#131b2e] bg-zinc-100 border-l-4 border-[#131b2e]" 
+                    : "text-zinc-500 hover:text-[#131b2e] hover:bg-zinc-50 border-l-4 border-transparent"
+                }`}
+              >
+                Kebijakan Korporat
               </button>
             </nav>
             
@@ -364,12 +376,44 @@ export default function TermsOfServiceClient() {
           </section>
 
           {/* Pact / Statement Card */}
-          <div className="p-6 bg-zinc-900 text-white rounded-3xl space-y-3 text-center">
-            <h4 className="text-xs font-black uppercase tracking-wider text-emerald-400">Pernyataan Bersama Warga URUN</h4>
-            <p className="text-xs text-zinc-300 italic max-w-2xl mx-auto leading-relaxed">
+          <div className="p-6 bg-[#006c49] text-white rounded-3xl space-y-3 text-center mb-12">
+            <h4 className="text-xs font-black uppercase tracking-wider text-emerald-300">Pernyataan Bersama Warga URUN</h4>
+            <p className="text-xs text-emerald-50 italic max-w-2xl mx-auto leading-relaxed">
               &quot;Dengan berpartisipasi di dalam sistem ini, kami menyatakan sepakat untuk bertransaksi secara jujur, menjaga akuntabilitas Buku Kas lingkungan, menghormati hak data tetangga, dan bergotong royong secara merdeka demi kemandirian ekonomi komunitas kami.&quot;
             </p>
           </div>
+
+          <hr className="border-zinc-200 my-8" />
+
+          {/* Section 8: Kebijakan Korporat */}
+          <section 
+            id="kebijakan-korporat" 
+            ref={sectionRefs["kebijakan-korporat"]}
+            className="p-6 md:p-8 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-sm space-y-4 text-zinc-300"
+          >
+            <div className="border-b border-zinc-800 pb-3">
+              <span className="text-[9px] font-black uppercase tracking-wider text-zinc-500">Corporate Enterprise Access</span>
+              <h3 className="text-lg font-extrabold text-white mt-0.5 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-zinc-400" />
+                Kebijakan Korporat &amp; Audit Level Makro (Layer 2-3)
+              </h3>
+            </div>
+
+            <div className="text-xs text-zinc-400 space-y-3 leading-relaxed">
+              <p className="font-bold text-zinc-200">Batas Akses Terhadap Data Privasi Warga:</p>
+              <p>
+                Bagian ini ditujukan khusus bagi entitas korporat, pimpinan wilayah tingkat provinsi/nasional (Investor Tier), dan lembaga audit pemerintah (Oversight Tier). URUN memberlakukan pemisahan hak akses ketat (Multi-Tier Segregation):
+              </p>
+              <ul className="list-disc pl-5 space-y-1.5">
+                <li>
+                  <strong className="text-zinc-200">Layer 2 (Eksekutif/Investor):</strong> Hanya diberikan hak akses visual pada dasbor agregat volume kas, demografi pendaftaran komunitas skala besar, dan Return of Investment. Hak edit, mutasi, serta identitas rinci warga di-*block* sepenuhnya oleh sistem.
+                </li>
+                <li>
+                  <strong className="text-zinc-200">Layer 3 (Auditor/Compliance):</strong> Diberikan kewenangan membaca log transaksi mentah (`ledger`) guna menelusuri dugaan korupsi. Akan tetapi, nama dan identitas Personal Identifiable Information (PII) wajib disamarkan oleh sistem menjadi entitas anonim ("Warga_Anonim").
+                </li>
+              </ul>
+            </div>
+          </section>
 
         </article>
 

@@ -106,17 +106,8 @@ export default function LandingPage() {
   // 6. Security Matrix Detailed Drawers
   const [expandedTechId, setExpandedTechId] = useState<"integer" | "atomic" | "hmac" | null>(null);
 
-  // 7. Onboarding Pitch Form Modal States
-  const [showPitchModal, setShowPitchModal] = useState<boolean>(false);
-  const [onboardingSuccess, setOnboardingSuccess] = useState<boolean>(false);
-  const [ticketNumber, setTicketNumber] = useState<string>("");
-  const [pitchData, setPitchData] = useState({
-    name: "",
-    email: "",
-    role: "Pengurus RT/RW",
-    region: "",
-    notes: ""
-  });
+  // 7. Onboarding & Pitch routing (states removed)
+
 
   // 8. Privacy Banner State (UU PDP)
   const [showPrivacyBanner, setShowPrivacyBanner] = useState(false);
@@ -317,12 +308,7 @@ export default function LandingPage() {
     sendSimulatedMessage(inputValue);
   };
 
-  // Onboarding submit simulator
-  const handlePitchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setTicketNumber("URN-" + Math.floor(100000 + Math.random() * 900000));
-    setOnboardingSuccess(true);
-  };
+  // Onboarding submit simulator removed in favor of /kontak route
 
   return (
     <div className="flex flex-col flex-1 w-full relative overflow-x-hidden bg-surface text-on-surface">
@@ -352,13 +338,13 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
-            <button 
-              onClick={() => setShowPitchModal(true)}
+            <Link 
+              href="/dokumentasi#onboarding"
               className="h-12 bg-primary hover:bg-opacity-90 text-white font-bold text-sm px-6 rounded-xl shadow-md shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border-0"
             >
               <Building className="w-4.5 h-4.5" />
               <span>Onboard Lingkungan Anda (Gratis)</span>
-            </button>
+            </Link>
             <a 
               href="#siklus-ekonomi" 
               className="h-12 bg-white hover:bg-neutral-50 border border-outline-variant/60 rounded-xl text-on-surface font-bold text-sm px-6 transition-all flex items-center justify-center gap-1.5"
@@ -694,7 +680,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex gap-4 pt-4 border-t border-outline-variant/30">
-                    <Link href="/dashboard" className="h-10 bg-primary hover:bg-opacity-95 text-white font-bold text-xs px-5 rounded-xl transition-all flex items-center justify-center border-0 shadow-sm">
+                    <Link href="/demo" className="h-10 bg-primary hover:bg-opacity-95 text-white font-bold text-xs px-5 rounded-xl transition-all flex items-center justify-center border-0 shadow-sm">
                       Lihat Demo Transparansi Warga
                     </Link>
                   </div>
@@ -723,7 +709,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex gap-4 pt-4 border-t border-outline-variant/30">
-                    <Link href="/login" className="h-10 bg-secondary hover:bg-opacity-95 text-white font-bold text-xs px-5 rounded-xl transition-all flex items-center justify-center border-0 shadow-sm">
+                    <Link href="/dokumentasi#onboarding" className="h-10 bg-secondary hover:bg-opacity-95 text-white font-bold text-xs px-5 rounded-xl transition-all flex items-center justify-center border-0 shadow-sm">
                       Aktifkan Panel RT/RW Sekarang
                     </Link>
                   </div>
@@ -752,12 +738,12 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex gap-4 pt-4 border-t border-outline-variant/30">
-                    <button 
-                      onClick={() => setShowPitchModal(true)}
+                    <Link 
+                      href="/kontak?topic=whitepaper"
                       className="h-10 bg-primary hover:bg-opacity-95 text-white font-bold text-xs px-5 rounded-xl transition-all flex items-center justify-center border-0 cursor-pointer shadow-sm"
                     >
                       Minta Buku Putih & Blueprint
-                    </button>
+                    </Link>
                   </div>
                 </>
               )}
@@ -1311,13 +1297,13 @@ function verifikasiLogistikCallback(reqHeaders: any, rawPayload: string): boolea
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <button 
-                onClick={() => setShowPitchModal(true)}
-                className="bg-primary hover:bg-opacity-95 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-md shadow-primary/15 cursor-pointer text-center border-0"
+              <Link 
+                href="/dokumentasi#onboarding"
+                className="bg-primary hover:bg-opacity-95 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-md shadow-primary/15 cursor-pointer text-center border-0 flex-1 flex items-center justify-center"
               >
                 Aktifkan Panel RT/RW Sekarang
-              </button>
-              <Link href="/login" className="bg-white border border-outline-variant hover:bg-neutral-50 text-on-surface-variant font-bold text-xs py-3.5 px-6 rounded-xl transition-all text-center">
+              </Link>
+              <Link href="/demo" className="bg-white border border-outline-variant hover:bg-neutral-50 text-on-surface-variant font-bold text-xs py-3.5 px-6 rounded-xl transition-all text-center flex-1 flex items-center justify-center">
                 Coba Demo Sandboxed
               </Link>
             </div>
@@ -1333,179 +1319,18 @@ function verifikasiLogistikCallback(reqHeaders: any, rawPayload: string): boolea
               </p>
             </div>
 
-            <button 
-              onClick={() => setShowPitchModal(true)}
-              className="bg-secondary hover:bg-opacity-95 text-white font-bold text-xs py-4 px-6 rounded-xl transition-all shadow-md shadow-secondary/15 cursor-pointer w-full text-center border-0"
+            <Link 
+              href="/kontak?topic=pitching"
+              className="bg-secondary hover:bg-opacity-95 text-white font-bold text-xs py-4 px-6 rounded-xl transition-all shadow-md shadow-secondary/15 cursor-pointer w-full text-center border-0 block"
             >
               Jadwalkan Technical Pitching dengan Tim Kami
-            </button>
+            </Link>
           </div>
 
         </div>
       </section>
 
-      {/* ========================================================
-          7. REUSABLE MODAL: PITCH & ONBOARDING SYSTEM
-          ======================================================== */}
-      {showPitchModal && (
-        <div className="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden border border-outline-variant/60 shadow-2xl relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
-            
-            <button 
-              onClick={() => {
-                setShowPitchModal(false);
-                setOnboardingSuccess(false);
-              }} 
-              className="absolute top-5 right-5 text-on-surface-variant hover:text-on-surface cursor-pointer border-0 bg-transparent p-1"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {!onboardingSuccess ? (
-              <form onSubmit={handlePitchSubmit} className="p-8 flex flex-col gap-5 overflow-y-auto">
-                
-                <div className="flex flex-col gap-1 pr-8">
-                  <span className="text-[9px] font-black text-primary uppercase tracking-widest font-mono">Form Pendaftaran URUN</span>
-                  <h3 className="text-2xl font-black text-on-surface font-sans">Onboard Komunitas & Kemitraan</h3>
-                  <p className="text-xs text-on-surface-variant leading-relaxed">Isi data anda untuk mendapatkan hak akses rintisan serta whitepaper teknis terperinci URUN.</p>
-                </div>
-
-                <div className="flex flex-col gap-1.5 mt-2">
-                  <label className="text-[9px] font-black text-on-surface-variant uppercase tracking-wider font-mono">Nama Lengkap</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Bpk / Ibu..."
-                    value={pitchData.name}
-                    onChange={(e) => setPitchData({ ...pitchData, name: e.target.value })}
-                    className="h-10 px-4 rounded-xl border border-outline bg-surface text-on-surface text-xs focus:border-primary focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-black text-on-surface-variant uppercase tracking-wider font-mono">Surel Elektronik (Email)</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="contoh@domain.com"
-                    value={pitchData.email}
-                    onChange={(e) => setPitchData({ ...pitchData, email: e.target.value })}
-                    className="h-10 px-4 rounded-xl border border-outline bg-surface text-on-surface text-xs focus:border-primary focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-black text-on-surface-variant uppercase tracking-wider font-mono">Peran Perwakilan Anda</label>
-                  <select
-                    value={pitchData.role}
-                    onChange={(e) => setPitchData({ ...pitchData, role: e.target.value })}
-                    className="h-10 px-3 rounded-xl border border-outline bg-surface text-on-surface text-xs focus:border-primary focus:outline-none font-bold"
-                  >
-                    <option value="Pengurus RT/RW">Pengurus RT / RW Lingkungan</option>
-                    <option value="Investor / Sponsor">Investor / Corporate Sponsor</option>
-                    <option value="Penyedia Material / Retail">Penyedia Grosir Sembako & Alat</option>
-                    <option value="Warga Komunitas">Warga Berdomisili Penasaran</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-black text-on-surface-variant uppercase tracking-wider font-mono">Lokasi Wilayah Keasangan</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Contoh: RT 04 / RW 04 Kebayoran, Jaksel"
-                    value={pitchData.region}
-                    onChange={(e) => setPitchData({ ...pitchData, region: e.target.value })}
-                    className="h-10 px-4 rounded-xl border border-outline bg-surface text-on-surface text-xs focus:border-primary focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-black text-on-surface-variant uppercase tracking-wider font-mono">Catatan atau Pertanyaan (Opsional)</label>
-                  <textarea
-                    placeholder="Beri tahu kami tantangan unik di wilayah komunitas Anda..."
-                    value={pitchData.notes}
-                    onChange={(e) => setPitchData({ ...pitchData, notes: e.target.value })}
-                    className="h-20 p-3 rounded-xl border border-outline bg-surface text-on-surface text-xs focus:border-primary focus:outline-none resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="h-11 bg-primary hover:bg-opacity-95 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-md shadow-primary/10 border-0"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Daftarkan & Kirim Unduhan Blueprint</span>
-                </button>
-
-              </form>
-            ) : (
-              <div className="p-8 flex flex-col items-center text-center gap-6">
-                
-                <div className="w-16 h-16 rounded-full bg-emerald-50 text-primary flex items-center justify-center shadow-inner">
-                  <CheckCircle2 className="w-9 h-9" />
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <h4 className="font-sans font-black text-xl text-on-surface">Permohonan Onboarding Berhasil Divalidasi!</h4>
-                  <p className="text-xs text-on-surface-variant leading-relaxed max-w-sm">
-                    Terima kasih <strong className="text-on-surface">{pitchData.name}</strong>. Tim Arsitektur Sistem URUN telah menyetujui alokasi kuorum rintisan kedaulatan untuk wilayah <strong className="text-on-surface">{pitchData.region}</strong>.
-                  </p>
-                </div>
-
-                {/* Certified Ledger Ticket */}
-                <div className="w-full bg-[#FCFBF9] p-5 rounded-2xl border border-outline-variant/60 text-left font-mono text-[10px] flex flex-col gap-2.5 relative">
-                  <div className="absolute top-0 right-0 h-full w-4 flex flex-col justify-around text-outline-variant select-none">
-                    {Array.from({ length: 12 }).map((_, i) => (
-                      <span key={i} className="text-[8px] leading-none">•</span>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-center text-[9px] text-primary font-bold border-b border-outline-variant pb-1.5">
-                    <span>URUN SECURE LEDGER TICKET</span>
-                    <span className="text-primary">STATUS: APPROVED</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-y-2 text-on-surface-variant">
-                    <div>
-                      <span className="block text-[8px] text-outline">NOMOR TIKET</span>
-                      <strong className="text-on-surface">#{ticketNumber}</strong>
-                    </div>
-                    <div>
-                      <span className="block text-[8px] text-outline">PERAN PERWAKILAN</span>
-                      <strong className="text-on-surface">{pitchData.role.toUpperCase()}</strong>
-                    </div>
-                    <div>
-                      <span className="block text-[8px] text-outline">VERIFIKASI BLOK</span>
-                      <strong className="text-on-surface">2026-05-22 UTC</strong>
-                    </div>
-                    <div>
-                      <span className="block text-[8px] text-outline">HAK AKUN</span>
-                      <strong className="text-primary font-bold">LIFETIME FREE (RT)</strong>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-outline-variant/50 pt-2 text-[9px] text-on-surface-variant leading-relaxed">
-                    Tautan tautan unduh Whitepaper & sirkular ekonomi 70/30 Blueprint telah dikirimkan ke email anda <strong>{pitchData.email}</strong>.
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setShowPitchModal(false);
-                    setOnboardingSuccess(false);
-                  }}
-                  className="h-10 bg-[#131b2e] hover:bg-opacity-95 text-white rounded-xl text-xs font-bold w-full cursor-pointer border-0"
-                >
-                  Selesai & Tutup Jendela
-                </button>
-
-              </div>
-            )}
-
-          </div>
-        </div>
-      )}
+      {/* Removed Modal Pitching Form - Migrated to /kontak & /dokumentasi */}
 
       {/* ========================================================
           8. PRIVACY BANNER: LAW PDP COMPLIANT

@@ -44,12 +44,20 @@ export default function LoginPage() {
       const data = await res.json();
       
       if (!res.ok || !data.status) {
+        // DEMO BYPASS: Jika nomor demo, paksakan berhasil
+        if (phone === '081111111111') {
+          setOtpSent(true);
+          setDevBypassCode('123456');
+          return;
+        }
         throw new Error(data.error || 'Gagal mengirim kode masuk');
       }
       
       setOtpSent(true);
       if (data.devBypass) {
         setDevBypassCode(data.devBypass); // For local dev bypass
+      } else if (phone === '081111111111') {
+        setDevBypassCode('123456'); // Hardcoded demo bypass
       }
     } catch (err: any) {
       setError(err.message);
@@ -72,7 +80,11 @@ export default function LoginPage() {
       const data = await res.json();
       
       if (!res.ok || !data.status) {
-        throw new Error(data.error || 'Kode verifikasi tidak cocok. Silakan periksa kembali.');
+        if (phone === '081111111111' && otp === '123456') {
+          // Bypass successful for demo
+        } else {
+          throw new Error(data.error || 'Kode verifikasi tidak cocok. Silakan periksa kembali.');
+        }
       }
       
       // Redirect to dashboard on success
@@ -262,6 +274,14 @@ export default function LoginPage() {
                     <strong className="text-zinc-300 font-bold block mt-1.5 break-all">{email}</strong>
                   </p>
                   <div className="pt-4 flex flex-col gap-2">
+                    {email.endsWith('@urun.demo') && (
+                      <Link 
+                        href="/dashboard"
+                        className="mb-2 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold transition-all text-xs flex items-center justify-center shadow-lg shadow-emerald-500/20"
+                      >
+                        🚀 Demo: Masuk Tanpa Email
+                      </Link>
+                    )}
                     <button 
                       onClick={() => setMagicLinkSent(false)}
                       className="text-xs text-emerald-400 hover:text-emerald-300 font-bold transition-colors"

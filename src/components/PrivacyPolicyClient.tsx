@@ -162,10 +162,10 @@ export default function PrivacyPolicyClient() {
             Kebijakan Privasi &amp; Perlindungan Data
           </h1>
           <p className="text-base md:text-lg text-[#006c49] font-black italic">
-            &quot;Data Anda adalah Milik Komunitas Anda, Bukan Komoditas Komersial.&quot;
+            &quot;Data Anda adalah Milik Warga, Bukan Komoditas Komersial.&quot;
           </p>
           <p className="text-sm text-zinc-500 leading-relaxed max-w-2xl">
-            Selamat datang di URUN. Kami membangun sistem ini sebagai infrastruktur sosial digital gotong royong yang berdaulat. Kami menjamin privasi dan kedaulatan informasi Anda dikelola dengan transparansi penuh serta terbebas dari pelacakan iklan komersial.
+            Halo Bapak/Ibu Warga sekalian, selamat datang di URUN. Kami membangun ruang ini layaknya balai rukun tetangga digital—tempat kita bergotong royong dengan aman dan nyaman. Kami berjanji untuk selalu menjaga kerahasiaan data pribadi Bapak/Ibu agar terbebas dari pelacakan iklan komersial.
           </p>
         </div>
       </section>
@@ -264,10 +264,10 @@ export default function PrivacyPolicyClient() {
             </h2>
             <div className="prose max-w-none text-zinc-600 text-sm leading-relaxed space-y-4">
               <p>
-                URUN berkomitmen penuh terhadap transparansi radikal dan perlindungan data pribadi warga bertetangga. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, mengolah, dan mematikan ancaman pelacakan informasi Anda dalam ekosistem digital kedaulatan warga lokal.
+                Kami di URUN mengerti betul bahwa kepercayaan adalah kunci bertetangga yang baik. Oleh karena itu, kebijakan privasi ini disusun dengan bahasa yang jelas agar Bapak/Ibu tenang dan paham bagaimana sistem ini menjaga data keluarga dan lingkungan kita.
               </p>
               <p>
-                Sistem kami dirancang agar warga memegang kunci kendali atas data mereka. Sesuai amanat **UU PDP No. 27/2022**, Anda berhak melihat, merevisi, memindahkan, maupun menghapus total identitas digital Anda kapan saja.
+                Sistem kami dirancang agar warga memegang kunci kendali atas datanya sendiri. Sesuai dengan amanat **UU PDP No. 27/2022**, Bapak/Ibu berhak melihat, mengunduh, memperbaiki, maupun meminta penghapusan total identitas digital kapan saja.
               </p>
             </div>
           </section>
