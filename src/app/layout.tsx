@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ProgressBar from "@/components/ProgressBar";
 import { getSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-server";
 
@@ -90,6 +91,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-surface text-on-surface selection:bg-primary/20 selection:text-primary">
+        <ProgressBar />
         <Navbar session={session} reputationScore={reputationScore} />
         <main className="flex-1 flex flex-col">
           {children}

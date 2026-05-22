@@ -39,7 +39,7 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Logo Brand */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 group min-h-[48px] px-1">
+          <Link prefetch={true} href="/" className="flex items-center gap-3 shrink-0 group min-h-[48px] px-1 active:scale-95 active:opacity-70 transition-all">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-sm shadow-primary/10 group-hover:shadow-primary/20 transition-shadow">
               <span className="text-lg font-extrabold text-white">U</span>
             </div>
@@ -54,7 +54,8 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-xs font-black uppercase tracking-wider transition-all py-5 border-b-2 ${
+                  prefetch={true}
+                  className={`text-xs font-black uppercase tracking-wider transition-all py-5 border-b-2 active:scale-95 active:opacity-70 ${
                     isActive 
                       ? "text-primary border-primary" 
                       : "text-on-surface-variant/80 hover:text-on-surface border-transparent"
@@ -74,8 +75,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
             <div className="hidden md:flex items-center gap-4 min-w-[150px] justify-end">
               {!session ? (
                 <Link
+                  prefetch={true}
                   href="/login"
-                  className="px-5 py-2 text-xs font-black uppercase tracking-wider text-white bg-primary rounded-full hover:bg-primary-container hover:shadow-md transition-all active:scale-95 min-h-[40px] flex items-center"
+                  className="px-5 py-2 text-xs font-black uppercase tracking-wider text-white bg-primary rounded-full hover:bg-primary-container hover:shadow-md transition-all active:scale-95 active:opacity-70 min-h-[40px] flex items-center"
                 >
                   Masuk Komunitas
                 </Link>
@@ -105,18 +107,18 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
                       </div>
                       
                       <div className="p-2 space-y-1">
-                        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+                        <Link prefetch={true} href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-all active:scale-95 active:opacity-70">
                           <LayoutDashboard className="w-4 h-4 text-on-surface-variant" />
                           Dashboard Warga
                         </Link>
                         
                         {(session.role === 'pengurus' || session.role === 'admin') && (
                           <>
-                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+                            <Link prefetch={true} href="/admin" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-all active:scale-95 active:opacity-70">
                               <Shield className="w-4 h-4 text-primary" />
                               Pusat Kendali
                             </Link>
-                            <Link href="/system/monitoring" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-secondary hover:bg-surface-container-low rounded-lg transition-colors">
+                            <Link prefetch={true} href="/system/monitoring" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-secondary hover:bg-surface-container-low rounded-lg transition-all active:scale-95 active:opacity-70">
                               <Info className="w-4 h-4 text-secondary" />
                               Observasi Sistem
                             </Link>
@@ -142,8 +144,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
             {/* Mobile Mini Avatar Header indicator */}
             {session && (
               <Link 
+                prefetch={true}
                 href="/dashboard" 
-                className="md:hidden w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-[10px] font-black uppercase min-w-[32px]"
+                className="md:hidden w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-[10px] font-black uppercase min-w-[32px] active:scale-95 active:opacity-70 transition-all"
                 aria-label="Dashboard Warga"
               >
                 {session.name ? session.name.substring(0, 2) : "UR"}
@@ -158,8 +161,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
       <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-outline-variant/60 flex justify-around items-center h-16 pb-safe z-40 shadow-lg px-2">
         {/* Tab 1: Beranda */}
         <Link 
+          prefetch={true}
           href="/" 
-          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all active:scale-95 active:opacity-70 ${
             pathname === "/" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
           }`}
         >
@@ -169,8 +173,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
 
         {/* Tab 2: Katalog */}
         <Link 
+          prefetch={true}
           href="/catalog" 
-          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all active:scale-95 active:opacity-70 ${
             pathname.startsWith("/catalog") ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
           }`}
         >
@@ -180,8 +185,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
 
         {/* Tab 3: Leaderboard */}
         <Link 
+          prefetch={true}
           href="/leaderboard" 
-          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all active:scale-95 active:opacity-70 ${
             pathname === "/leaderboard" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
           }`}
         >
@@ -191,8 +197,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
 
         {/* Tab 4: Tentang */}
         <Link 
+          prefetch={true}
           href="/tentang" 
-          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all active:scale-95 active:opacity-70 ${
             pathname === "/tentang" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
           }`}
         >
@@ -202,8 +209,9 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
 
         {/* Tab 5: Akun */}
         <Link 
+          prefetch={true}
           href={session ? "/dashboard" : "/login"} 
-          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all active:scale-95 active:opacity-70 ${
             pathname === "/dashboard" || pathname === "/login" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
           }`}
         >
