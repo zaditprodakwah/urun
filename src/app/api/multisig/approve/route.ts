@@ -129,10 +129,32 @@ export async function POST(req: NextRequest) {
     };
     const updatedApprovals = [...approvalsList, newApproval];
     const newSigsCount = msig.current_sigs + 1;
+    const isQuorumReached = newSigsCount >= msig.required_sigs;
+    const newStatus = isQuorumReached ? 'approved' : 'pending';
+
+    // 7. Optimistic Concurrency Control (OCC) Lock
+    // We update the multisig request FIRST. If current_sigs changed in the database
+    // while we were processing, this update will fail to find the row.
+    const { data: updatedMsig, error: updateErr } = await supabaseAdmin
+      .from('multisig_requests')
+      .update({
+        current_sigs: newSigsCount,
+        approvals: updatedApprovals,
+        status: newStatus
+      })
+      .eq('id', msig.id)
+      .eq('current_sigs', msig.current_sigs) // EXACT MATCH LOCK
+      .select()
+      .single();
+
+    if (updateErr || !updatedMsig) {
+      console.warn(`[OCC CONFLICT] Multisig ${msig.id} was modified concurrently.`);
+      return NextResponse.json({ error: 'Konflik Data (Race Condition): Tanda tangan sedang diproses oleh pengurus lain. Silakan muat ulang halaman untuk melihat status terbaru.' }, { status: 409 });
+    }
 
     // Check if quorum reached
-    if (newSigsCount >= msig.required_sigs) {
-      // QUORUM REACHED!
+    if (isQuorumReached) {
+      // QUORUM REACHED & OCC SECURED!
       // Fetch requested_by member to determine dynamic entry type and direction
       const { data: reqMember } = await supabaseAdmin
         .from('community_members')
@@ -165,23 +187,24 @@ export async function POST(req: NextRequest) {
 
       if (ledgerErr) {
         console.error('Failed to write approved transaction to ledger:', ledgerErr);
-        return NextResponse.json({ error: 'Failed to write approved transaction to ledger.' }, { status: 500 });
+        // ROLLBACK MULTISIG STATUS if ledger fails
+        await supabaseAdmin
+          .from('multisig_requests')
+          .update({
+            current_sigs: msig.current_sigs,
+            approvals: msig.approvals,
+            status: 'pending'
+          })
+          .eq('id', msig.id);
+        
+        return NextResponse.json({ error: 'Gagal mencatat transaksi ke Ledger. Status Multi-Sig dikembalikan ke Pending.' }, { status: 500 });
       }
 
-      // b. Update multisig_requests to approved and save ledger reference
-      const { error: updateErr } = await supabaseAdmin
+      // b. Update multisig_requests to save ledger reference
+      await supabaseAdmin
         .from('multisig_requests')
-        .update({
-          current_sigs: newSigsCount,
-          approvals: updatedApprovals,
-          status: 'approved',
-          ledger_ref_id: ledgerEntry.id
-        })
+        .update({ ledger_ref_id: ledgerEntry.id })
         .eq('id', msig.id);
-
-      if (updateErr) {
-        console.error('Error updating multisig request status:', updateErr);
-      }
 
       // c. Log to audit_log with actor_id
       await supabaseAdmin
@@ -264,19 +287,8 @@ export async function POST(req: NextRequest) {
 
     } else {
       // QUORUM NOT YET REACHED (Still pending)
-      const { error: updateErr } = await supabaseAdmin
-        .from('multisig_requests')
-        .update({
-          current_sigs: newSigsCount,
-          approvals: updatedApprovals
-        })
-        .eq('id', msig.id);
-
-      if (updateErr) {
-        console.error('Error updating approvals list:', updateErr);
-        return NextResponse.json({ error: 'Failed to record signature.' }, { status: 500 });
-      }
-
+      // OCC Update was already successful above!
+      
       // Log to audit_log
       await supabaseAdmin
         .from('audit_log')
@@ -302,6 +314,7 @@ export async function POST(req: NextRequest) {
         requiredSigs: msig.required_sigs
       }, { status: 200 });
     }
+
 
   } catch (err: any) {
     console.error('[Approve Multi-Sig API Error]:', err);
