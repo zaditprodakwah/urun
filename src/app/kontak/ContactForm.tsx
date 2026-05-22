@@ -152,19 +152,20 @@ export default function ContactForm() {
           <h3 className="text-xl font-bold text-zinc-900 mb-6">Pertanyaan Umum (FAQ)</h3>
           <div className="space-y-3">
             {[
-              { q: "Apakah saya perlu mendownload aplikasi URUN dari PlayStore?", a: "Tidak perlu. URUN adalah platform berbasis Web (Sistem Operasi Mikro) yang terintegrasi penuh dengan WhatsApp Anda. Anda dapat mendaftar, membayar, dan memantau transparansi kas hanya dengan mengirim pesan ke nomor bot resmi URUN." },
-              { q: "Bagaimana cara mendirikan simpul pengurus di RT saya?", a: "Silakan isi formulir kontak di sebelah kiri atau hubungi WhatsApp kami. Kami akan melakukan verifikasi identitas Ketua RT/RW Anda untuk mendirikan isolasi database (RLS) baru khusus untuk lingkungan Anda." },
-              { q: "Apakah data warga RT saya bisa dilihat oleh RT lain?", a: "Sama sekali tidak. Kami menggunakan arsitektur Row-Level Security (RLS) tingkat lanjut. Database secara kaku mengunci akses data; sehingga Pengurus A tidak akan pernah bisa membaca Buku Kas atau Profil Warga dari Pengurus B." },
-              { q: "Mengapa menggunakan metode Multi-Sig untuk pencairan dana?", a: "Ini adalah protokol keamanan tertinggi kami (Rule 5). Pencairan uang warga dalam jumlah besar (> Rp 5 Juta) tidak boleh diputuskan sepihak oleh bendahara saja. Sistem akan membekukan dana sampai 2 dari 3 perwakilan pengurus setuju via tandatangan digital WhatsApp." }
+              { q: "Apakah saya perlu mendownload aplikasi URUN dari PlayStore?", a: "Tidak perlu. URUN adalah platform berbasis <em>Web</em> (Sistem Operasi Mikro) yang terintegrasi penuh dengan <em>WhatsApp</em> Anda. Anda dapat mendaftar, membayar, dan memantau transparansi kas hanya dengan mengirim pesan ke nomor <em>bot</em> resmi URUN." },
+              { q: "Bagaimana cara mendirikan simpul pengurus di RT saya?", a: "Silakan isi formulir kontak di sebelah kiri atau hubungi <em>WhatsApp</em> kami. Kami akan melakukan verifikasi identitas Ketua RT/RW Anda untuk mendirikan ruang data aman yang terenkripsi dan terisolasi khusus untuk lingkungan Anda." },
+              { q: "Apakah data warga RT saya bisa dilihat oleh RT lain?", a: "Sama sekali tidak. Sistem URUN dirancang dengan pemisahan data yang sangat ketat. Lapisan keamanan kami mengunci akses secara kaku, sehingga Pengurus RT A tidak akan pernah bisa membaca Buku Kas atau Profil Warga dari RT B." },
+              { q: "Mengapa menggunakan metode Multi-Sig untuk pencairan dana?", a: "Ini adalah protokol keamanan tertinggi kami (Rule 5). Pencairan uang warga dalam jumlah besar (> Rp 5 Juta) tidak boleh diputuskan sepihak oleh bendahara saja. Sistem akan membekukan dana sampai 2 dari 3 perwakilan pengurus setuju via tandatangan digital <em>WhatsApp</em>." }
             ].map((faq, idx) => (
               <details key={idx} className="group bg-white border border-[#bbcabf]/40 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden shadow-sm">
                 <summary className="flex items-center justify-between p-5 cursor-pointer hover:bg-zinc-50 transition-colors">
                   <h4 className="text-sm font-bold text-zinc-800 pr-4">{faq.q}</h4>
                   <ChevronDown className="w-4 h-4 text-zinc-400 group-open:rotate-180 transition-transform shrink-0" />
                 </summary>
-                <div className="px-5 pb-5 pt-1 text-zinc-500 font-medium text-xs leading-relaxed border-t border-zinc-100">
-                  {faq.a}
-                </div>
+                <div 
+                  className="px-5 pb-5 pt-1 text-zinc-500 font-medium text-xs leading-relaxed border-t border-zinc-100"
+                  dangerouslySetInnerHTML={{ __html: faq.a }}
+                />
               </details>
             ))}
           </div>

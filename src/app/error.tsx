@@ -21,9 +21,9 @@ export default function Error({
         <div className="mx-auto w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
           <AlertTriangle className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-bold text-[#131b2e]">Kegagalan Sistem Internal</h1>
+        <h1 className="text-2xl font-bold text-[#131b2e]">Kendala Koneksi Sistem</h1>
         <p className="text-zinc-650 text-sm leading-relaxed">
-          Sovereign Core mendeteksi kesalahan fatal saat memproses permintaan Anda. Hal ini bisa terjadi karena anomali jaringan atau kegagalan otorisasi RLS.
+          Sistem mendeteksi adanya kendala saat memproses permintaan Anda. Hal ini bisa terjadi karena gangguan koneksi jaringan internet atau sesi masuk Anda telah kedaluwarsa.
         </p>
         <div className="pt-4">
           <button
@@ -31,7 +31,7 @@ export default function Error({
             className="inline-flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-colors border border-zinc-700"
           >
             <RotateCcw className="w-4 h-4" />
-            Coba Kembali Eksekusi
+            Coba Muat Ulang Halaman
           </button>
         </div>
       </div>

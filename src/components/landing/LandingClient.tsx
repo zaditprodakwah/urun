@@ -69,11 +69,14 @@ export default function LandingClient() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (emulatorTab === "whatsapp") {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (emulatorTab === "whatsapp" && chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   }, [messages, isTyping, emulatorTab]);
   const [activeExplain, setActiveExplain] = useState<Message["underTheHood"] | null>(null);
@@ -221,10 +224,10 @@ export default function LandingClient() {
     setTimeout(() => {
       let replyText = "";
       let explanation: Message["underTheHood"] = {
-        title: "Pencarian Warga & Row-Level Security",
-        description: "Sistem secara aman memverifikasi nomor telepon warga dengan database. Dengan RLS PostgreSQL, data finansial dan identitas terisolasi kaku hanya untuk komunitas RT/RW Anda sendiri.",
-        rules: ["ATURAN 1: Row-Level Security (RLS) di Tingkat Database", "ATURAN 3: Kedaulatan Data & Penghapusan Privasi Mutlak"],
-        technical: "SELECT * FROM community_members WHERE profiles.phone = sender_phone AND community_id = X;",
+        title: "Verifikasi Keamanan Warga",
+        description: "Sistem secara aman memverifikasi nomor *WhatsApp* Anda untuk memastikan identitas warga sah. Informasi pribadi Anda dilindungi secara ketat sehingga data keuangan dan identitas hanya dapat diakses oleh warga di lingkungan RT/RW Anda sendiri.",
+        rules: ["ATURAN 1: Isolasi Keamanan Data Lingkungan RT/RW", "ATURAN 3: Kedaulatan & Kerahasiaan Data Warga Mutlak"],
+        technical: "1. Cocokkan nomor *WhatsApp* pengirim dengan daftar warga yang sah\n2. Terapkan proteksi keamanan data tingkat wilayah secara otomatis\n3. Izinkan akses informasi hanya untuk warga di lingkungan RT/RW setempat",
       };
 
       const normalized = text.trim().toLowerCase();
@@ -232,10 +235,10 @@ export default function LandingClient() {
       if (normalized === "#urun") {
         replyText = "📦 *PENGADAAN & IURAN WARGA AKTIF*\nSimpul Komunitas: URUN RT 01 Kalisari\n-------------------------------\n\n1. *URUN Semen Jalan RT 01*\n   👉 Ikut: `#urun join semen-jalan-rt-01 1`\n   🎯 Target: 100 unit (Terkumpul: 50)\n   📅 Batas Waktu: 30 Juni 2026\n\n2. *URUN Lampu Penerangan Gang*\n   👉 Ikut: `#urun join lampu-penerangan-gang 1`\n   🎯 Target: 20 unit (Terkumpul: 10)\n   📅 Batas Waktu: 15 Juni 2026\n\nKetik `#kas` untuk melihat rincian pembukuan Kas RT/RW secara terbuka.";
         explanation = {
-          title: "Query Pengadaan Aktif Komunitas",
-          description: "Mengambil data program gotong royong yang sedang aktif dari tabel `tenders` di database. Keamanan RLS memastikan data iuran tidak dapat dibocorkan ke wilayah lain.",
-          rules: ["ATURAN 1: Isolasi Data Wilayah Warga", "ATURAN 3: Kedaulatan & Kerahasiaan Data Belanja"],
-          technical: "SELECT * FROM tenders WHERE community_id = $1 AND current_state = 'subscribing';",
+          title: "Pencarian Gotong Royong Aktif",
+          description: "Menampilkan daftar program iuran bersama yang sedang berjalan aktif di lingkungan warga. Sistem menyaring program secara cerdas agar hanya menampilkan iuran yang relevan bagi wilayah Anda.",
+          rules: ["ATURAN 1: Kejelasan Informasi Program Warga", "ATURAN 3: Kedaulatan & Kerahasiaan Data Iuran"],
+          technical: "1. Ambil daftar program gotong royong yang sedang berjalan aktif\n2. Saring iuran khusus untuk wilayah komunitas RT/RW terdaftar\n3. Tampilkan pilihan iuran secara langsung di layar ponsel warga",
         };
       } else if (normalized.startsWith("#urun join")) {
         const parts = text.split(/\s+/);
@@ -246,53 +249,53 @@ export default function LandingClient() {
         if (total >= 5000000) {
           replyText = `⚠️ *BUTUH KONSENSUS MULTI-SIG PENGURUS*\n\nKontribusi Anda dalam program *${slug.toUpperCase().replace(/-/g, " ")}* sebanyak ${qty} unit dengan total *Rp ${total.toLocaleString("id-ID")}* telah dicatat.\n\nKarena nominal iuran/pengadaan ini bernilai besar (> Rp 5 juta), dana disimpan sementara dengan status *TERKUNCI* hingga disetujui secara mufakat oleh minimal 2 Pengurus RT/RW demi akuntabilitas kas warga.`;
           explanation = {
-            title: "Pengunci Kas Nominal Besar (Multi-Sig)",
-            description: "Transaksi iuran berjumlah besar (> Rp 5 Juta) secara otomatis dialihkan ke status PENDING di tabel `multisig_requests`. Sistem memblokir penulisan ke kas utama sebelum disetujui bersama oleh para pengurus RT/RW.",
-            rules: ["ATURAN 5: Validasi Ganda Pengurus (>Rp 5 Juta)", "ATURAN 2: Buku Kas Aman & Permanen (Hanya Tambah Data)"],
-            technical: "INSERT INTO multisig_requests (requested_by, amount, required_sigs, status) VALUES (...);",
+            title: "Persetujuan Mufakat Pengurus untuk Iuran Besar",
+            description: "Iuran bersama dalam jumlah besar secara otomatis disimpan dengan status tertunda (*pending*) terlebih dahulu demi menjaga akuntabilitas kas warga. Sistem mewajibkan adanya persetujuan mufakat dari minimal 2 pengurus RT/RW sebelum dana resmi dicatat ke buku kas utama.",
+            rules: ["ATURAN 5: Validasi Mufakat Pengurus Lingkungan", "ATURAN 2: Buku Kas Aman & Permanen (Hanya Tambah Data)"],
+            technical: "1. Deteksi kontribusi bernilai besar\n2. Alihkan status transaksi menjadi tertunda (*pending*) untuk verifikasi\n3. Kirim notifikasi persetujuan mufakat ke pengurus RT/RW setempat",
           };
         } else {
           replyText = `✅ *PENCATATAN IURAN SELESAI*\n\nTerima kasih tetangga! Anda resmi bergabung dalam program *${slug.toUpperCase().replace(/-/g, " ")}*.\n\n*Rincian Partisipasi Warga:*\n• Jumlah: ${qty} unit\n• Iuran Per Unit: Rp 75.000\n• Total Iuran: *Rp ${total.toLocaleString("id-ID")}*\n\nCatatan iuran Anda sudah tersimpan dengan aman di *Buku Kas RT*.\nSilakan serahkan iuran iuran tunai atau transfer langsung ke Bendahara RT/RW kita. Terima kasih atas gotong royongnya!`;
           explanation = {
-            title: "Pencatatan Kas & Pembaruan Skor Keaktifan Warga",
-            description: "Menulis kontribusi warga ke Buku Kas Kolektif secara aman. Sistem secara otomatis memicu pembaruan Skor Keaktifan Warga (+3 poin keaktifan) sebagai bentuk apresiasi gotong royong.",
-            rules: ["ATURAN 2: Buku Kas Permanen & Tidak Bisa Diubah Sepihak", "ATURAN 4: Skor Keaktifan Dihitung Adil & Otomatis (+3 Poin)"],
-            technical: "SELECT process_ledger_entry(p_community_id => $1, p_amount => $2, p_entry_type => 'tender_contribution');",
+            title: "Pencatatan Iuran & Poin Keaktifan Warga",
+            description: "Pernyataan ikut serta warga dalam iuran akan langsung dicatat ke dalam Buku Kas Kolektif secara aman. Sistem secara otomatis memberikan skor keaktifan warga sebagai apresiasi sosial gotong royong.",
+            rules: ["ATURAN 2: Buku Kas Bersifat Permanen & Transparan", "ATURAN 4: Skor Keaktifan Warga Diapresiasi Otomatis (+3 Poin)"],
+            technical: "1. Catat kontribusi secara permanen di Buku Kas RT/RW\n2. Tambahkan +3 poin keaktifan warga sebagai bentuk apresiasi\n3. Perbarui tingkat ketercapaian target iuran bersama secara langsung",
           };
         }
       } else if (normalized === "#kas") {
         replyText = "📊 *BUKU KAS RT/RW KITA*\nBuku Pembukuan Transparan, Jujur, & Terbuka\n-------------------------------\n*Saldo Kas Kita Saat Ini:* *Rp 150.000*\n\n*5 Catatan Keluar-Masuk Kas Terakhir:*\n1. [22 Mei] 🟢 (+) *Rp 150.000*\n   _WhatsApp: Iuran URUN Semen Jalan RT 01 x2 unit_\n2. [22 Mei] 🟢 (+) *Rp 0*\n   _Sistem: Penyelarasan Awal Kas RT 01 Kalisari_";
         explanation = {
-          title: "Perhitungan Saldo Kas Real-Time",
-          description: "Menghitung total saldo kas warga secara transparan dengan menjumlahkan seluruh dana masuk (direction='in') dan mengurangkan dana keluar (direction='out'). Rantai kas terjamin aman dari manipulasi.",
-          rules: ["ATURAN 2: Kas Bersifat Mutlak (Tidak Bisa Diedit/Dihapus)", "ATURAN 6: Rekonsiliasi Kas Harian Otomatis"],
-          technical: "SELECT SUM(CASE WHEN direction = 'in' THEN amount ELSE -amount END) FROM ledger WHERE community_id = $1;",
+          title: "Transparansi Saldo Kas Terbuka",
+          description: "Menghitung total saldo kas warga secara transparan dan instan dengan menjumlahkan seluruh dana masuk dan mengurangkan pengeluaran secara jujur. Semua warga dapat ikut memantau secara terbuka.",
+          rules: ["ATURAN 2: Buku Kas Bersifat Permanen (Tidak Bisa Dihapus)", "ATURAN 6: Pencocokan Saldo Kas Harian Otomatis"],
+          technical: "1. Jumlahkan seluruh pemasukan kas warga yang sah\n2. Kurangi dengan total pengeluaran kas wilayah\n3. Tampilkan sisa saldo secara terbuka dan *real-time*",
         };
       } else if (normalized === "#reputasi") {
         replyText = "🎗️ *SKOR KEAKTIFAN WARGA*\nApresiasi Gotong Royong Tetangga URUN\n-------------------------------\n• Nama Warga: *Zadit Prodakwah*\n• Skor Keaktifan: *18 poin*\n• Kategori: *Warga Aktif ⭐*\n\n*3 Riwayat Keaktifan Terakhir:*\n1. [22 Mei] *Ikut gotong royong: URUN Semen Jalan RT 01 (+3 poin)*\n2. [22 Mei] *Penyusunan awal kepengurusan warga (+10 poin)*\n3. [21 Mei] *Profil warga berhasil diverifikasi (+5 poin)*";
         explanation = {
-          title: "Sistem Keaktifan Warga yang Adil",
-          description: "Skor keaktifan dihitung secara transparan berdasarkan aksi nyata gotong royong Anda. Algoritma database memastikan skor dihitung adil tanpa bias atau pengaruh eksternal.",
-          rules: ["ATURAN 4: Skor Keaktifan Adil & Deterministik", "ATURAN 7: Jaminan Hak Penghapusan & Portabilitas Data Warga"],
-          technical: "SELECT reputation_score FROM community_members WHERE id = $1;",
+          title: "Apresiasi Gotong Royong Tetangga",
+          description: "Skor keaktifan dihitung secara transparan berdasarkan aksi gotong royong nyata Anda di lingkungan. Sistem otomatis memberikan poin keaktifan sebagai bentuk penghargaan sosial antar-warga.",
+          rules: ["ATURAN 4: Skor Keaktifan Adil & Berimbang", "ATURAN 7: Jaminan Hak Penghapusan & Keamanan Data Pribadi Warga"],
+          technical: "1. Cari profil warga berdasarkan nomor *WhatsApp* terdaftar\n2. Ambil skor keaktifan dari riwayat gotong royong warga\n3. Tampilkan tingkat reputasi warga secara otomatis",
         };
       } else if (normalized.startsWith("#approve")) {
         const parts = text.split(/\s+/);
         const reqId = parts[1] || "req-908";
         replyText = `✍️ *PERSETUJUAN PENGURUS RT/RW KAS DICATAT*\n\nPersetujuan Anda berhasil diverifikasi. Saat ini terkumpul (*2/2*) tanda tangan pengurus.\n\n✅ *PENCAIRAN KAS DISETUJUI SEPENUHNYA*\n\nKuorum tercapai. Dana gotong royong sebesar *Rp 7.500.000* untuk pembelian semen resmi dicairkan dan dicatat ke *Buku Kas RT* kita.`;
         explanation = {
-          title: "Konsensus Pencairan Kas (Multi-Sig)",
-          description: "Mencatat persetujuan ganda dari pengurus RT/RW. Ketika batas kuorum minimal (2 dari 3 pengurus) terpenuhi, status pencairan menjadi disetujui dan saldo kas resmi dilepas secara aman.",
+          title: "Pencairan Kas Secara Transparan",
+          description: "Mencatat persetujuan mufakat dari pengurus RT/RW secara aman. Ketika batas persetujuan terpenuhi, status pencairan menjadi disetujui dan dana kas resmi dicairkan serta dicatat permanen.",
           rules: ["ATURAN 5: Validasi Kuorum Pengurus Wilayah", "ATURAN 2: Penulisan Permanen Buku Kas RT/RW"],
-          technical: `UPDATE multisig_requests SET status = 'approved' WHERE id = '${reqId}' AND current_sigs >= required_sigs;`,
+          technical: "1. Periksa tanda tangan digital dari pengurus RT/RW\n2. Pastikan batas minimal persetujuan mufakat tercapai\n3. Cairkan dana kas secara otomatis & catat ke buku besar",
         };
       } else {
         replyText = "🤖 *ASISTEN DIGITAL URUN*\n\nPerintah chat tidak dikenali. Silakan gunakan perintah resmi berikut:\n\n• *#urun* : Lihat daftar iuran & pengadaan bersama yang sedang aktif\n• *#urun join [nama-barang] [jumlah]* : Ikut serta dalam iuran bersama\n• *#kas* : Lihat pembukuan & mutasi Kas RT/RW secara terbuka (real-time)\n• *#reputasi* : Cek keaktifan & riwayat gotong royong Anda sebagai warga\n• *#approve [id-laporan]* : Persetujuan pencairan kas (Khusus Pengurus RT/RW)";
         explanation = {
-          title: "Pemberian Panduan & Menu Bantuan",
+          title: "Menu Bantuan & Panduan Warga",
           description: "Ketika pesan tidak sesuai dengan format perintah, asisten secara otomatis mengirimkan pesan bantuan ini untuk memandu warga.",
           rules: ["ATURAN 3: Minimasi Pesan & Navigasi Mudah"],
-          technical: "RegExp matching fails -> Send WhatsApp help string template.",
+          technical: "1. Deteksi kata kunci perintah dari pesan *WhatsApp*\n2. Kirim petunjuk penggunaan asisten digital secara instan",
         };
       }
 
@@ -531,7 +534,7 @@ export default function LandingClient() {
                   </div>
 
                   {/* Chat Messages Log */}
-                  <div className="flex-1 overflow-y-auto max-h-[300px] pr-1 space-y-2 mb-2 scroll-smooth text-[11px]">
+                  <div ref={chatContainerRef} className="flex-1 overflow-y-auto max-h-[300px] pr-1 space-y-2 mb-2 scroll-smooth text-[11px]">
                     {messages.map((msg, i) => (
                       <div key={i} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                         <div
@@ -554,7 +557,6 @@ export default function LandingClient() {
                         </div>
                       </div>
                     )}
-                    <div ref={messagesEndRef} />
                   </div>
 
                   {/* Command quick buttons inside phone */}
@@ -598,40 +600,6 @@ export default function LandingClient() {
       </section>
       </div>
 
-      {/* SQL AND SYSTEM GUARANTEES PANEL (Displayed when active tab is WhatsApp to show what happens under the hood) */}
-      {emulatorTab === "whatsapp" && activeExplain && (
-        <section className="w-full max-w-7xl mx-auto px-6 py-4 animate-in fade-in duration-300">
-          <div className="bg-[#131b2e] text-white rounded-2xl p-6 font-mono text-xs border border-[#1e293b] shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="text-[10px] font-bold text-primary-container uppercase tracking-wider flex items-center gap-1.5 mb-3">
-                <Shield className="w-4 h-4 text-primary-container" />
-                <span>DI BALIK LAYAR (SOVEREIGN CORE CORE)</span>
-              </div>
-              <h4 className="font-extrabold text-sm text-white">{activeExplain.title}</h4>
-              <p className="text-[11px] text-neutral-350 mt-1.5 leading-relaxed">{activeExplain.description}</p>
-              
-              <div className="mt-4 space-y-1.5">
-                <div className="text-[9px] text-neutral-450 font-bold uppercase tracking-wider">Aturan Kepercayaan Terikat:</div>
-                <ul className="space-y-1">
-                  {activeExplain.rules.map((rule, idx) => (
-                    <li key={idx} className="text-[11px] text-emerald-300 flex items-start gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-primary-container shrink-0" />
-                      <span>{rule}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-col justify-between">
-              <div className="text-[9px] text-neutral-450 font-bold uppercase tracking-wider mb-2">OPERASI BASIS DATA (POSTGRESQL PL/PGSQL):</div>
-              <div className="p-3.5 bg-[#0b0f19] rounded-xl border border-slate-800 text-[10px] text-primary-container overflow-x-auto whitespace-pre">
-                {activeExplain.technical}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ========================================================
           2. FITUR KHUSUS UNTUK SETIAP PERAN
@@ -893,9 +861,9 @@ export default function LandingClient() {
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-primary flex items-center justify-center mt-2 shadow-inner">
                 <Lock className="w-5 h-5 text-primary" />
               </div>
-              <h4 className="font-sans font-extrabold text-base text-[#0f172a] leading-tight">Pengikatan Trust Anchor</h4>
+              <h4 className="font-sans font-extrabold text-base text-[#0f172a] leading-tight">Aktivasi Akun & Perlindungan Keamanan</h4>
               <p className="text-[11px] leading-relaxed text-on-surface-variant">
-                URUN diaktifkan secara gratis oleh pengurus lingkungan. Sistem menyinkronkan data warga secara aman di bawah perlindungan Row-Level Security (RLS) PostgreSQL, menggantikan tumpukan catatan fisik dan grup obrolan yang kacau.
+                URUN diaktifkan secara gratis oleh pengurus lingkungan. Sistem menyinkronkan data warga secara aman di bawah perlindungan enkripsi dan isolasi keamanan data tingkat wilayah, menggantikan tumpukan catatan fisik dan grup obrolan yang kacau.
               </p>
             </div>
 
@@ -907,9 +875,9 @@ export default function LandingClient() {
               <div className="w-10 h-10 rounded-xl bg-blue-50 text-secondary flex items-center justify-center mt-2 shadow-inner">
                 <ShoppingBag className="w-5 h-5 text-secondary" />
               </div>
-              <h4 className="font-sans font-extrabold text-base text-[#0f172a] leading-tight">Transaksi Capture Loop</h4>
+              <h4 className="font-sans font-extrabold text-base text-[#0f172a] leading-tight">Gotong Royong & Pencatatan Transaksi</h4>
               <p className="text-[11px] leading-relaxed text-on-surface-variant">
-                Warga melakukan aktivitas belanja kebutuhan rutin harian atau pembayaran kolektif melalui Price Discovery Hub di katalog URUN. Sistem menangkap komisi afiliasi dari penyedia komoditas luar yang biasanya menguap sia-sia.
+                Warga melakukan aktivitas belanja kebutuhan rutin harian atau pembayaran kolektif secara transparan melalui etalase bersama di katalog URUN. Sistem mengumpulkan komisi afiliasi dari penyedia kebutuhan yang biasanya menguap sia-sia.
               </p>
             </div>
 
@@ -923,7 +891,7 @@ export default function LandingClient() {
               </div>
               <h4 className="font-sans font-extrabold text-base text-[#0f172a] leading-tight">Alokasi Pasif Otomatis (70/30)</h4>
               <p className="text-[11px] leading-relaxed text-on-surface-variant">
-                Melalui kalkulasi mesin ledger integer, komisi dibagi secara presisi: 70% disuntikkan langsung ke rekening kas RT/RW setempat secara immutable untuk pendanaan infrastruktur fisik (jalan, pos ronda, sosial), sementara 30% dialokasikan sebagai pendapatan platform URUN untuk perawatan infrastruktur server terdistribusi.
+                Setiap komisi dibagi secara presisi dan otomatis: 70% disalurkan langsung ke kas RT/RW setempat untuk pendanaan gotong royong warga (seperti perbaikan jalan, pos ronda, atau bantuan sosial), sementara 30% digunakan untuk perawatan *server* dan pengembangan *platform* URUN agar layanan tetap gratis.
               </p>
             </div>
 

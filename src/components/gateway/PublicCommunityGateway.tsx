@@ -55,8 +55,8 @@ export default function PublicCommunityGateway({ data }: { data: GatewayData }) 
         </div>
         <h1 className="text-3xl font-black text-on-surface mb-3">{data.name}</h1>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/50 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-6">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Sovereign Privacy Active</span>
+          <Lock className="w-3.5 h-3.5" />
+          <span><em>Sovereign Privacy Active</em></span>
         </div>
         <p className="text-on-surface-variant text-sm leading-relaxed max-w-md mx-auto">
           {data.message || 'Pengurus menetapkan kebijakan transparansi tertutup. Hanya warga internal terverifikasi yang dapat mengakses buku besar, tender, dan pemilu komunal.'}
@@ -105,7 +105,7 @@ export default function PublicCommunityGateway({ data }: { data: GatewayData }) 
           </div>
           <div className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-1 rounded w-fit uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-            Real-time Aggregation
+            <em>Real-time Aggregation</em>
           </div>
         </div>
       </div>
@@ -172,12 +172,12 @@ export default function PublicCommunityGateway({ data }: { data: GatewayData }) 
       {/* FOOTER & COMPLIANCE BADGE */}
       <div className="pt-12 text-center border-t border-outline-variant/30">
         <p className="text-[10px] font-mono text-outline-variant max-w-sm mx-auto leading-relaxed">
-          Tampilan agregasi ini dihasilkan secara otomatis oleh <strong>URUN Protocol</strong>. 
+          Tampilan agregasi ini dihasilkan secara otomatis oleh <strong>URUN <em>Protocol</em></strong>. 
           Data pribadi penyumbang/warga dilindungi penuh sesuai mandat UU PDP No.27/2022.
         </p>
         {generated_at && (
           <p className="text-[9px] text-outline mt-2 font-mono">
-            Snapshot Timestamp: {new Date(generated_at * 1000).toISOString()}
+            <em>Snapshot Timestamp</em>: {new Date(generated_at * 1000).toISOString()}
           </p>
         )}
       </div>

@@ -5,10 +5,26 @@ import { X, MessageCircle, Smartphone, Box, Calculator, ShieldCheck } from 'luci
 
 type CompetitorId = 'whatsapp' | 'superapp' | 'appkonvensional' | 'excel';
 
-const COMPETITORS = [
+interface Competitor {
+  id: CompetitorId;
+  label: React.ReactNode;
+  icon: React.ComponentType<any>;
+  color: string;
+  description: string;
+  weaknesses: {
+    title: string;
+    desc: string;
+  }[];
+}
+
+const COMPETITORS: Competitor[] = [
   {
-    id: 'whatsapp' as CompetitorId,
-    label: 'WhatsApp Group',
+    id: 'whatsapp',
+    label: (
+      <span>
+        <em>WhatsApp Group</em>
+      </span>
+    ),
     icon: MessageCircle,
     color: 'bg-[#25D366] text-white',
     description: 'Bagus untuk sekadar bertukar pesan, namun sangat kacau untuk mengurus transparansi kas.',
@@ -28,8 +44,12 @@ const COMPETITORS = [
     ]
   },
   {
-    id: 'superapp' as CompetitorId,
-    label: 'Superapps (Komersial Ekstraktif)',
+    id: 'superapp',
+    label: (
+      <span>
+        <em>Superapps</em> (Komersial Ekstraktif)
+      </span>
+    ),
     icon: Smartphone,
     color: 'bg-indigo-600 text-white',
     description: 'Menawarkan kemudahan konsumerisme, namun menyedot perputaran ekonomi keluar dari wilayah Anda.',
@@ -49,15 +69,19 @@ const COMPETITORS = [
     ]
   },
   {
-    id: 'appkonvensional' as CompetitorId,
-    label: 'App Manajemen RT/RW Biasa',
+    id: 'appkonvensional',
+    label: (
+      <span>
+        Aplikasi Manajemen RT/RW Biasa
+      </span>
+    ),
     icon: Box,
     color: 'bg-zinc-800 text-white',
     description: 'Aplikasi manajemen kas berbayar yang biasanya rumit dan sulit digunakan oleh kalangan lansia.',
     weaknesses: [
       {
         title: 'Friksi Unduhan Berukuran Besar (App Fatigue)',
-        desc: 'Mewajibkan tiap warga mengunduh APK/Aplikasi berat via PlayStore. Lansia dan warga dengan HP memori penuh enggan menggunakannya.'
+        desc: 'Mewajibkan tiap warga mengunduh APK/Aplikasi berat via <em>Play Store</em>. Lansia dan warga dengan HP memori penuh enggan menggunakannya.'
       },
       {
         title: 'Model Berlangganan Membebani Kas',
@@ -70,15 +94,19 @@ const COMPETITORS = [
     ]
   },
   {
-    id: 'excel' as CompetitorId,
-    label: 'Buku Kas Excel Fisik',
+    id: 'excel',
+    label: (
+      <span>
+        Buku Kas <em>Excel</em> Fisik
+      </span>
+    ),
     icon: Calculator,
     color: 'bg-[#107C41] text-white',
     description: 'Metode pembukuan jadul yang sangat menguras tenaga dan waktu para pengurus secara gratisan.',
     weaknesses: [
       {
         title: 'Rentan Rusak dan Hilang Sepihak',
-        desc: 'Satu harddisk rusak atau satu buku hilang, maka riwayat keuangan kas puluhan juta rupiah hangus tak berbekas.'
+        desc: 'Satu <em>hard disk</em> rusak atau satu buku hilang, maka riwayat keuangan kas puluhan juta rupiah hangus tak berbekas.'
       },
       {
         title: 'Krisis Kepercayaan & Beban Fitnah',
@@ -86,7 +114,7 @@ const COMPETITORS = [
       },
       {
         title: 'Kelelahan Rekonsiliasi Manual',
-        desc: 'Rekapitulasi Excel mengharuskan bendahara membuang waktu akhir pekan untuk mengetik ulang ratusan resi pembayaran.'
+        desc: 'Rekapitulasi <em>Excel</em> mengharuskan bendahara membuang waktu akhir pekan untuk mengetik ulang ratusan resi pembayaran.'
       }
     ]
   }
@@ -134,7 +162,7 @@ export default function EcosystemBenchmarking() {
             Mengapa Sistem Konvensional Selalu Merugikan Komunitas Anda?
           </h2>
           <p className="text-sm text-on-surface-variant leading-relaxed">
-            Menjalankan siklus ekonomi dan kepercayaan puluhan warga tidak cukup hanya bermodalkan pesan teks atau aplikasi pencatat utang. URUN lahir sebagai antitesis dari titik buta platform komersial saat ini.
+            Menjalankan siklus ekonomi dan kepercayaan puluhan warga tidak cukup hanya bermodalkan pesan teks atau aplikasi pencatat utang. URUN lahir sebagai antitesis dari titik buta <em>platform</em> komersial saat ini.
           </p>
         </div>
 
@@ -183,13 +211,15 @@ export default function EcosystemBenchmarking() {
               {/* Top Banner indicating VS URUN */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-outline-variant/30 pb-6">
                 <div>
-                  <h4 className="text-xl font-black text-on-surface">Kelemahan {activeData.label}</h4>
+                  <h4 className="text-xl font-black text-on-surface flex items-center gap-1.5">
+                    Kelemahan {activeData.label}
+                  </h4>
                   <p className="text-xs text-on-surface-variant mt-1.5">{activeData.description}</p>
                 </div>
                 
                 <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-primary/20 shrink-0 text-center">
                   <span className="block text-[9px] uppercase tracking-wider text-primary font-black font-mono">Ditebas Oleh</span>
-                  <span className="block text-lg font-black text-primary leading-none mt-1">URUN OS</span>
+                  <span className="block text-lg font-black text-primary leading-none mt-1">URUN <em>OS</em></span>
                 </div>
               </div>
 
@@ -202,7 +232,10 @@ export default function EcosystemBenchmarking() {
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <h5 className="font-bold text-on-surface text-sm">{weakness.title}</h5>
-                      <p className="text-xs text-on-surface-variant leading-relaxed">{weakness.desc}</p>
+                      <p 
+                        className="text-xs text-on-surface-variant leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: weakness.desc }}
+                      />
                     </div>
                   </div>
                 ))}
@@ -217,7 +250,7 @@ export default function EcosystemBenchmarking() {
                   <div>
                     <h5 className="text-sm font-black text-white uppercase tracking-wider font-mono mb-1">Paradigma URUN</h5>
                     <p className="text-[11px] text-zinc-300 leading-relaxed">
-                      Sistem Operasi URUN 100% mendemokratisasi pencatatan. Tidak ada friksi karena notifikasi langsung terkirim via Webhook WhatsApp Gateway, sementara datanya diamankan secara persisten dalam PostgreSQL berbasis Integer-ledger di server awan mutakhir.
+                      Sistem URUN mempermudah pencatatan gotong royong secara otomatis. Laporan iuran dan kas terkirim langsung ke obrolan <em>WhatsApp</em> warga secara transparan, sementara saldonya tersimpan aman dan akurat di sistem komputasi berstandar tinggi.
                     </p>
                   </div>
                 </div>

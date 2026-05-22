@@ -53,7 +53,7 @@ export default function TentangPage() {
             </div>
             <h3 className="text-lg font-black text-zinc-900 mb-3">Keamanan Data Warga</h3>
             <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-semibold">
-              Seluruh data penting seperti nomor WhatsApp, profil keluarga, dan catatan iuran Anda disimpan dengan aman dan rahasia. Data ini diisolasi secara ketat dan tidak akan pernah dibagikan atau dijual ke pihak luar untuk keperluan iklan.
+              Seluruh data penting seperti nomor <em>WhatsApp</em>, profil keluarga, dan catatan iuran Anda disimpan dengan aman dan rahasia. Data ini diisolasi secara ketat dan tidak akan pernah dibagikan atau dijual ke pihak luar untuk keperluan iklan.
             </p>
           </div>
           
@@ -63,7 +63,7 @@ export default function TentangPage() {
             </div>
             <h3 className="text-lg font-black text-zinc-900 mb-3">Efisiensi Gotong Royong</h3>
             <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-semibold">
-              Membantu warga mendapatkan kebutuhan pokok atau iuran pembangunan sarana lingkungan dengan harga terbaik tanpa perantara. Sebagian sisa hasil iuran/procurement dikembalikan langsung sebagai dana kas sosial warga.
+              Membantu warga mendapatkan kebutuhan pokok atau iuran pembangunan sarana lingkungan dengan harga terbaik tanpa perantara. Sebagian sisa hasil iuran/<em>procurement</em> dikembalikan langsung sebagai dana kas sosial warga.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export default function TentangPage() {
               <div className="aspect-[4/3] rounded-3xl bg-zinc-100 border border-zinc-200 shadow-inner relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer hover:bg-zinc-200 transition-colors">
                 <div className="absolute inset-0 bg-gradient-to-tr from-zinc-200/50 to-transparent" />
                 <PlayCircle className="w-16 h-16 text-zinc-300 group-hover:text-emerald-500 transition-colors relative z-10" />
-                <p className="mt-4 text-xs font-bold text-zinc-400 uppercase tracking-widest relative z-10">Animasi: Cara Iuran via WA</p>
+                <p className="mt-4 text-xs font-bold text-zinc-400 uppercase tracking-widest relative z-10">Animasi: Cara Iuran via <em>WhatsApp</em></p>
               </div>
             </div>
             <div className="w-full md:w-1/2 order-1 md:order-2 space-y-4">
@@ -107,7 +107,7 @@ export default function TentangPage() {
               </div>
               <h3 className="text-3xl font-bold text-zinc-900 leading-tight">Buku Kas Terkunci</h3>
               <p className="text-zinc-600 leading-relaxed text-base font-semibold">
-                Iuran lingkungan kini tercatat dalam <strong>Buku Kas Terkunci</strong> secara otomatis. Setiap uang masuk dan keluar akan langsung terdistribusi kepada seluruh warga secara *real-time* via WhatsApp. Pengurus tidak bisa menghapus histori pengeluaran tanpa jejak.
+                Iuran lingkungan kini tercatat dalam <strong>Buku Kas Terkunci</strong> secara otomatis. Setiap uang masuk dan keluar akan langsung terdistribusi kepada seluruh warga secara <em>real-time</em> via <em>WhatsApp</em>. Pengurus tidak bisa menghapus histori pengeluaran tanpa jejak.
               </p>
               <button className="inline-flex items-center gap-2 font-bold text-emerald-600 hover:text-emerald-500 transition-colors pt-2 group">
                 Lihat Panduan <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -125,7 +125,7 @@ export default function TentangPage() {
               </div>
               <h3 className="text-3xl font-bold text-zinc-900 leading-tight">Mendukung Dagangan Tetangga</h3>
               <p className="text-zinc-600 leading-relaxed text-base font-semibold">
-                Jelajahi etalase warga setempat. Beli sembako atau pesan jasa perbaikan langsung dari tetangga tanpa potongan biaya platform. Pesanan dan negosiasi berlangsung privat, namun integritas penjual dijamin lewat ulasan warga.
+                Jelajahi etalase warga setempat. Beli sembako atau pesan jasa perbaikan langsung dari tetangga tanpa potongan biaya <em>platform</em>. Pesanan dan negosiasi berlangsung privat, namun integritas penjual dijamin lewat ulasan warga.
               </p>
               <Link href="/catalog" className="inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-500 transition-colors pt-2 group">
                 Buka Katalog Warga <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -135,7 +135,7 @@ export default function TentangPage() {
               <div className="aspect-[4/3] rounded-3xl bg-zinc-100 border border-zinc-200 shadow-inner relative overflow-hidden flex flex-col items-center justify-center group cursor-pointer hover:bg-zinc-200 transition-colors">
                 <div className="absolute inset-0 bg-gradient-to-tr from-zinc-200/50 to-transparent" />
                 <PlayCircle className="w-16 h-16 text-zinc-300 group-hover:text-blue-500 transition-colors relative z-10" />
-                <p className="mt-4 text-xs font-bold text-zinc-400 uppercase tracking-widest relative z-10">Animasi: Checkout Otomatis</p>
+                <p className="mt-4 text-xs font-bold text-zinc-400 uppercase tracking-widest relative z-10">Animasi: <em>Checkout</em> Otomatis</p>
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function TentangPage() {
               </div>
               <h3 className="text-3xl font-bold text-zinc-900 leading-tight">Persetujuan Bersama</h3>
               <p className="text-zinc-600 leading-relaxed text-base font-semibold">
-                Protokol keamanan URUN menjamin pengeluaran kas yang besar tidak bisa dilakukan sepihak. Harus ada <strong>Persetujuan Bersama</strong> dari mayoritas warga atau pengurus (lewat voting bot WhatsApp) sebelum dana dicairkan. Uang Anda, keputusan Anda.
+                Protokol keamanan URUN menjamin pengeluaran kas yang besar tidak bisa dilakukan sepihak. Harus ada <strong>Persetujuan Bersama</strong> dari mayoritas warga atau pengurus (lewat <em>voting bot WhatsApp</em>) sebelum dana dicairkan. Uang Anda, keputusan Anda.
               </p>
               <button className="inline-flex items-center gap-2 font-bold text-indigo-600 hover:text-indigo-500 transition-colors pt-2 group">
                 Simulasikan Persetujuan <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

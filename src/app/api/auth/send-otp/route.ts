@@ -15,14 +15,65 @@ export async function POST(req: NextRequest) {
     const formattedPhone = formatPhoneNumber(phone);
 
     // 1. Kedaulatan Profil: Pastikan nomor terdaftar di Sovereign Core
-    const { data: profile, error } = await supabaseAdmin
+    let { data: profile, error } = await supabaseAdmin
       .from('profiles')
       .select('id, full_name')
       .eq('phone', formattedPhone)
       .single();
 
     if (error || !profile) {
-      return NextResponse.json({ error: 'Nomor WhatsApp Anda belum terdaftar. Silakan hubungi Pengurus Lingkungan.' }, { status: 404 });
+      console.log(`Auto-registering phone number: ${formattedPhone}`);
+      const shadowEmail = `${formattedPhone}@warga.urun.local`;
+      const fullName = formattedPhone === '6282316363177' ? 'Muh Zadit' : 'Warga Baru (Auto)';
+
+      try {
+        const { data: listData } = await supabaseAdmin.auth.admin.listUsers();
+        let authUser = listData?.users?.find(u => u.phone === formattedPhone || u.email === shadowEmail);
+
+        if (!authUser) {
+          const { data: createData, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+            email: shadowEmail,
+            phone: formattedPhone,
+            email_confirm: true,
+            phone_confirm: true,
+            user_metadata: { full_name: fullName }
+          });
+          if (createErr) {
+            console.error('Shadow Account Creation failed:', createErr);
+            return NextResponse.json({ error: 'Nomor WhatsApp Anda belum terdaftar. Silakan hubungi Pengurus Lingkungan.' }, { status: 404 });
+          }
+          authUser = createData.user;
+        }
+
+        if (authUser) {
+          // Insert into profiles
+          await supabaseAdmin.from('profiles').insert({
+            id: authUser.id,
+            full_name: fullName,
+            phone: formattedPhone,
+            global_role: 'user'
+          });
+
+          // Insert into community_members
+          await supabaseAdmin.from('community_members').insert({
+            profile_id: authUser.id,
+            community_id: 'demo-community-id',
+            role: 'warga',
+            reputation_score: 10
+          });
+
+          // Re-fetch profile
+          const { data: newProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('id, full_name')
+            .eq('id', authUser.id)
+            .single();
+          profile = newProfile;
+        }
+      } catch (regErr: any) {
+        console.error('Auto-registration failed:', regErr);
+        return NextResponse.json({ error: 'Nomor WhatsApp Anda belum terdaftar. Silakan hubungi Pengurus Lingkungan.' }, { status: 404 });
+      }
     }
 
     // 2. Buat Tantangan OTP (6 Digit Angka Numerik)
@@ -48,7 +99,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Kirim via Fonnte Gateway secara Asinkron
-    const msg = `*URUN DANA - KODE KEAMANAN*\n\nHalo ${profile.full_name}, kode masuk Anda adalah:\n\n*${otp}*\n\nJANGAN berikan kode ini kepada siapapun, termasuk pengurus. Kode hanya berlaku selama 3 menit.`;
+    const msg = `*URUN DANA - KODE KEAMANAN*\n\nHalo ${profile?.full_name || 'Tetangga'}, kode masuk Anda adalah:\n\n*${otp}*\n\nJANGAN berikan kode ini kepada siapapun, termasuk pengurus. Kode hanya berlaku selama 3 menit.`;
     sendWhatsappMessageAsync(formattedPhone, msg);
 
     return NextResponse.json({ success: true, message: 'OTP berhasil dikirim ke WhatsApp Anda.' });
