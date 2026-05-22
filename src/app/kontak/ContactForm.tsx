@@ -26,16 +26,19 @@ export default function ContactForm() {
 
   useEffect(() => {
     // Anti-scraping: build contact info on client side
-    const user = "muhzadit";
-    const domain = "gmail.com";
-    const wa = "6282316363177";
-    const waDisplay = "0823-1636-3177";
-    
-    setContactInfo({
-      email: `${user}@${domain}`,
-      phoneDisplay: waDisplay,
-      phoneLink: `https://wa.me/${wa}?text=Halo%20URUN,%20saya%20ingin%20berdiskusi%20mengenai...`
-    });
+    const timer = setTimeout(() => {
+      const user = "muhzadit";
+      const domain = "gmail.com";
+      const wa = "6282316363177";
+      const waDisplay = "0823-1636-3177";
+      
+      setContactInfo({
+        email: `${user}@${domain}`,
+        phoneDisplay: waDisplay,
+        phoneLink: `https://wa.me/${wa}?text=Halo%20URUN,%20saya%20ingin%20berdiskusi%20mengenai...`
+      });
+    }, 0);
+    return () => clearTimeout(timer);
   }, [topic]);
 
   const handleSubmit = (e: React.FormEvent) => {

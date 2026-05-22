@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Play, Shield, Lock, ArrowRight, Activity, Users, FileText } from "lucide-react";
+import { Play, Shield, Lock, ArrowRight, Users } from "lucide-react";
 
 export const metadata = {
   title: "Demo Sandboxed - URUN",
