@@ -314,9 +314,11 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col flex-1 w-full relative overflow-x-hidden bg-surface text-on-surface">
       
-      {/* Background Radial Glow accents */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse duration-[8000ms]"></div>
-      <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+      {/* WRAPPER HERO & BLOB - Mencegah Offside */}
+      <div className="relative w-full overflow-hidden">
+        {/* Background Radial Glow accents */}
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse duration-[8000ms]"></div>
+        <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
       {/* ========================================================
           1. HERO SECTION: THE HOOK
@@ -527,7 +529,7 @@ export default function LandingPage() {
                     {messages.map((msg, i) => (
                       <div key={i} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                         <div
-                          className={`max-w-[90%] rounded-xl p-2.5 shadow-sm whitespace-pre-wrap ${
+                          className={`max-w-[90%] min-w-0 break-words rounded-xl p-2.5 shadow-sm whitespace-pre-wrap ${
                             msg.sender === "user"
                               ? "bg-primary text-white rounded-tr-none"
                               : "bg-[#F5F3EF] text-on-surface rounded-tl-none border border-outline-variant/40"
@@ -587,6 +589,7 @@ export default function LandingPage() {
         </div>
 
       </section>
+      </div>
 
       {/* SQL AND SYSTEM GUARANTEES PANEL (Displayed when active tab is WhatsApp to show what happens under the hood) */}
       {emulatorTab === "whatsapp" && activeExplain && (
@@ -1196,7 +1199,7 @@ export default function LandingPage() {
           </div>
 
           {/* Collapsible Tech Visuals (Pure React transition-based drawer) */}
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedTechId ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedTechId ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"}`}>
             {expandedTechId && (
               <div className="bg-[#131b2e] text-white rounded-3xl p-6 md:p-8 font-mono text-[11px] border border-[#1e293b] leading-relaxed shadow-lg mt-4 relative">
                 <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -1341,7 +1344,7 @@ function verifikasiLogistikCallback(reqHeaders: any, rawPayload: string): boolea
           8. PRIVACY BANNER: LAW PDP COMPLIANT
           ======================================================== */}
       {showPrivacyBanner && (
-        <div className="fixed bottom-0 left-0 w-full z-50 p-4 animate-in slide-in-from-bottom-full duration-500">
+        <div className="fixed bottom-16 md:bottom-0 left-0 w-full z-[60] p-4 animate-in slide-in-from-bottom-full duration-500">
           <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-xl border border-primary/20 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col sm:flex-row items-center gap-6">
             <div className="flex items-start gap-4 flex-1">
               <ShieldCheck className="w-8 h-8 text-primary shrink-0 mt-1" />

@@ -93,7 +93,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-surface text-on-surface selection:bg-primary/20 selection:text-primary">
         <ProgressBar />
         <Navbar session={session} reputationScore={reputationScore} />
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col pb-16 md:pb-0">
           {children}
         </main>
         <Footer />

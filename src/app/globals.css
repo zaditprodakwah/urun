@@ -42,7 +42,8 @@
   --color-on-error-container: #93000a;
 }
 
-body {
+html, body {
   background-color: var(--color-surface);
   color: var(--color-on-surface);
+  overflow-x: hidden;
 }
