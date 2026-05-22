@@ -1,19 +1,11 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import { Star, ShieldCheck, Activity, BarChart4, MessageSquareQuote } from 'lucide-react';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { supabaseBrowser } from '@/lib/supabase';
 
-export default async function LivingSocialProof() {
-  // 1. Fetch real 5-star reviews from database for authentic social proof
-  const { data: realReviews } = await supabaseAdmin
-    .from('catalog_reviews')
-    .select('id, rating, comment, profiles(full_name)')
-    .eq('rating', 5)
-    .not('comment', 'is', null)
-    .order('created_at', { ascending: false })
-    .limit(3);
-
-  // 2. Fallback Mock Data if the platform is brand new and has < 3 reviews
-  const fallbackTestimonials = [
+export default function LivingSocialProof() {
+  const [displayTestimonials, setDisplayTestimonials] = useState<any[]>([
     {
       id: 'mock-1',
       role: "Mantan Bendahara Lingkungan",
@@ -35,26 +27,42 @@ export default async function LivingSocialProof() {
       content: "Sebagai orang IT, saya salut dengan Row-Level Security URUN. Privasi nomor HP dan foto mutasi KTP dijamin tidak akan pernah bocor lintas RT. Sepadan dengan enkripsi e-Banking.",
       rating: 5,
     }
-  ];
+  ]);
 
-  let displayTestimonials = fallbackTestimonials;
-  
-  if (realReviews && realReviews.length >= 3) {
-    displayTestimonials = realReviews.map((r: any) => {
-      // Anonymize name (UU PDP No 27/2022) e.g. "Budi Santoso" -> "B*** S******"
-      const rawName = r.profiles?.full_name || 'Warga URUN';
-      const nameParts = rawName.split(' ');
-      const anonName = nameParts.map((p: string) => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ');
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const { data } = await supabaseBrowser
+          .from('catalog_reviews')
+          .select('id, rating, comment, profiles(full_name)')
+          .eq('rating', 5)
+          .not('comment', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(3);
 
-      return {
-        id: r.id,
-        role: `Warga Terverifikasi (${anonName})`,
-        location: "Katalog Komunitas URUN",
-        content: r.comment,
-        rating: r.rating
-      };
-    });
-  }
+        if (data && data.length >= 3) {
+          const formatted = data.map((r: any) => {
+            const rawName = r.profiles?.full_name || 'Warga URUN';
+            const nameParts = rawName.split(' ');
+            const anonName = nameParts.map((p: string) => p.length > 1 ? p[0] + '*'.repeat(p.length - 1) : p).join(' ');
+
+            return {
+              id: r.id,
+              role: `Warga Terverifikasi (${anonName})`,
+              location: "Katalog Komunitas URUN",
+              content: r.comment,
+              rating: r.rating
+            };
+          });
+          setDisplayTestimonials(formatted);
+        }
+      } catch (err) {
+        console.error('Failed to fetch reviews', err);
+      }
+    }
+    
+    fetchReviews();
+  }, []);
 
   const schemaJson = {
     "@context": "https://schema.org",
