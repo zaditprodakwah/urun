@@ -155,7 +155,6 @@ export default function LandingPage() {
   const averageCommissionRate = 0.05; // 5% flat affiliate capture rate
   const totalBelanjaBulanan = jumlahKK * belanjaBulanan;
   const totalBelanjaTahunan = totalBelanjaBulanan * 12;
-  const totalKomisiBulanan = totalBelanjaBulanan * averageCommissionRate;
   const totalKomisiTahunan = totalBelanjaTahunan * averageCommissionRate;
 
   // 70 / 30 Blueprint circular allocation

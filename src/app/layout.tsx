@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-server";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Fallback font variables to resolve offline build connection issues during Turbopack compilation
+const geistSans = {
+  variable: "font-sans-fallback",
+};
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistMono = {
+  variable: "font-mono-fallback",
+};
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://urunwarga.vercel.app';
 

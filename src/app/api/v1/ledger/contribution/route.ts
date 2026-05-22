@@ -21,10 +21,28 @@ export async function POST(req: NextRequest) {
     // 1. Read raw body text for accurate HMAC verification
     const rawBody = await req.text();
     const signature = req.headers.get('x-urun-signature') || req.headers.get('X-Urun-Signature');
+    const timestampStr = req.headers.get('x-urun-timestamp') || req.headers.get('X-Urun-Timestamp');
 
     if (!signature) {
       return NextResponse.json({ 
         error: 'UNAUTHORIZED: Header "x-urun-signature" tidak ditemukan.' 
+      }, { status: 401 });
+    }
+
+    if (!timestampStr) {
+      return NextResponse.json({ 
+        error: 'UNAUTHORIZED: Header "x-urun-timestamp" tidak ditemukan.' 
+      }, { status: 401 });
+    }
+
+    // 1.5. Mitigasi Replay Attack (Maksimum selisih 300 detik)
+    const requestTimestamp = parseInt(timestampStr, 10);
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    if (isNaN(requestTimestamp) || Math.abs(currentTimestamp - requestTimestamp) > 300) {
+      console.warn(`❌ Replay Attack Blocked: timestamp diff was ${Math.abs(currentTimestamp - requestTimestamp)}s.`);
+      return NextResponse.json({ 
+        error: 'UNAUTHORIZED: Request kedaluwarsa atau perbedaan waktu server terlalu besar (> 300 detik).' 
       }, { status: 401 });
     }
 
@@ -145,11 +163,15 @@ export async function POST(req: NextRequest) {
 
     if (result.status === 'multisig_required') {
       console.log(`📡 Third-party contribution redirected to Multi-Sig request ID: ${result.multisig_id}`);
-      return NextResponse.json({
+      const pendingResponse = {
         status: 'multisig_required',
-        message: 'Kontribusi berhasil diterima tetapi memerlukan persetujuan Multi-Sig pengurus karena melebihi batas batas ambang.',
+        message: 'Kontribusi berhasil diterima tetapi memerlukan persetujuan Multi-Sig pengurus karena melebihi batas ambang.',
         multisig_id: result.multisig_id
-      }, { status: 202 });
+      };
+
+      await saveIdempotencyResult(supabaseAdmin, idempotency_key, 202, pendingResponse);
+
+      return NextResponse.json(pendingResponse, { status: 202 });
     }
 
     if (result.status === 'error') {

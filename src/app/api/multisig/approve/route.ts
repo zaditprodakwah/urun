@@ -2,16 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 import { sendWhatsappMessage, formatIDR } from '@/lib/whatsapp';
 import { sendReputationNotif } from '@/lib/notifications';
+import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'UNAUTHORIZED: Silakan login terlebih dahulu.' }, { status: 401 });
+    }
+
     const body = await req.json().catch(() => ({}));
     const { requestId, memberId } = body;
 
-    if (!requestId || !memberId) {
-      return NextResponse.json({ error: 'requestId and memberId are required.' }, { status: 400 });
+    if (!requestId) {
+      return NextResponse.json({ error: 'requestId is required.' }, { status: 400 });
     }
 
     // 1. Fetch the multisig request details
@@ -24,6 +30,26 @@ export async function POST(req: NextRequest) {
     if (msigErr || !msig) {
       return NextResponse.json({ error: 'Request Multi-Sig tidak ditemukan.' }, { status: 404 });
     }
+
+    // Fail-Safe: Resolve and verify authenticated member ID from real-time database
+    const { data: currentMember, error: currMemErr } = await supabaseAdmin
+      .from('community_members')
+      .select('id, role')
+      .eq('profile_id', session.userId)
+      .eq('community_id', msig.community_id)
+      .single();
+
+    if (currMemErr || !currentMember) {
+      return NextResponse.json({ error: 'FORBIDDEN: Keanggotaan Anda tidak ditemukan di simpul komunitas ini.' }, { status: 403 });
+    }
+
+    // In production, force using the authenticated member ID to prevent client-side spoofing.
+    // In development/simulation, fallback to provided memberId only if it represents a valid pengurus.
+    let resolvedMemberId = currentMember.id;
+    if (process.env.NODE_ENV !== 'production' && memberId) {
+      resolvedMemberId = memberId;
+    }
+
 
     // 2. Check if request is still pending
     if (msig.status !== 'pending') {
@@ -74,7 +100,7 @@ export async function POST(req: NextRequest) {
           phone
         )
       `)
-      .eq('id', memberId)
+      .eq('id', resolvedMemberId)
       .eq('community_id', msig.community_id)
       .single();
 
@@ -89,14 +115,14 @@ export async function POST(req: NextRequest) {
 
     // 5. Check if member already signed
     const approvalsList = Array.isArray(msig.approvals) ? msig.approvals : [];
-    const alreadySigned = approvalsList.some((app: any) => app.member_id === memberId);
+    const alreadySigned = approvalsList.some((app: any) => app.member_id === resolvedMemberId);
     if (alreadySigned) {
       return NextResponse.json({ error: 'Anda sudah menandatangani permintaan Multi-Sig ini sebelumnya.' }, { status: 400 });
     }
 
     // 6. Record signature
     const newApproval = {
-      member_id: memberId,
+      member_id: resolvedMemberId,
       approved_at: new Date().toISOString(),
       signature: `SIG_${crypto.randomUUID().slice(0, 8)}`,
       full_name: member.profiles?.full_name || 'Pengurus'
@@ -162,7 +188,7 @@ export async function POST(req: NextRequest) {
         .from('audit_log')
         .insert({
           community_id: msig.community_id,
-          actor_id: memberId,
+          actor_id: resolvedMemberId,
           action: 'multisig_approved',
           table_affected: 'ledger',
           new_value: { ledger_id: ledgerEntry.id, request_id: msig.id, direction, entryType },
@@ -256,7 +282,7 @@ export async function POST(req: NextRequest) {
         .from('audit_log')
         .insert({
           community_id: msig.community_id,
-          actor_id: memberId,
+          actor_id: resolvedMemberId,
           action: 'multisig_signed',
           table_affected: 'multisig_requests',
           new_value: { request_id: msig.id, current_sigs: newSigsCount },

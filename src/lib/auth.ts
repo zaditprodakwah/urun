@@ -93,11 +93,32 @@ export async function requireAuth(): Promise<UserSession> {
   return session;
 }
 
-// Server Component Guard: require specific role(s)
+// Server Component Guard: require specific role(s) with database fail-safe verification
 export async function requireRole(allowedRoles: ('warga' | 'pengurus' | 'admin')[]): Promise<UserSession> {
   const session = await requireAuth();
-  if (!allowedRoles.includes(session.role)) {
-    throw new Error('FORBIDDEN');
+
+  // Fail-Safe Real-time Verification for administrative roles
+  if (allowedRoles.includes('admin') || allowedRoles.includes('pengurus')) {
+    const { data: member, error } = await supabaseAdmin
+      .from('community_members')
+      .select('role')
+      .eq('profile_id', session.userId)
+      .eq('community_id', session.communityId)
+      .single();
+
+    if (error || !member || !allowedRoles.includes(member.role as any)) {
+      console.warn(`⚠️ Real-time role verification failed for user ${session.userId} in community ${session.communityId}. Expected administrative role.`);
+      throw new Error('FORBIDDEN');
+    }
+
+    // Keep the session role synchronized with the real-time database role
+    session.role = member.role as any;
+  } else {
+    // Normal role check with standard session fallback
+    if (!allowedRoles.includes(session.role)) {
+      throw new Error('FORBIDDEN');
+    }
   }
+
   return session;
 }

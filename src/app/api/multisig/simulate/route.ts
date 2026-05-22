@@ -15,7 +15,20 @@ export async function POST(req: NextRequest) {
     }
     
     const communityId = session.communityId;
-    const actorId = session.profileId;
+    
+    // Resolve community_members.id from profile_id & community_id to prevent foreign key constraint violations
+    const { data: currentMember, error: currMemErr } = await supabaseAdmin
+      .from('community_members')
+      .select('id')
+      .eq('profile_id', session.userId)
+      .eq('community_id', communityId)
+      .single();
+
+    if (currMemErr || !currentMember) {
+      return NextResponse.json({ error: 'FORBIDDEN: Keanggotaan Anda tidak ditemukan di simpul komunitas ini.' }, { status: 403 });
+    }
+
+    const actorId = currentMember.id;
 
     const body = await req.json().catch(() => ({}));
     const amount = body.amount || 7500000; // Default Rp 7.500.000 (exceeds Rp 5.000.000 threshold)

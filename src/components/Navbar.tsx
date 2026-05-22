@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, LayoutDashboard, Shield, LogOut } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Shield, LogOut, Home, ShoppingBag, Trophy, Info, User } from "lucide-react";
 import type { UserSession } from "@/lib/auth";
 import SyncStatusIndicator from "@/components/SyncStatusIndicator";
 
@@ -13,7 +13,6 @@ interface NavbarProps {
 }
 
 export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
 
@@ -34,167 +33,180 @@ export default function Navbar({ session, reputationScore = 0 }: NavbarProps) {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-surface/80 border-b border-outline-variant/50 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-sm shadow-primary/10 group-hover:shadow-primary/20 transition-shadow">
-            <span className="text-xl font-bold text-white">U</span>
+    <>
+      {/* ================= DESKTOP & MOBILE STATIC TOP HEADER ================= */}
+      <nav className="sticky top-0 z-40 w-full backdrop-blur-md bg-surface/90 border-b border-outline-variant/60 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          
+          {/* Logo Brand */}
+          <Link href="/" className="flex items-center gap-3 shrink-0 group min-h-[48px] px-1">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-sm shadow-primary/10 group-hover:shadow-primary/20 transition-shadow">
+              <span className="text-lg font-extrabold text-white">U</span>
+            </div>
+            <span className="text-lg font-black tracking-tight text-on-surface group-hover:text-primary transition-colors">URUN</span>
+          </Link>
+
+          {/* Desktop Navigation Links (hidden on mobile) */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-xs font-black uppercase tracking-wider transition-all py-5 border-b-2 ${
+                    isActive 
+                      ? "text-primary border-primary" 
+                      : "text-on-surface-variant/80 hover:text-on-surface border-transparent"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
-          <span className="text-xl font-bold tracking-tight text-on-surface group-hover:text-primary transition-colors">URUN</span>
-        </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors py-5 border-b-2 ${
-                  isActive 
-                    ? "text-primary border-primary" 
-                    : "text-on-surface-variant/80 hover:text-on-surface border-transparent"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </div>
+          {/* Top Bar Indicators & Auth (Desktop & Mobile Header Status) */}
+          <div className="flex items-center justify-end gap-3 sm:gap-4">
+            <SyncStatusIndicator />
 
-        {/* Auth Section (Desktop) */}
-        <div className="hidden md:flex items-center justify-end gap-4 min-w-[200px]">
-          <SyncStatusIndicator />
-          {!session ? (
-            <Link
-              href="/login"
-              className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-full hover:bg-primary-container hover:shadow-md transition-all active:scale-95"
-            >
-              Masuk Komunitas
-            </Link>
-          ) : (
-            <div className="relative">
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-                className="flex items-center gap-2 p-1.5 pr-3 rounded-full border border-outline-variant bg-surface-container-low hover:bg-surface-container transition-colors"
-              >
-                <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-xs font-bold uppercase">
-                  {session.name ? session.name.substring(0, 2) : "UR"}
-                </div>
-                <span className="text-sm font-medium text-on-surface truncate max-w-[100px]">
-                  {session.name}
-                </span>
-                <ChevronDown className={`w-4 h-4 text-on-surface-variant transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
+            {/* Desktop Auth Section */}
+            <div className="hidden md:flex items-center gap-4 min-w-[150px] justify-end">
+              {!session ? (
+                <Link
+                  href="/login"
+                  className="px-5 py-2 text-xs font-black uppercase tracking-wider text-white bg-primary rounded-full hover:bg-primary-container hover:shadow-md transition-all active:scale-95 min-h-[40px] flex items-center"
+                >
+                  Masuk Komunitas
+                </Link>
+              ) : (
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
+                    className="flex items-center gap-2 p-1 rounded-full border border-outline-variant bg-surface-container-low hover:bg-surface-container transition-colors min-h-[40px] px-2.5"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-[10px] font-black uppercase">
+                      {session.name ? session.name.substring(0, 2) : "UR"}
+                    </div>
+                    <span className="text-xs font-black text-on-surface truncate max-w-[90px]">
+                      {session.name}
+                    </span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-on-surface-variant transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
 
-              {/* Dropdown Menu */}
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-xl border border-outline-variant bg-surface shadow-lg overflow-hidden py-1">
-                  <div className="px-4 py-3 border-b border-outline-variant/60 bg-surface-container-low">
-                    <p className="text-xs text-on-surface-variant">Dedikasi: <span className="text-primary font-bold">{reputationScore} ★</span></p>
-                    <p className="text-xs text-on-surface-variant mt-0.5">Peran: <span className="text-on-surface font-medium capitalize">{session.role}</span></p>
-                  </div>
-                  
-                  <div className="p-2 space-y-1">
-                    <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
-                      <LayoutDashboard className="w-4 h-4 text-on-surface-variant" />
-                      Dashboard Warga
-                    </Link>
-                    
-                    {(session.role === 'pengurus' || session.role === 'admin') && (
-                      <Link href="/admin" className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
-                        <Shield className="w-4 h-4 text-primary" />
-                        Pusat Kendali Pengurus
-                      </Link>
-                    )}
-                  </div>
-                  
-                  <div className="p-2 border-t border-outline-variant/60">
-                    <button 
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-error hover:text-error/80 hover:bg-error-container/20 rounded-lg transition-colors text-left"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Keluar Sesi
-                    </button>
-                  </div>
+                  {/* Desktop Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 rounded-xl border border-outline-variant bg-white shadow-xl overflow-hidden py-1 z-50">
+                      <div className="px-4 py-3 border-b border-outline-variant/60 bg-surface-container-low">
+                        <p className="text-[10px] uppercase font-black text-zinc-400">Dedikasi Warga</p>
+                        <p className="text-xs font-black text-primary mt-0.5">{reputationScore} CP ★</p>
+                        <p className="text-[9px] font-black bg-emerald-500/10 text-emerald-800 px-2 py-0.5 rounded border border-emerald-500/20 inline-block uppercase tracking-wider mt-2 capitalize">{session.role}</p>
+                      </div>
+                      
+                      <div className="p-2 space-y-1">
+                        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+                          <LayoutDashboard className="w-4 h-4 text-on-surface-variant" />
+                          Dashboard Warga
+                        </Link>
+                        
+                        {(session.role === 'pengurus' || session.role === 'admin') && (
+                          <Link href="/admin" className="flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+                            <Shield className="w-4 h-4 text-primary" />
+                            Pusat Kendali
+                          </Link>
+                        )}
+                      </div>
+                      
+                      <div className="p-2 border-t border-outline-variant/60">
+                        <button 
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-xs font-black uppercase tracking-wider text-error hover:text-error/80 hover:bg-error-container/20 rounded-lg transition-colors text-left cursor-pointer"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Keluar Sesi
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* Mobile Hamburger */}
-        <div className="md:hidden flex items-center gap-3">
-          <SyncStatusIndicator />
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors"
-            aria-label="Menu"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu Drawer */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-[64px] left-0 w-full border-b border-outline-variant/60 bg-surface/95 backdrop-blur-xl shadow-lg">
-          <div className="px-4 py-4 flex flex-col space-y-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`px-3 py-2 text-base font-medium rounded-lg transition-colors ${
-                  pathname === link.href ? "bg-primary/10 text-primary" : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low"
-                }`}
+            {/* Mobile Mini Avatar Header indicator */}
+            {session && (
+              <Link 
+                href="/dashboard" 
+                className="md:hidden w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-[10px] font-black uppercase min-w-[32px]"
+                aria-label="Dashboard Warga"
               >
-                {link.label}
+                {session.name ? session.name.substring(0, 2) : "UR"}
               </Link>
-            ))}
-            
-            <div className="h-px bg-outline-variant/60 my-2"></div>
-            
-            {!session ? (
-              <Link
-                href="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full mt-2 px-5 py-3 text-center text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-container transition-colors"
-              >
-                Masuk Komunitas
-              </Link>
-            ) : (
-              <div className="space-y-3 pt-2">
-                <div className="px-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-on-surface">{session.name}</p>
-                    <p className="text-xs text-on-surface-variant capitalize">{session.role} • {reputationScore} ★</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low rounded-lg">
-                    <LayoutDashboard className="w-4 h-4" /> Dashboard Warga
-                  </Link>
-                  {(session.role === 'pengurus' || session.role === 'admin') && (
-                    <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-primary hover:bg-surface-container-low rounded-lg">
-                      <Shield className="w-4 h-4" /> Pusat Kendali Pengurus
-                    </Link>
-                  )}
-                  <button onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-error hover:bg-surface-container-low rounded-lg text-left">
-                    <LogOut className="w-4 h-4" /> Keluar Sesi
-                  </button>
-                </div>
-              </div>
             )}
           </div>
         </div>
-      )}
-    </nav>
+      </nav>
+
+      {/* ================= MOBILE BOTTOM-DOCKED TAB BAR ================= */}
+      {/* Visible only on screens < md, handles all key navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-outline-variant/60 flex justify-around items-center h-16 pb-safe z-40 shadow-lg px-2">
+        {/* Tab 1: Beranda */}
+        <Link 
+          href="/" 
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+            pathname === "/" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
+          }`}
+        >
+          <Home className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-black uppercase tracking-wider">Beranda</span>
+        </Link>
+
+        {/* Tab 2: Katalog */}
+        <Link 
+          href="/catalog" 
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+            pathname.startsWith("/catalog") ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
+          }`}
+        >
+          <ShoppingBag className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-black uppercase tracking-wider">Katalog</span>
+        </Link>
+
+        {/* Tab 3: Leaderboard */}
+        <Link 
+          href="/leaderboard" 
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+            pathname === "/leaderboard" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
+          }`}
+        >
+          <Trophy className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-black uppercase tracking-wider">Papan</span>
+        </Link>
+
+        {/* Tab 4: Tentang */}
+        <Link 
+          href="/tentang" 
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+            pathname === "/tentang" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
+          }`}
+        >
+          <Info className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-black uppercase tracking-wider">Tentang</span>
+        </Link>
+
+        {/* Tab 5: Akun */}
+        <Link 
+          href={session ? "/dashboard" : "/login"} 
+          className={`flex flex-col items-center justify-center flex-1 h-full min-h-[48px] transition-all ${
+            pathname === "/dashboard" || pathname === "/login" ? "text-primary font-black" : "text-on-surface-variant/80 hover:text-on-surface"
+          }`}
+        >
+          <User className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-black uppercase tracking-wider">
+            {session ? "Akun" : "Masuk"}
+          </span>
+        </Link>
+      </nav>
+    </>
   );
 }
